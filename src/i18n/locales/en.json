@@ -1,0 +1,732 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "close": "Close",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "submit": "Submit",
+    "reset": "Reset",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "back": "Back",
+    "continue": "Continue",
+    "selectAll": "Select All",
+    "clearAll": "Clear All"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact",
+    "cart": "Cart",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "admin": "Admin",
+    "logout": "Logout",
+    "reviews": "Reviews",
+    "chat": "Chat",
+    "orders": "Orders",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "hero": {
+    "title": "Delicious Chicken Samosa",
+    "subtitle": "Fresh, crispy, and made with love",
+    "description": "Order now and experience the authentic taste of Bangladesh",
+    "orderNow": "Order Now",
+    "learnMore": "Learn More"
+  },
+  "products": {
+    "title": "Our Products",
+    "featured": "Featured Products",
+    "addToCart": "Add to Cart",
+    "outOfStock": "Out of Stock",
+    "viewDetails": "View Details",
+    "ingredients": "Ingredients",
+    "nutrition": "Nutrition",
+    "preparation": "Preparation Time",
+    "serving": "Serving Size",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "filters": "Filters",
+    "sortBy": "Sort By",
+    "category": "Category",
+    "priceRange": "Price Range",
+    "clearFilters": "Clear Filters",
+    "noResults": "No Products Found"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery Charge",
+    "finalTotal": "Final Total",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping",
+    "remove": "Remove",
+    "update": "Update"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "customerInfo": "Customer Information",
+    "deliveryAddress": "Delivery Address",
+    "paymentMethod": "Payment Method",
+    "orderSummary": "Order Summary",
+    "placeOrder": "Place Order",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email (Optional)",
+    "street": "Street Address",
+    "area": "Area",
+    "city": "City",
+    "district": "District",
+    "postalCode": "Postal Code (Optional)",
+    "paymentInstructions": "Payment Instructions",
+    "uploadScreenshot": "Upload Payment Screenshot"
+  },
+  "orders": {
+    "title": "My Orders",
+    "orderNumber": "Order Number",
+    "status": "Status",
+    "date": "Date",
+    "amount": "Amount",
+    "track": "Track Order",
+    "trackingTitle": "Order Tracking",
+    "statusHistory": "Status History",
+    "estimatedDelivery": "Estimated Delivery",
+    "statuses": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "out_for_delivery": "Out for Delivery",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    }
+  },
+  "reviews": {
+    "title": "Customer Reviews",
+    "writeReview": "Write Review",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submitReview": "Submit Review",
+    "helpful": "Helpful",
+    "notHelpful": "Not Helpful",
+    "verified": "Verified",
+    "adminResponse": "Restaurant Response",
+    "comingSoon": "Reviews Coming Soon",
+    "description": "Share your experience and read what others say about our delicious chicken samosas.",
+    "features": {
+      "ratings": "Star Ratings",
+      "ratingsDesc": "Rate products from 1 to 5 stars",
+      "detailed": "Detailed Reviews",
+      "detailedDesc": "Write comprehensive feedback",
+      "verified": "Verified Reviews",
+      "verifiedDesc": "Only from actual customers"
+    },
+    "preview": "Based on customer feedback",
+    "notifyMe": "Notify When Available"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember Me",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "createAccount": "Create Account",
+    "loginSuccess": "Successfully logged in",
+    "loginError": "Login error",
+    "registerSuccess": "Successfully registered",
+    "registerError": "Registration error",
+    "logoutSuccess": "Successfully logged out",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "nameRequired": "Name is required",
+    "phoneRequired": "Phone number is required"
+  },
+  "login": {
+    "comingSoon": "Login Coming Soon",
+    "description": "Secure login to access your account and manage your orders.",
+    "features": {
+      "secure": "Secure Access",
+      "secureDesc": "Protected with industry-standard security",
+      "profile": "Personal Profile",
+      "profileDesc": "Manage your personal information",
+      "privacy": "Privacy Protected",
+      "privacyDesc": "Your data is safe and secure"
+    },
+    "formPreview": "Login Form Preview",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Login to Account",
+    "notifyMe": "Notify When Available"
+  },
+  "register": {
+    "comingSoon": "Registration Coming Soon",
+    "description": "Create your account to start ordering delicious chicken samosas.",
+    "features": {
+      "secure": "Secure Registration",
+      "secureDesc": "Safe and protected account creation",
+      "verification": "Email Verification",
+      "verificationDesc": "Verify your email for security",
+      "profile": "Complete Profile",
+      "profileDesc": "Add delivery addresses and preferences"
+    },
+    "formPreview": "Registration Form Preview",
+    "namePlaceholder": "Enter your full name",
+    "emailPlaceholder": "Enter your email",
+    "phonePlaceholder": "Enter your phone number",
+    "addressPlaceholder": "Enter your address",
+    "registerButton": "Create Account",
+    "notifyMe": "Notify When Available"
+  },
+  "chat": {
+    "title": "Live Chat Support",
+    "startChat": "Start Chat",
+    "sendMessage": "Send Message",
+    "typing": "typing...",
+    "online": "Online",
+    "offline": "Offline",
+    "enterMessage": "Type your message...",
+    "comingSoon": "Live Chat Coming Soon",
+    "description": "Get instant help and support from our customer service team.",
+    "features": {
+      "realTime": "Real-time Messaging",
+      "realTimeDesc": "Instant responses from our team",
+      "notifications": "Smart Notifications",
+      "notificationsDesc": "Get notified of new messages",
+      "support": "24/7 Support",
+      "supportDesc": "Always available to help you"
+    },
+    "notifyMe": "Notify When Available"
+  },
+  "trackOrder": {
+    "title": "Track Your Order",
+    "subtitle": "Enter your order details to track the current status and delivery progress.",
+    "orderNumber": "Order Number",
+    "orderNumberPlaceholder": "Enter your order number",
+    "phoneNumber": "Phone Number",
+    "phoneNumberPlaceholder": "Enter your phone number",
+    "trackButton": "Track Order",
+    "tracking": "Tracking...",
+    "orderDetails": "Order Details",
+    "currentStatus": "Current Status",
+    "estimatedDelivery": "Estimated Delivery",
+    "statusHistory": "Order Status History",
+    "supportText": "Need help? Contact our support team at",
+    "status": {
+      "placed": "Order Placed",
+      "confirmed": "Order Confirmed",
+      "preparing": "Preparing Food",
+      "in_transit": "Out for Delivery",
+      "out_for_delivery": "Out for Delivery",
+      "delivered": "Delivered"
+    }
+  },
+  "returnPolicy": {
+    "title": "Return Policy",
+    "subtitle": "We want you to be completely satisfied with your order. Here's our return policy.",
+    "overview": {
+      "timeLimit": "24 Hour Return",
+      "timeLimitDesc": "Return items within 24 hours",
+      "guarantee": "Quality Guarantee",
+      "guaranteeDesc": "100% satisfaction guaranteed",
+      "process": "Easy Process",
+      "processDesc": "Simple return procedure"
+    },
+    "detailed": {
+      "title": "Detailed Return Policy"
+    },
+    "conditions": {
+      "title": "Return Conditions",
+      "fresh": "Food must be fresh and unopened",
+      "time": "Return request within 24 hours",
+      "packaging": "Original packaging required",
+      "receipt": "Order receipt or confirmation needed"
+    },
+    "process": {
+      "title": "Return Process",
+      "step1": "Contact our support team immediately",
+      "step2": "Provide order details and reason for return",
+      "step3": "Keep the food in original packaging",
+      "step4": "Wait for pickup or return instructions"
+    },
+    "nonReturnable": {
+      "title": "Non-Returnable Items",
+      "description": "The following items cannot be returned:",
+      "consumed": "Already consumed food items",
+      "damaged": "Customer damaged packaging",
+      "special": "Special promotional items"
+    },
+    "refund": {
+      "title": "Refund Policy",
+      "description": "Approved returns will be refunded via:",
+      "mobile": "Mobile banking (bKash, Nagad, Rocket)",
+      "bank": "Bank transfer for large amounts",
+      "timeline": "Refunds processed within 3-5 business days"
+    },
+    "contact": {
+      "title": "Need Help with Returns?",
+      "phone": "Call Us",
+      "phoneHours": "Available 24/7",
+      "email": "Email Us",
+      "emailResponse": "Response within 2 hours"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about our chicken samosas and services.",
+    "searchPlaceholder": "Search questions...",
+    "categories": {
+      "all": "All",
+      "ordering": "Ordering",
+      "delivery": "Delivery",
+      "payment": "Payment",
+      "product": "Products",
+      "account": "Account"
+    },
+    "ordering": {
+      "q1": "How do I place an order?",
+      "a1": "You can place an order through our website, mobile app, or by calling our hotline. Browse our menu, select items, and proceed to checkout.",
+      "q2": "What is the minimum order amount?",
+      "a2": "The minimum order amount is 200 BDT for delivery. There's no minimum for pickup orders."
+    },
+    "delivery": {
+      "q1": "What are your delivery areas?",
+      "a1": "We deliver across Dhaka city including Gulshan, Banani, Dhanmondi, Mirpur, Uttara, and surrounding areas.",
+      "q2": "How long does delivery take?",
+      "a2": "Standard delivery takes 30-45 minutes. During peak hours, it may take up to 60 minutes."
+    },
+    "payment": {
+      "q1": "What payment methods do you accept?",
+      "a1": "We accept cash on delivery, bKash, Nagad, Rocket, Upay, and major credit/debit cards.",
+      "q2": "Is online payment secure?",
+      "a2": "Yes, all online payments are processed through secure, encrypted gateways to protect your information."
+    },
+    "product": {
+      "q1": "Are your samosas halal?",
+      "a1": "Yes, all our chicken samosas are 100% halal. We use only halal-certified chicken and ingredients.",
+      "q2": "Do you have vegetarian options?",
+      "a2": "Currently, we specialize in chicken samosas, but we're working on adding vegetarian options soon."
+    },
+    "account": {
+      "q1": "How do I create an account?",
+      "a1": "Click the 'Register' button, fill in your details, and verify your email address to complete registration.",
+      "q2": "Can I track my order history?",
+      "a2": "Yes, once you create an account, you can view all your past orders in the 'My Orders' section."
+    },
+    "noResults": "No questions found",
+    "tryDifferentSearch": "Try a different search term",
+    "stillNeedHelp": "Still Need Help?",
+    "contactSupport": "Our support team is ready to assist you",
+    "callUs": "Call Us",
+    "emailUs": "Email Us"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with us for any questions, suggestions, or support needs.",
+    "form": {
+      "title": "Send us a Message",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "subject": "Subject",
+      "selectSubject": "Select a subject",
+      "subjects": {
+        "order": "Order Inquiry",
+        "delivery": "Delivery Issue",
+        "payment": "Payment Problem",
+        "complaint": "Complaint",
+        "suggestion": "Suggestion",
+        "other": "Other"
+      },
+      "message": "Message",
+      "send": "Send Message",
+      "sending": "Sending..."
+    },
+    "info": {
+      "title": "Contact Information",
+      "phone": {
+        "title": "Phone Support",
+        "hours": "Available 24/7"
+      },
+      "email": {
+        "title": "Email Support",
+        "response": "Response within 24 hours"
+      },
+      "address": {
+        "title": "Our Location"
+      },
+      "hours": {
+        "title": "Business Hours",
+        "weekdays": "Mon-Fri",
+        "weekends": "Sat-Sun"
+      }
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "trackOrder": "Track Your Order",
+      "faq": "FAQ",
+      "returnPolicy": "Return Policy"
+    },
+    "successMessage": "Message sent successfully! We'll get back to you soon."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "Your privacy is important to us. Learn how we collect, use, and protect your information.",
+    "lastUpdated": "Last Updated",
+    "overview": {
+      "title": "Privacy Overview",
+      "description": "This privacy policy explains how we collect, use, and protect your personal information when you use our services."
+    },
+    "sections": {
+      "collection": {
+        "title": "Information We Collect",
+        "personal": "Personal information like name, email, phone number",
+        "usage": "Usage data including pages visited and features used",
+        "technical": "Technical information such as IP address and browser type",
+        "payment": "Payment information for processing transactions"
+      },
+      "use": {
+        "title": "How We Use Information",
+        "orders": "Processing and fulfilling your orders",
+        "communication": "Communicating with you about services",
+        "improvement": "Improving our products and services",
+        "legal": "Complying with legal obligations"
+      },
+      "protection": {
+        "title": "Data Protection",
+        "encryption": "Data encrypted during transmission and storage",
+        "access": "Limited access to authorized personnel only",
+        "storage": "Secure servers with regular security updates",
+        "monitoring": "Continuous monitoring for security threats"
+      },
+      "rights": {
+        "title": "Your Rights",
+        "access": "Right to access your personal data",
+        "correction": "Right to correct inaccurate information",
+        "deletion": "Right to delete your personal data",
+        "portability": "Right to transfer your data"
+      }
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "essential": {
+        "title": "Essential Cookies",
+        "description": "Required for basic website functionality"
+      },
+      "analytics": {
+        "title": "Analytics Cookies",
+        "description": "Help us understand how you use our website"
+      }
+    },
+    "thirdParty": {
+      "title": "Third-Party Services",
+      "payment": {
+        "title": "Payment Processors",
+        "description": "We use secure third-party payment processors"
+      },
+      "analytics": {
+        "title": "Analytics Services",
+        "description": "We use analytics to improve our services"
+      }
+    },
+    "contact": {
+      "title": "Privacy Questions?",
+      "description": "Contact us if you have any questions about this privacy policy",
+      "email": "Email Privacy Team",
+      "form": "Contact Form"
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "subtitle": "Please read these terms carefully before using our services.",
+    "lastUpdated": "Last Updated",
+    "agreement": {
+      "title": "Agreement to Terms",
+      "description": "By using our services, you agree to be bound by these terms and conditions."
+    },
+    "service": {
+      "title": "Our Services",
+      "description1": "Online food ordering and delivery platform",
+      "description2": "Customer support and order tracking",
+      "description3": "Quality food preparation and delivery"
+    },
+    "responsibilities": {
+      "title": "User Responsibilities",
+      "allowed": {
+        "title": "You May",
+        "orders": "Place legitimate food orders",
+        "account": "Maintain accurate account information",
+        "feedback": "Provide honest feedback and reviews"
+      },
+      "prohibited": {
+        "title": "You May Not",
+        "fraud": "Engage in fraudulent activities",
+        "abuse": "Abuse our customer service",
+        "interference": "Interfere with our systems"
+      }
+    },
+    "payment": {
+      "title": "Payment Terms",
+      "methods": {
+        "title": "Accepted Methods",
+        "description": "We accept various payment methods as listed on our platform"
+      },
+      "processing": {
+        "title": "Payment Processing",
+        "description": "Payments are processed securely through third-party providers"
+      },
+      "refunds": {
+        "title": "Refunds",
+        "description": "Refunds are subject to our return policy"
+      }
+    },
+    "liability": {
+      "title": "Limitation of Liability",
+      "description": "Our liability is limited to the maximum extent permitted by law."
+    },
+    "modifications": {
+      "title": "Terms Modifications",
+      "description": "We reserve the right to modify these terms at any time with notice."
+    },
+    "law": {
+      "title": "Governing Law",
+      "description": "These terms are governed by the laws of Bangladesh."
+    },
+    "contact": {
+      "title": "Questions About Terms?",
+      "description": "Contact our legal team if you have questions about these terms",
+      "email": "Email Legal Team",
+      "form": "Contact Form"
+    }
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "subtitle": "Learn about how we use cookies to improve your experience on our website.",
+    "lastUpdated": "Last Updated",
+    "what": {
+      "title": "What are Cookies?",
+      "description": "Cookies are small text files stored on your device when you visit our website.",
+      "note": "Most websites use cookies to provide personalized experiences."
+    },
+    "types": {
+      "essential": {
+        "title": "Essential Cookies",
+        "description": "Required for basic website functionality and security.",
+        "examples": {
+          "auth": "User authentication and login sessions",
+          "cart": "Shopping cart functionality",
+          "security": "Security and fraud prevention"
+        }
+      },
+      "functional": {
+        "title": "Functional Cookies",
+        "description": "Remember your preferences and improve user experience.",
+        "examples": {
+          "language": "Language and region preferences",
+          "theme": "Dark/light mode preferences",
+          "preferences": "User interface customizations"
+        }
+      },
+      "analytics": {
+        "title": "Analytics Cookies",
+        "description": "Help us understand how visitors use our website.",
+        "examples": {
+          "usage": "Page views and user interactions",
+          "performance": "Website performance metrics",
+          "errors": "Error tracking and debugging"
+        }
+      },
+      "marketing": {
+        "title": "Marketing Cookies",
+        "description": "Used to show relevant advertisements and track effectiveness.",
+        "examples": {
+          "ads": "Targeted advertising content",
+          "tracking": "Cross-site tracking for ads",
+          "social": "Social media integration"
+        }
+      }
+    },
+    "required": "Required",
+    "examples": "Examples",
+    "management": {
+      "title": "Managing Cookies",
+      "browser": {
+        "title": "Browser Settings",
+        "description": "You can control cookies through your browser settings"
+      },
+      "preferences": {
+        "title": "Cookie Preferences",
+        "description": "Use the toggles above to customize your cookie preferences"
+      }
+    },
+    "thirdParty": {
+      "title": "Third-Party Cookies",
+      "analytics": "We use Google Analytics to understand website usage",
+      "payment": "Payment processors may set cookies for transaction security"
+    },
+    "savePreferences": "Save Cookie Preferences",
+    "preferencesSaved": "Your cookie preferences have been saved!",
+    "learnMore": "Learn More",
+    "contact": {
+      "title": "Cookie Questions?",
+      "description": "Contact us if you have questions about our cookie policy",
+      "email": "Email Privacy Team",
+      "form": "Contact Form"
+    }
+  },
+  "refund": {
+    "title": "Refund Policy",
+    "subtitle": "Fair and transparent refund policy for your peace of mind."
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "orderHistory": "Order History",
+    "reviewHistory": "Review History",
+    "addressBook": "Address Book",
+    "preferences": "Preferences",
+    "security": "Security",
+    "changePassword": "Change Password",
+    "updateProfile": "Update Profile",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "profileUpdated": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully",
+    "uploadAvatar": "Upload Profile Picture",
+    "removeAvatar": "Remove Profile Picture",
+    "editAddress": "Edit Address",
+    "addAddress": "Add New Address",
+    "defaultAddress": "Default Address",
+    "deleteAddress": "Delete Address"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "users": "Users",
+    "reviews": "Reviews",
+    "content": "Content",
+    "chat": "Chat Support",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "totalUsers": "Total Users",
+    "totalProducts": "Total Products",
+    "pendingOrders": "Pending Orders",
+    "completedOrders": "Completed Orders",
+    "averageRating": "Average Rating",
+    "totalReviews": "Total Reviews",
+    "monthlyRevenue": "Monthly Revenue",
+    "newUsers": "New Users",
+    "performanceOverview": "Performance Overview",
+    "salesGrowth": "Sales Growth",
+    "customerGrowth": "Customer Growth",
+    "satisfaction": "Satisfaction",
+    "quickActions": "Quick Actions",
+    "addNewProduct": "Add New Product",
+    "manageOrders": "Manage Orders",
+    "reviewManagement": "Review Management",
+    "userManagement": "User Management",
+    "contentManagement": "Content Management",
+    "chatSupport": "Chat Support",
+    "recentOrders": "Recent Orders",
+    "recentUsers": "Recent Users",
+    "viewAll": "View All",
+    "orderId": "Order ID",
+    "customer": "Customer",
+    "total": "Total",
+    "status": "Status",
+    "date": "Date",
+    "active": "Active",
+    "inactive": "Inactive",
+    "approve": "Approve",
+    "reject": "Reject",
+    "edit": "Edit",
+    "delete": "Delete",
+    "notifications": "Notifications",
+    "adminSessionActive": "Admin Session Active",
+    "signOut": "Sign Out",
+    "preferences": "Preferences",
+    "light": "Light",
+    "dark": "Dark",
+    "noRecentOrders": "No recent orders found",
+    "manageProducts": "Manage Products",
+    "customerSupport": "Customer Support",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "footer": {
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "followUs": "Follow Us",
+    "newsletter": "Newsletter",
+    "subscribe": "Subscribe",
+    "copyright": "© 2024 Chicken Samosa Business. All rights reserved.",
+    "quickLinks": "Quick Links",
+    "customerService": "Customer Service",
+    "legal": "Legal",
+    "trackOrder": "Track Order",
+    "returnPolicy": "Return Policy",
+    "faq": "FAQ",
+    "contact": "Contact Us",
+    "cookiePolicy": "Cookie Policy",
+    "refundPolicy": "Refund Policy"
+  },
+  "notifications": {
+    "orderPlaced": "Order placed successfully",
+    "orderConfirmed": "Order confirmed",
+    "orderPreparing": "Your order is being prepared",
+    "orderReady": "Your order is ready",
+    "orderOutForDelivery": "Your order is out for delivery",
+    "orderDelivered": "Order delivered successfully",
+    "paymentReceived": "Payment received",
+    "reviewSubmitted": "Review submitted successfully",
+    "profileUpdated": "Profile updated successfully",
+    "error": "An error occurred",
+    "success": "Completed successfully",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "errors": {
+    "networkError": "Network error",
+    "serverError": "Server error",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "validationError": "Validation error",
+    "fileUploadError": "File upload error",
+    "invalidInput": "Invalid input",
+    "requiredField": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password too short",
+    "passwordMismatch": "Passwords do not match",
+    "phoneInvalid": "Invalid phone number",
+    "tryAgain": "Please try again",
+    "contactSupport": "Contact support for assistance"
+  }
+} 
