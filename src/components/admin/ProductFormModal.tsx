@@ -119,11 +119,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
   };
 
   const handleImageUpload = (files: FileList | null) => {
-    console.log('handleImageUpload called with files:', files);
+    
     if (!files) return;
     
     const fileArray = Array.from(files);
-    console.log('File array:', fileArray);
+    
     
     const validFiles = fileArray.filter(file => {
       if (!file.type.startsWith('image/')) {
@@ -137,10 +137,10 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       return true;
     });
 
-    console.log('Valid files:', validFiles);
+    
     setNewImages(prev => {
       const updated = [...prev, ...validFiles];
-      console.log('Updated newImages state:', updated);
+      
       return updated;
     });
   };
@@ -158,20 +158,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     const fileInput = document.getElementById('image-upload') as HTMLInputElement;
     const fileInputFiles = fileInput?.files ? Array.from(fileInput.files) : [];
     
-    console.log('Validating form...', { 
-      existingImages: images.length, 
-      newImages: newImages.length,
-      newImagesFiles: newImages,
-      fileInputFiles: fileInputFiles.length,
-      actualFileInput: fileInputFiles
-    });
+    
     
     if (!formData.name.en.trim()) {
       toast.error('English name is required');
       return false;
     }
     if (!formData.name.bn.trim()) {
-      console.log('Bengali name is empty, auto-filling with English name');
+      
       // Auto-fill Bengali name with English name if empty
       formData.name.bn = formData.name.en;
     }
@@ -180,7 +174,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       return false;
     }
     if (!formData.description.bn.trim()) {
-      console.log('Bengali description is empty, auto-filling with English description');
+      
       // Auto-fill Bengali description with English description if empty
       formData.description.bn = formData.description.en;
     }
@@ -203,32 +197,28 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     const hasFileInputImages = fileInputFiles.length > 0;
     
     if (!hasExistingImages && !hasNewImages && !hasFileInputImages) {
-      console.log('Image validation failed - no images found in any source');
+      
       toast.error('At least one product image is required');
       return false;
     }
     
     // If we have file input images but they're not in newImages state, add them
     if (hasFileInputImages && !hasNewImages) {
-      console.log('Found images in file input but not in state, updating state...');
+      
       setNewImages(fileInputFiles.filter(file => file.type.startsWith('image/')));
     }
     
-    console.log('Form validation passed');
+    
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submit started. Current state:', {
-      images: images.length,
-      newImages: newImages.length,
-      formData
-    });
+
     
     if (!validateForm()) {
-      console.log('Validation failed, stopping submission');
+      
       return;
     }
     
@@ -251,19 +241,19 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('ingredients', JSON.stringify(formData.ingredients));
       
       // Add new image files from state
-      console.log('Adding files to FormData:', newImages.length, newImages);
+      
       newImages.forEach((file, index) => {
-        console.log(`Adding file ${index}:`, file.name, file.type, file.size);
+        
         submitData.append('images', file);
       });
       
       // Also check file input directly as backup
       const fileInput = document.getElementById('image-upload') as HTMLInputElement;
       if (fileInput?.files && fileInput.files.length > 0 && newImages.length === 0) {
-        console.log('Using files directly from input since state is empty');
+        
         Array.from(fileInput.files).forEach(file => {
           if (file.type.startsWith('image/')) {
-            console.log('Adding file from input:', file.name, file.type);
+            
             submitData.append('images', file);
           }
         });
@@ -280,35 +270,23 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       }
       
       // Debug: Log FormData contents
-      console.log('FormData contents:');
-      for (let pair of (submitData as any).entries()) {
-        if (pair[1] instanceof File) {
-          console.log(pair[0], 'File:', pair[1].name, pair[1].type, pair[1].size, 'bytes');
-        } else {
-          console.log(pair[0], pair[1]);
-        }
-      }
       
-      // Double check that we actually have files
-      let hasFiles = false;
-      for (let pair of (submitData as any).entries()) {
-        if (pair[1] instanceof File) {
-          hasFiles = true;
-          break;
-        }
-      }
-      console.log('FormData has files:', hasFiles);
+     
+      
+      
+     
+      
       
       if (product?._id) {
         // Update existing product
-        console.log('Calling updateProduct API...');
+       
         await adminAPI.updateProduct(product._id, submitData);
         toast.success('Product updated successfully!');
       } else {
         // Create new product
-        console.log('Calling createProduct API...');
-        const response = await adminAPI.createProduct(submitData);
-        console.log('API Response:', response);
+        
+         await adminAPI.createProduct(submitData);
+        
         toast.success('Product created successfully!');
       }
       
@@ -577,7 +555,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
               className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center"
               onDrop={(e) => {
                 e.preventDefault();
-                console.log('Drop event triggered');
+                
                 handleImageUpload(e.dataTransfer.files);
               }}
               onDragOver={(e) => e.preventDefault()}
@@ -587,7 +565,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 multiple
                 accept="image/*"
                 onChange={(e) => {
-                  console.log('File input change event triggered');
+                  
                   handleImageUpload(e.target.files);
                 }}
                 className="hidden"

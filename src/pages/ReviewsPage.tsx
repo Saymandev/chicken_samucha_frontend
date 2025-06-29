@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, MessageSquare, Search, Star, ThumbsUp, User, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/useStore';
 import { reviewsAPI } from '../utils/api';
 
@@ -33,7 +32,7 @@ interface Review {
 }
 
 const ReviewsPage: React.FC = () => {
-  const { t } = useTranslation();
+  
   const { isAuthenticated, user } = useStore();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +53,7 @@ const ReviewsPage: React.FC = () => {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // Fetch reviews
-  const fetchReviews = async () => {
+  const fetchReviews =useCallback( async () => {
     setIsLoading(true);
     try {
       const params = {
@@ -80,11 +79,11 @@ const ReviewsPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, filterRating, sortBy]);
 
   useEffect(() => {
     fetchReviews();
-  }, [currentPage, searchTerm, filterRating, sortBy]);
+  }, [fetchReviews]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,13 +139,13 @@ const ReviewsPage: React.FC = () => {
         formData.append('orderNumber', reviewForm.orderNumber);
       }
 
-      console.log('Submitting review with FormData:');
+      
       // Log FormData contents (TypeScript-safe way)
       const formDataEntries: string[] = [];
       formData.forEach((value, key) => {
         formDataEntries.push(`${key}: ${value}`);
       });
-      console.log(formDataEntries.join('\n'));
+      
 
       const response = await reviewsAPI.createReview(formData);
       

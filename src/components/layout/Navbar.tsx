@@ -175,11 +175,11 @@ const Navbar: React.FC = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Theme toggle clicked! Current theme:', theme);
+                
                 toggleTheme();
                 // Check theme after a brief delay
                 setTimeout(() => {
-                  console.log('Theme after toggle:', useStore.getState().theme);
+                  
                 }, 100);
               }}
               className="relative z-40 p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors pointer-events-auto"
@@ -196,7 +196,7 @@ const Navbar: React.FC = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Language toggle clicked!', language);
+                
                 handleLanguageChange();
               }}
               className="relative z-40 flex items-center space-x-1 p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors pointer-events-auto"
@@ -264,7 +264,7 @@ const Navbar: React.FC = () => {
                           to={item.path}
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Navbar - Navigating to:', item.path);
+                            
                             setIsUserMenuOpen(false);
                           }}
                           className={`flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
@@ -406,7 +406,7 @@ const Navbar: React.FC = () => {
                         to={item.path}
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log('Mobile - Navigating to:', item.path);
+                          
                           setIsMobileMenuOpen(false);
                         }}
                         className={`flex items-center space-x-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors min-h-[44px] relative z-50 ${

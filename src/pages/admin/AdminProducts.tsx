@@ -8,7 +8,7 @@ import {
   Star,
   Trash2
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import ProductFormModal from '../../components/admin/ProductFormModal';
@@ -46,11 +46,9 @@ const AdminProducts: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [currentPage, searchTerm, selectedCategory, sortBy, sortOrder]);
+  
 
-  const fetchProducts = async () => {
+  const fetchProducts =useCallback( async () => {
     try {
       setLoading(true);
       const params = {
@@ -74,8 +72,10 @@ const AdminProducts: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [currentPage, searchTerm, selectedCategory, sortBy, sortOrder]);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
   const handleDelete = async (productId: string) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     

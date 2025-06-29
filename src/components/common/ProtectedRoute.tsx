@@ -20,11 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const location = useLocation();
 
   // Debug logging
-  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
-  console.log('ProtectedRoute - user:', user);
-  console.log('ProtectedRoute - token:', token);
-  console.log('ProtectedRoute - adminOnly:', adminOnly);
-  console.log('ProtectedRoute - location:', location.pathname);
+  
 
   useEffect(() => {
     const verifyAuth = async () => {

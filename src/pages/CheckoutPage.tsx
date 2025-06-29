@@ -309,7 +309,7 @@ const CheckoutPage: React.FC = () => {
       // Send items array in the format backend expects
       cart.forEach((item, index) => {
         const productId = item.product.id || (item.product as any)._id;
-        console.log(`Item ${index} - Product ID:`, productId, 'Full product:', item.product);
+        
         formData.append(`items[${index}][product]`, productId);
         formData.append(`items[${index}][quantity]`, item.quantity.toString());
       });
@@ -335,12 +335,7 @@ const CheckoutPage: React.FC = () => {
         formData.append('paymentScreenshot', paymentInfo.screenshot);
       }
 
-      console.log('Sending order data:', {
-        customer: customerInfo,
-        items: cart,
-        paymentInfo: paymentInfo,
-        deliveryCharge
-      });
+      
 
       const response = await ordersAPI.createOrder(formData);
       

@@ -69,7 +69,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Stock Status */}
-          {!product.isAvailable || product.stock < 1 && (
+          {(product.stock < 1) && (
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg">
                 {t('products.outOfStock')}
@@ -158,15 +158,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="p-4 pt-0">
           <button
             onClick={handleAddToCart}
-            disabled={!product.isAvailable || product.stock < 1}
+            disabled={ product.stock < 1}
             className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-              product.isAvailable && product.stock > 0
+               product.stock > 0
                 ? 'btn-primary hover:bg-primary-700'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
             <ShoppingCart className="w-4 h-4" />
-            {product.isAvailable && product.stock > 0 
+            {product.stock > 0 
               ? t('products.addToCart')
               : t('products.outOfStock')
             }

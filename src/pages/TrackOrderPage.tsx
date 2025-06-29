@@ -36,9 +36,9 @@ const TrackOrderPage: React.FC = () => {
     setError('');
     
     try {
-      console.log('Tracking order:', { orderNumber: orderNumber.trim(), phone: phone.trim() });
+      
       const response = await ordersAPI.trackOrderWithPhone(orderNumber.trim(), phone.trim());
-      console.log('Track response:', response.data);
+      
       
       if (response.data.success && response.data.data) {
         setOrderStatus(response.data.data);

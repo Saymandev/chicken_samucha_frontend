@@ -1,12 +1,10 @@
 import { CheckCircle, Eye, MessageSquare, Search, Star, Trash2, XCircle } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { adminAPI } from '../../utils/api';
 
-// Debug: Log what adminAPI contains
-console.log('AdminReviews - adminAPI object:', adminAPI);
-console.log('AdminReviews - adminAPI.getAllReviews:', adminAPI.getAllReviews);
+
 
 interface Review {
   _id: string;
@@ -40,7 +38,7 @@ interface Review {
 }
 
 const AdminReviews: React.FC = () => {
-  console.log('AdminReviews component mounted');
+  
   
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,23 +52,10 @@ const AdminReviews: React.FC = () => {
   const [responseText, setResponseText] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  useEffect(() => {
-    console.log('AdminReviews useEffect triggered');
-    console.log('Dependencies:', { currentPage, searchTerm, statusFilter, ratingFilter });
-    fetchReviews();
-  }, [currentPage, searchTerm, statusFilter, ratingFilter]);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('=== FRONTEND DEBUG ===');
-      console.log('Calling adminAPI.getAllReviews with params:', {
-        page: currentPage,
-        limit: 10,
-        search: searchTerm || undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        rating: ratingFilter !== 'all' ? ratingFilter : undefined
-      });
+      
       
       const params: any = {
         page: currentPage,
@@ -80,9 +65,9 @@ const AdminReviews: React.FC = () => {
         rating: ratingFilter !== 'all' ? ratingFilter : undefined
       };
 
-      console.log('About to call adminAPI.getAllReviews...');
+      
       const response = await adminAPI.getAllReviews(params);
-      console.log('Response received:', response.data);
+      
       
       if (response.data.success) {
         setReviews(response.data.data || []);
@@ -96,7 +81,10 @@ const AdminReviews: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, statusFilter, ratingFilter]);
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const updateReviewStatus = async (reviewId: string, status: 'approved' | 'rejected' | 'hidden') => {
     try {

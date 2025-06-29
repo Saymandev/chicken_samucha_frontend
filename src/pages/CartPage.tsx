@@ -2,12 +2,10 @@ import { motion } from 'framer-motion';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 
 const CartPage: React.FC = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { cart, cartTotal, cartCount, updateCartItem, removeFromCart, clearCart, language } = useStore();
   

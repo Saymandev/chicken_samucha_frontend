@@ -102,9 +102,7 @@ const ChatPage: React.FC = () => {
   const initializeChat = async () => {
     setIsLoading(true);
     try {
-      console.log('=== FRONTEND CHAT DEBUG ===');
-      console.log('Initializing chat for user:', user);
-      console.log('Is authenticated:', isAuthenticated);
+     
       
       const customerInfo = isAuthenticated ? {
         name: user?.name || 'User',
@@ -112,7 +110,7 @@ const ChatPage: React.FC = () => {
         email: user?.email || ''
       } : guestForm;
       
-      console.log('Customer info:', customerInfo);
+      
       
       // Start or get existing chat session
       const response = await chatAPI.startChatSession({
@@ -120,7 +118,7 @@ const ChatPage: React.FC = () => {
         category: 'general'
       });
       
-      console.log('Chat session response:', response.data);
+     
       
       const session = response.data.data.chatSession;
       setChatSession(session);
@@ -128,22 +126,21 @@ const ChatPage: React.FC = () => {
       // Load existing messages if session has chatId
       if (session.chatId || session.id) {
         const chatId = session.chatId || session.id;
-        console.log('🔍 Session data:', session);
-        console.log('🔄 Loading messages for chatId:', chatId);
+       
         
         try {
           const messagesResponse = await chatAPI.getChatMessages(chatId);
-          console.log('📨 Messages API response:', messagesResponse.data);
+          
           
           const loadedMessages = messagesResponse.data?.data?.messages || [];
-          console.log('📝 Loaded messages count:', loadedMessages.length);
+          
           
           if (loadedMessages.length > 0) {
-            console.log('📋 Sample loaded message:', loadedMessages[0]);
+            
             setMessages(loadedMessages);
-            console.log('✅ Messages set in state');
+            
           } else {
-            console.log('📭 No messages found for this chat');
+            
             setMessages([]);
           }
         } catch (msgError: any) {
@@ -169,26 +166,26 @@ const ChatPage: React.FC = () => {
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     const socketURL = API_BASE_URL.replace('/api', '');
     
-    console.log('Connecting to socket at:', socketURL);
+    
     
     socketRef.current = io(socketURL, {
       transports: ['websocket', 'polling']
     });
 
     socketRef.current.on('connect', () => {
-      console.log('Socket connected successfully');
+      
       setIsConnected(true);
       // Join chat room
       socketRef.current?.emit('join-chat', chatId);
     });
 
     socketRef.current.on('disconnect', () => {
-      console.log('Socket disconnected');
+      
       setIsConnected(false);
     });
 
     socketRef.current.on('receive-message', (messageData: Message) => {
-      console.log('Received message via socket:', messageData);
+     
       
       // Only add messages from admin (not user's own messages)
       if (messageData.senderType === 'admin') {
@@ -215,10 +212,7 @@ const ChatPage: React.FC = () => {
     
     if ((!newMessage.trim() && !selectedFile) || !chatSession) return;
 
-    console.log('=== SENDING MESSAGE ===');
-    console.log('Message:', newMessage);
-    console.log('Selected file:', selectedFile);
-    console.log('Chat session:', chatSession);
+   
 
     const chatId = chatSession.chatId;
     const messageText = newMessage.trim();
@@ -266,12 +260,10 @@ const ChatPage: React.FC = () => {
         formData.append('attachment', currentFile);
       }
       
-      console.log('Sending via API');
-      console.log('Has message:', !!messageText);
-      console.log('Has file:', !!currentFile);
+      
       
       const response = await chatAPI.sendMessage(formData);
-      console.log('API Response:', response.data);
+      
       
       // Replace optimistic message with real message from API
       const realMessage = response.data.data.chatMessage;

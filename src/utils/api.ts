@@ -132,6 +132,12 @@ export const authAPI = {
     newPassword: string;
   }) => api.put('/auth/updatepassword', data),
   
+  forgotPassword: (email: string) =>
+    api.post('/auth/forgot-password', { email }),
+  
+  resetPassword: (token: string, password: string) =>
+    api.put(`/auth/reset-password/${token}`, { password }),
+  
   uploadAvatar: (formData: FormData) =>
     api.post('/users/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -276,7 +282,7 @@ export const adminAPI = {
   // Product management
   getAllProducts: (params?: any) => api.get('/admin/products', { params }),
   createProduct: (productData: FormData) => {
-    console.log('API createProduct called with FormData');
+    
     // Don't set Content-Type header - let browser set it with boundary
     return api.post('/admin/products', productData);
   },
@@ -300,9 +306,7 @@ export const adminAPI = {
   
   // Review management
   getAllReviews: (params?: any) => {
-    console.log('=== API DEBUG ===');
-    console.log('adminAPI.getAllReviews called with params:', params);
-    console.log('Making GET request to /admin/reviews');
+    
     return api.get('/admin/reviews', { params });
   },
   getReview: (id: string) => api.get(`/admin/reviews/${id}`),

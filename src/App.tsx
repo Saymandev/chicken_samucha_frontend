@@ -19,10 +19,12 @@ import ChatPage from './pages/ChatPage';
 import ContactUsPage from './pages/ContactUsPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import FAQPage from './pages/FAQPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import LoginPage from './pages/LoginPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import RefundPolicyPage from './pages/RefundPolicyPage';
 import RegisterPage from './pages/RegisterPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import ReturnPolicyPage from './pages/ReturnPolicyPage';
 import ReviewsPage from './pages/ReviewsPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
@@ -75,6 +77,8 @@ function AppContent() {
           {/* Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           
           {/* Legal & Info Pages */}
           <Route path="/contact" element={<ContactUsPage />} />
@@ -209,13 +213,13 @@ function App() {
 
   // Apply theme to document
   useEffect(() => {
-    console.log('Applying theme to DOM:', theme);
+    
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
-      console.log('Added dark class to document');
+     
     } else {
       document.documentElement.classList.remove('dark');
-      console.log('Removed dark class from document');
+     
     }
   }, [theme]);
 

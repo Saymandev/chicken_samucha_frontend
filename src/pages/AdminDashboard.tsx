@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   DashboardCardSkeleton,
@@ -86,7 +85,6 @@ interface QuickAction {
 }
 
 const AdminDashboard: React.FC = () => {
-  const { t } = useTranslation();
   const { language, user } = useStore();
   const navigate = useNavigate();
   

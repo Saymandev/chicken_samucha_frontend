@@ -70,13 +70,13 @@ const AdminChat: React.FC = () => {
       });
 
       socketRef.current.on('connect', () => {
-        console.log('Admin socket connected');
+        
         // Join admin dashboard to receive global admin events
         socketRef.current?.emit('join-admin-dashboard');
       });
 
       socketRef.current.on('receive-message', (messageData: any) => {
-        console.log('Admin received message:', messageData);
+        
         
         // Add message if it's for the currently selected chat
         if (selectedChat && messageData.chatId === selectedChat.chatId) {
@@ -94,13 +94,13 @@ const AdminChat: React.FC = () => {
           };
           
           setMessages(prev => [...prev, transformedMessage]);
-          console.log('✅ Message added to current chat');
+          
         }
       });
 
       // Listen for new customer messages across all chats
       socketRef.current.on('new-customer-message', (data: any) => {
-        console.log('New customer message notification:', data);
+       
         
         // Update the chat sessions list with the new message
         setChatSessions(prev => prev.map(session => {
@@ -131,12 +131,12 @@ const AdminChat: React.FC = () => {
       });
 
       socketRef.current.on('user-typing', (data: any) => {
-        console.log('User typing:', data);
+       
         // You can add typing indicators here
       });
 
       socketRef.current.on('chat-status-changed', (data: any) => {
-        console.log('Chat status changed:', data);
+        
         // Update chat session status in real-time
         setChatSessions(prev => prev.map(session => {
           if (session.chatId === data.chatId) {
@@ -151,12 +151,12 @@ const AdminChat: React.FC = () => {
       });
 
       socketRef.current.on('user-joined-chat', (data: any) => {
-        console.log('User joined chat:', data);
+        
         // You can show notifications when users join chats
       });
 
       socketRef.current.on('new-chat-session', (sessionData: any) => {
-        console.log('New chat session created:', sessionData);
+        
         // Add new session to the list
         fetchChatSessions();
         toast(`New chat session started by ${sessionData.customerName}`, {
@@ -182,7 +182,7 @@ const AdminChat: React.FC = () => {
       
       // Join the specific chat room for real-time updates
       if (socketRef.current) {
-        console.log('Admin joining chat room:', selectedChat.chatId);
+        
         socketRef.current.emit('join-chat', selectedChat.chatId);
       }
     }
@@ -201,7 +201,7 @@ const AdminChat: React.FC = () => {
         sortBy: 'updatedAt'
       });
       
-      console.log('Fetched chat sessions:', response.data);
+      
       setChatSessions(response.data.sessions || []);
     } catch (error: any) {
       console.error('Error fetching chat sessions:', error);
@@ -216,7 +216,7 @@ const AdminChat: React.FC = () => {
       setMessagesLoading(true);
       const response = await adminAPI.getChatMessages(chatId);
       
-      console.log('Fetched messages:', response.data);
+      
       setMessages(response.data.data?.messages || []);
     } catch (error: any) {
       console.error('Error fetching messages:', error);
@@ -249,7 +249,7 @@ const AdminChat: React.FC = () => {
 
       // Send via API
       const response = await adminAPI.sendAdminMessage(selectedChat.chatId, messageText);
-      console.log('Admin message sent:', response.data);
+      
 
       // Replace optimistic message with real one
       setMessages(prev => prev.map(msg => 
