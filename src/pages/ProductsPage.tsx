@@ -20,6 +20,9 @@ const ProductsPage: React.FC = () => {
   
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [priceRange, setPriceRange] = useState({
@@ -48,29 +51,54 @@ const ProductsPage: React.FC = () => {
   ];
 
   useEffect(() => {
-    fetchProducts();
+    setCurrentPage(1);
+    setProducts([]);
+    fetchProducts(1, true);
   }, [searchTerm, selectedCategory, priceRange, sortBy]);
 
-  const fetchProducts = async () => {
-    setLoading(true);
+  const fetchProducts = async (page = 1, isNewSearch = false) => {
+    if (isNewSearch) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+    
     try {
       const params = {
         search: searchTerm,
         category: selectedCategory,
         minPrice: priceRange.min,
         maxPrice: priceRange.max,
-        sortBy
+        sortBy,
+        page,
+        limit: 12
       };
 
       const response = await productsAPI.getProducts(params);
       if (response.data.success) {
-        setProducts(response.data.products);
+        const newProducts = response.data.products;
+        
+        if (isNewSearch) {
+          setProducts(newProducts);
+        } else {
+          setProducts(prev => [...prev, ...newProducts]);
+        }
+        
+        setCurrentPage(page);
+        setHasMore(newProducts.length === 12); // If less than 12, no more pages
       }
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error('Failed to load products');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMoreProducts = () => {
+    if (!loadingMore && hasMore) {
+      fetchProducts(currentPage + 1, false);
     }
   };
 
@@ -308,15 +336,17 @@ const ProductsPage: React.FC = () => {
         )}
 
         {/* Load More */}
-        {!loading && products.length > 0 && products.length % 12 === 0 && (
+        {!loading && products.length > 0 && hasMore && (
           <div className="text-center mt-12">
             <button
-              onClick={() => {
-                // Load more products logic
-              }}
-              className="btn-outline px-8 py-3"
+              onClick={loadMoreProducts}
+              disabled={loadingMore}
+              className="btn-outline px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {language === 'bn' ? 'আরো পণ্য লোড করুন' : 'Load More Products'}
+              {loadingMore 
+                ? (language === 'bn' ? 'লোড হচ্ছে...' : 'Loading...')
+                : (language === 'bn' ? 'আরো পণ্য লোড করুন' : 'Load More Products')
+              }
             </button>
           </div>
         )}

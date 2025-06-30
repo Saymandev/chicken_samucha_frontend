@@ -16,7 +16,19 @@ interface Order {
   id: string;
   _id?: string; // For backward compatibility
   orderNumber: string;
-  customer: { name: string; phone: string; email?: string };
+  customer: { 
+    name: string; 
+    phone: string; 
+    email?: string;
+    address?: {
+      street?: string;
+      area?: string;
+      city?: string;
+      district?: string;
+      postalCode?: string;
+      landmark?: string;
+    };
+  };
   items: Array<{ 
     name: { en: string; bn: string } | string; 
     quantity: number; 
@@ -31,6 +43,12 @@ interface Order {
     status: 'pending' | 'verified' | 'failed';
     transactionId?: string;
     screenshot?: { url: string };
+  };
+  deliveryInfo?: {
+    method: 'delivery' | 'pickup';
+    address?: string;
+    preferredTime?: string;
+    deliveryInstructions?: string;
   };
   createdAt: string;
 }
@@ -508,6 +526,83 @@ const AdminOrders: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Delivery Information - Only show for delivery orders */}
+                {selectedOrder.deliveryInfo?.method === 'delivery' && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Delivery Information
+                    </h3>
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div>
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Delivery Method:</span>
+                          <p className="font-medium text-gray-900 dark:text-white capitalize">
+                            {selectedOrder.deliveryInfo.method}
+                          </p>
+                        </div>
+                        
+                        {/* Show delivery address from deliveryInfo or construct from customer address */}
+                        {(selectedOrder.deliveryInfo.address || selectedOrder.customer.address) && (
+                          <div>
+                            <span className="text-sm text-gray-600 dark:text-gray-300">Delivery Address:</span>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {selectedOrder.deliveryInfo.address || 
+                                `${selectedOrder.customer.address?.street || ''} ${selectedOrder.customer.address?.area || ''}, ${selectedOrder.customer.address?.city || 'Dhaka'}, ${selectedOrder.customer.address?.district || 'Dhaka'}`
+                              }
+                            </p>
+                            {selectedOrder.customer.address?.landmark && (
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                Landmark: {selectedOrder.customer.address.landmark}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {selectedOrder.deliveryInfo.preferredTime && (
+                          <div>
+                            <span className="text-sm text-gray-600 dark:text-gray-300">Preferred Time:</span>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {selectedOrder.deliveryInfo.preferredTime}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {selectedOrder.deliveryInfo.deliveryInstructions && (
+                          <div>
+                            <span className="text-sm text-gray-600 dark:text-gray-300">Delivery Instructions:</span>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {selectedOrder.deliveryInfo.deliveryInstructions}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pickup Information - Show for pickup orders */}
+                {selectedOrder.deliveryInfo?.method === 'pickup' && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Pickup Information
+                    </h3>
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                        <Package className="w-5 h-5" />
+                        <span className="font-medium">Customer will pickup from restaurant</span>
+                      </div>
+                      {selectedOrder.deliveryInfo.preferredTime && (
+                        <div className="mt-3">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Preferred Pickup Time:</span>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {selectedOrder.deliveryInfo.preferredTime}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Order Status */}
                 <div className="mb-6">

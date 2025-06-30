@@ -67,6 +67,8 @@ const ProfilePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [userStats, setUserStats] = useState({ orders: 0, reviews: 0 });
+  const [userReviews, setUserReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   // Fetch user statistics
   React.useEffect(() => {
@@ -76,7 +78,7 @@ const ProfilePage: React.FC = () => {
       try {
         const [ordersRes, reviewsRes] = await Promise.all([
           ordersAPI.getMyOrders({ limit: 1 }),
-          reviewsAPI.getReviews({ limit: 1 })
+          reviewsAPI.getMyReviews({ limit: 1 })
         ]);
         
         setUserStats({
@@ -85,10 +87,32 @@ const ProfilePage: React.FC = () => {
         });
       } catch (error) {
         console.error('Failed to fetch user stats:', error);
+        // Set fallback values if API calls fail
+        setUserStats({ orders: 0, reviews: 0 });
       }
     };
 
     fetchUserStats();
+  }, [user]);
+
+  // Fetch user reviews
+  React.useEffect(() => {
+    const fetchUserReviews = async () => {
+      if (!user) return;
+      
+      setReviewsLoading(true);
+      try {
+        const response = await reviewsAPI.getMyReviews({ limit: 5 });
+        setUserReviews(response.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch user reviews:', error);
+        setUserReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchUserReviews();
   }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -554,6 +578,82 @@ const ProfilePage: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              </div>
+
+              {/* My Reviews Section */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    My Reviews ({userStats.reviews})
+                  </h3>
+                  {userStats.reviews > 5 && (
+                    <button className="text-orange-600 hover:text-orange-800 transition-colors text-sm">
+                      View All
+                    </button>
+                  )}
+                </div>
+
+                {reviewsLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : userReviews.length > 0 ? (
+                  <div className="space-y-4">
+                    {userReviews.map((review, index) => (
+                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={`text-sm ${
+                                    i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              {review.product?.name?.en || review.product?.name || 'General Review'}
+                            </span>
+                          </div>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            review.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                            review.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          }`}>
+                            {review.status}
+                          </span>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm">
+                          {review.comment?.en || review.comment}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 dark:text-gray-500 mb-2">
+                      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400">No reviews yet</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                      Start reviewing products you've purchased!
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

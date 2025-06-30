@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { ordersAPI, reviewsAPI } from '../utils/api';
+import '../utils/debug'; // Import debug utilities for development
 
 interface Order {
   id: string;
@@ -69,13 +70,42 @@ const OrdersPage: React.FC = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await ordersAPI.getMyOrders();
-      if (response.data.success) {
-        setOrders(response.data.orders);
+      console.log('🔍 Fetching orders for user:', user?.name);
+      
+      // Check if user is logged in
+      if (!user) {
+        console.error('❌ User not logged in');
+        toast.error('Please login to view your orders');
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      toast.error('Failed to load orders');
+
+      const response = await ordersAPI.getMyOrders();
+      console.log('📦 Orders response:', response.data);
+      
+      if (response.data.success) {
+        setOrders(response.data.orders || []);
+        console.log(`✅ Loaded ${response.data.orders?.length || 0} orders`);
+      } else {
+        console.error('❌ API returned unsuccessful response:', response.data);
+        toast.error('Failed to load orders');
+      }
+    } catch (error: any) {
+      console.error('❌ Error fetching orders:', error);
+      
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        console.error('❌ Authentication error - redirecting to login');
+        toast.error('Session expired. Please login again.');
+        // The API interceptor should handle this, but just in case
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else if (error.response?.status === 404) {
+        console.log('ℹ️ No orders found for user');
+        setOrders([]);
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to load orders');
+      }
     } finally {
       setLoading(false);
     }

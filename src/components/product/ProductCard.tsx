@@ -22,7 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!product.isAvailable || product.stock < 1) {
+    if (product.stock < 1) {
       toast.error(t('products.outOfStock'));
       return;
     }

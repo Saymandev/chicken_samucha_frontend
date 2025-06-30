@@ -177,6 +177,8 @@ export const reviewsAPI = {
   getFeaturedReviews: (limit?: number) =>
     api.get('/reviews/featured', { params: { limit } }),
   
+  getMyReviews: (params?: any) => api.get('/reviews/my-reviews', { params }),
+  
   createReview: (reviewData: FormData) =>
     api.post('/reviews', reviewData, {
       headers: { 'Content-Type': 'multipart/form-data' }
