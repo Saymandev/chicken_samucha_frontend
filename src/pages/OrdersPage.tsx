@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { ordersAPI, reviewsAPI } from '../utils/api';
@@ -52,7 +51,7 @@ interface Order {
 }
 
 const OrdersPage: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Unused variable
   const { language, user } = useStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +64,7 @@ const OrdersPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchOrders = async () => {

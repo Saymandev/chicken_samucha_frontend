@@ -9,7 +9,7 @@ const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const { cart, cartTotal, cartCount, updateCartItem, removeFromCart, clearCart, language } = useStore();
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   

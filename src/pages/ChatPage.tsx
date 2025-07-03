@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Clock, MessageCircle, Paperclip, Phone, Send, Smile, User } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import io, { Socket } from 'socket.io-client';
 import { useStore } from '../store/useStore';
 import { chatAPI } from '../utils/api';
@@ -36,7 +35,7 @@ interface ChatSession {
 }
 
 const ChatPage: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Unused variable
   const { user, isAuthenticated } = useStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -75,6 +74,7 @@ const ChatPage: React.FC = () => {
         socketRef.current.disconnect();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user]);
 
   // Scroll to bottom when messages change

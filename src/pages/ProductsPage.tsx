@@ -54,6 +54,7 @@ const ProductsPage: React.FC = () => {
     setCurrentPage(1);
     setProducts([]);
     fetchProducts(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, priceRange, sortBy]);
 
   const fetchProducts = async (page = 1, isNewSearch = false) => {

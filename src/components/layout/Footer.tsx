@@ -1,12 +1,12 @@
 import {
-  Clock,
-  Facebook,
-  Heart,
-  Instagram,
-  Mail,
-  MapPin,
-  Phone,
-  Twitter
+    Clock,
+    Facebook,
+    Heart,
+    Instagram,
+    Mail,
+    MapPin,
+    Phone,
+    Twitter
 } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -165,27 +165,27 @@ const Footer: React.FC = () => {
                 {language === 'bn' ? 'আমাদের ফলো করুন:' : 'Follow us:'}
               </span>
               <div className="flex space-x-3">
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className="text-gray-300 hover:text-primary-400 transition-colors"
                   aria-label="Facebook"
                 >
                   <Facebook className="w-5 h-5" />
-                </a>
-                <a
-                  href="#"
+                </button>
+                <button
+                  type="button"
                   className="text-gray-300 hover:text-primary-400 transition-colors"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-5 h-5" />
-                </a>
-                <a
-                  href="#"
+                </button>
+                <button
+                  type="button"
                   className="text-gray-300 hover:text-primary-400 transition-colors"
                   aria-label="Twitter"
                 >
                   <Twitter className="w-5 h-5" />
-                </a>
+                </button>
               </div>
             </div>
 

@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { productsAPI } from '../utils/api';
@@ -30,7 +29,7 @@ interface Product {
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Unused variable
   const { language, addToCart } = useStore();
   
   const [product, setProduct] = useState<Product | null>(null);
@@ -45,6 +44,7 @@ const ProductDetailPage: React.FC = () => {
     } else {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchProduct = async () => {

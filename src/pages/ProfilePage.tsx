@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/useStore';
 import { authAPI, ordersAPI, reviewsAPI } from '../utils/api';
 
@@ -42,7 +41,7 @@ interface UserWithAddress {
 }
 
 const ProfilePage: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Unused variable
   const { user, theme, language, setTheme, setLanguage, setUser } = useStore();
   
   const [isEditing, setIsEditing] = useState(false);
