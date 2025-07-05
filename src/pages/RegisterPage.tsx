@@ -21,8 +21,8 @@ const RegisterPage: React.FC = () => {
     address: {
       street: '',
       area: '',
-      city: 'Dhaka',
-      district: 'Dhaka'
+      city: 'Rangpur',
+      district: 'Rangpur'
     },
     agreeToTerms: false
   });
@@ -302,7 +302,7 @@ const RegisterPage: React.FC = () => {
                       name="address.area"
                       value={formData.address.area}
                       onChange={handleChange}
-                      placeholder="Gulshan, Banani, etc."
+                      placeholder="Rangpur, etc."
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors"
                     />
                   </div>
@@ -318,10 +318,10 @@ const RegisterPage: React.FC = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors"
                     >
-                      <option value="Dhaka">Dhaka</option>
-                      <option value="Chittagong">Chittagong</option>
-                      <option value="Sylhet">Sylhet</option>
-                      <option value="Rajshahi">Rajshahi</option>
+                      <option value="Rangpur">Rangpur</option>
+                      <option value="Dinajpur">Dinajpur</option>
+                      <option value="Panchagarh">Panchagarh</option>
+                      <option value="Thakurgaon">Thakurgaon</option>
                     </select>
                   </div>
 

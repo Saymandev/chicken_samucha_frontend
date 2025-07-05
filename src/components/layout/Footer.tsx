@@ -1,12 +1,10 @@
 import {
-    Clock,
-    Facebook,
-    Heart,
-    Instagram,
-    Mail,
-    MapPin,
-    Phone,
-    Twitter
+  Clock,
+  Facebook,
+  Heart,
+  Mail,
+  MapPin,
+  Phone
 } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,8 +66,8 @@ const Footer: React.FC = () => {
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn' 
-                ? 'ঢাকার সবচেয়ে সুস্বাদু চিকেন সমুচা। তাজা উপাদান এবং ঐতিহ্যবাহী রেসিপি দিয়ে তৈরি।'
-                : 'Dhaka\'s most delicious chicken samosa. Made with fresh ingredients and traditional recipes.'
+                ? 'রংপুরের সবচেয়ে সুস্বাদু চিকেন সমুচা। তাজা উপাদান এবং ঐতিহ্যবাহী রেসিপি দিয়ে তৈরি।'
+                : 'Rangpur\'s most delicious chicken samosa. Made with fresh ingredients and traditional recipes.'
               }
             </p>
             
@@ -77,7 +75,7 @@ const Footer: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-sm">
                 <Phone className="w-4 h-4 text-primary-400" />
-                <span>+880 1234-567890</span>
+                <span>+880 1537134852</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <Mail className="w-4 h-4 text-primary-400" />
@@ -87,8 +85,8 @@ const Footer: React.FC = () => {
                 <MapPin className="w-4 h-4 text-primary-400" />
                 <span className={language === 'bn' ? 'font-bengali' : ''}>
                   {language === 'bn' 
-                    ? 'ঢাকা, বাংলাদেশ'
-                    : 'Dhaka, Bangladesh'
+                    ? 'রংপুর, বাংলাদেশ'
+                    : 'Rangpur, Bangladesh'
                   }
                 </span>
               </div>
@@ -165,6 +163,7 @@ const Footer: React.FC = () => {
                 {language === 'bn' ? 'আমাদের ফলো করুন:' : 'Follow us:'}
               </span>
               <div className="flex space-x-3">
+                <Link to="https://www.facebook.com/profile.php?id=61560857046585" target="_blank" rel="noopener noreferrer">
                 <button
                   type="button"
                   className="text-gray-300 hover:text-primary-400 transition-colors"
@@ -172,20 +171,8 @@ const Footer: React.FC = () => {
                 >
                   <Facebook className="w-5 h-5" />
                 </button>
-                <button
-                  type="button"
-                  className="text-gray-300 hover:text-primary-400 transition-colors"
-                  aria-label="Instagram"
-                >
-                  <Instagram className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  className="text-gray-300 hover:text-primary-400 transition-colors"
-                  aria-label="Twitter"
-                >
-                  <Twitter className="w-5 h-5" />
-                </button>
+                </Link>
+                
               </div>
             </div>
 

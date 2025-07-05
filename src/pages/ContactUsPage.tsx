@@ -209,7 +209,7 @@ const ContactUsPage: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         {t('contact.info.phone.title')}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">+880 123 456 7890</p>
+                      <p className="text-gray-600 dark:text-gray-300">+880 1537134852</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {t('contact.info.phone.hours')}
                       </p>
@@ -238,8 +238,8 @@ const ContactUsPage: React.FC = () => {
                         {t('contact.info.address.title')}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300">
-                        123 Food Street, Gulshan-2<br />
-                        Dhaka-1212, Bangladesh
+                        Rangpur, C.O Bazar<br />
+                        Bangladesh
                       </p>
                     </div>
                   </div>
