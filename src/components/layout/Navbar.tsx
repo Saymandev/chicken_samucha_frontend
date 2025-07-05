@@ -315,7 +315,7 @@ const Navbar: React.FC = () => {
                 e.stopPropagation();
                 toggleMobileMenu();
               }}
-              className="md:hidden relative z-40 p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors pointer-events-auto"
+              className="lg:hidden relative z-40 p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors pointer-events-auto"
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
@@ -334,7 +334,7 @@ const Navbar: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4 relative z-50"
+              className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-4 relative z-50"
             >
               <div className="space-y-2">
                 {navItems.map((item) => (
