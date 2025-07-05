@@ -217,8 +217,8 @@ const HomePage: React.FC = () => {
                 icon: '🚚',
                 title: language === 'bn' ? 'দ্রুত ডেলিভারি' : 'Fast Delivery',
                 description: language === 'bn'
-                  ? 'ঢাকার যেকোনো জায়গায় দ্রুত এবং নিরাপদ ডেলিভারি'
-                  : 'Quick and safe delivery anywhere in Dhaka'
+                  ? 'রংপুরের যেকোনো জায়গায় দ্রুত এবং নিরাপদ ডেলিভারি'
+                  : 'Quick and safe delivery anywhere in Rangpur'
               },
               {
                 icon: '💳',
@@ -333,8 +333,8 @@ const HomePage: React.FC = () => {
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn'
-                ? 'ঢাকার সেরা চিকেন সমুচার স্বাদ নিন। ফ্রি ডেলিভারি ৫০০ টাকার উপরে!'
-                : 'Taste the best chicken samosa in Dhaka. Free delivery on orders above ৳500!'
+                ? 'রংপুরের সেরা চিকেন সমুচার স্বাদ নিন। ফ্রি ডেলিভারি ৫০০ টাকার উপরে!'
+                : 'Taste the best chicken samosa in Rangpur. Free delivery on orders above ৳500!'
               }
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

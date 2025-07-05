@@ -548,7 +548,7 @@ const AdminOrders: React.FC = () => {
                             <span className="text-sm text-gray-600 dark:text-gray-300">Delivery Address:</span>
                             <p className="font-medium text-gray-900 dark:text-white">
                               {selectedOrder.deliveryInfo.address || 
-                                `${selectedOrder.customer.address?.street || ''} ${selectedOrder.customer.address?.area || ''}, ${selectedOrder.customer.address?.city || 'Dhaka'}, ${selectedOrder.customer.address?.district || 'Dhaka'}`
+                                `${selectedOrder.customer.address?.street || ''} ${selectedOrder.customer.address?.area || ''}, ${selectedOrder.customer.address?.city || 'Rangpur'}, ${selectedOrder.customer.address?.district || 'Rangpur'}`
                               }
                             </p>
                             {selectedOrder.customer.address?.landmark && (

@@ -43,8 +43,8 @@ const CheckoutPage: React.FC = () => {
     address: {
       street: user?.address?.street || '',
       area: user?.address?.area || '',
-      city: user?.address?.city || 'Dhaka',
-      district: user?.address?.district || 'Dhaka',
+      city: user?.address?.city || 'Rangpur',
+      district: user?.address?.district || 'Rangpur',
       postalCode: user?.address?.postalCode || ''
     }
   });
