@@ -146,7 +146,7 @@ const Navbar: React.FC = () => {
             {/* Logo - visible on small and large screens */}
            
             {/* Website name - hidden on small screens, visible on medium and large */}
-            <span className={`font-bold text-xl text-primary-600 hidden sm:block ${
+            <span className={`font-bold text-xl text-primary-600  ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn' ? 'চিকেন সমুচা' : 'Chicken Samosa'}
