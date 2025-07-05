@@ -57,6 +57,26 @@ const ReviewsPage: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showReviewModal) {
+        setShowReviewModal(false);
+      }
+    };
+
+    if (showReviewModal) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showReviewModal]);
+
   // Fetch reviews
   const fetchReviews =useCallback( async () => {
     setIsLoading(true);
@@ -497,25 +517,32 @@ const ReviewsPage: React.FC = () => {
 
         {/* Write Review Modal */}
         {showReviewModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowReviewModal(false);
+              }
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md my-8 max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <div className="flex items-center justify-between mb-4 sm:mb-6 sticky top-0 bg-white dark:bg-gray-800 py-2 -mx-6 px-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                   Write a Review
                 </h3>
                 <button
                   onClick={() => setShowReviewModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmitReview} className="space-y-4">
+              <form onSubmit={handleSubmitReview} className="space-y-3 sm:space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Product Name *
@@ -563,8 +590,8 @@ const ReviewsPage: React.FC = () => {
                     value={reviewForm.comment}
                     onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
                     placeholder="Share your experience with this product..."
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
+                    rows={3}
+                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
                     required
                   />
                 </div>
@@ -601,7 +628,7 @@ const ReviewsPage: React.FC = () => {
 
                   {/* Upload Button */}
                   <div
-                    className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center"
+                    className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 sm:p-4 text-center"
                     onDrop={(e) => {
                       e.preventDefault();
                       const files = Array.from(e.dataTransfer.files);
@@ -639,7 +666,7 @@ const ReviewsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 pt-3 sm:pt-4">
                   <button
                     type="submit"
                     disabled={isSubmittingReview}
