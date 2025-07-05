@@ -22,7 +22,7 @@ const transformData = (data: any): any => {
   return data;
 };
 // changes made here
-const API_BASE_URL =  process.env.API_URL || 'http://localhost:5000/api';
+const API_BASE_URL =  process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
