@@ -1,18 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Globe,
-    Home,
-    LogOut,
-    Menu,
-    MessageCircle,
-    Moon,
-    Package,
-    Settings,
-    ShoppingCart,
-    Star,
-    Sun,
-    User,
-    X
+  Globe,
+  Home,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Moon,
+  Package,
+  Settings,
+  ShoppingCart,
+  Star,
+  Sun,
+  User,
+  X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -144,7 +144,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             {/* Logo - visible on small and large screens */}
-            <div className="text-2xl sm:hidden lg:block">🥟</div>
+           
             {/* Website name - hidden on small screens, visible on medium and large */}
             <span className={`font-bold text-xl text-primary-600 hidden sm:block ${
               language === 'bn' ? 'font-bengali' : ''
@@ -154,7 +154,7 @@ const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.path}
