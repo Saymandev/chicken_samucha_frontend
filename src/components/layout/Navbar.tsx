@@ -1,18 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Globe,
-  Home,
-  LogOut,
-  Menu,
-  MessageCircle,
-  Moon,
-  Package,
-  Settings,
-  ShoppingCart,
-  Star,
-  Sun,
-  User,
-  X
+    Globe,
+    Home,
+    LogOut,
+    Menu,
+    MessageCircle,
+    Moon,
+    Package,
+    Settings,
+    ShoppingCart,
+    Star,
+    Sun,
+    User,
+    X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -143,8 +143,10 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl">🥟</div>
-            <span className={`font-bold text-xl text-primary-600 ${
+            {/* Logo - visible on small and large screens */}
+            <div className="text-2xl sm:hidden lg:block">🥟</div>
+            {/* Website name - hidden on small screens, visible on medium and large */}
+            <span className={`font-bold text-xl text-primary-600 hidden sm:block ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn' ? 'চিকেন সমুচা' : 'Chicken Samosa'}

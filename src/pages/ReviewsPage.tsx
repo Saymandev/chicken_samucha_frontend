@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Calendar, MessageSquare, Search, Star, ThumbsUp, User, X } from 'lucide-react';
+import { Calendar, ImagePlus, MessageSquare, Search, Star, ThumbsUp, User, X } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useStore } from '../store/useStore';
@@ -22,6 +22,10 @@ interface Review {
   originalProductName?: string;
   rating: number;
   comment: { en: string; bn?: string; } | string;
+  images?: Array<{
+    url: string;
+    public_id: string;
+  }>;
   isVerified: boolean;
   helpfulVotes: number;
   createdAt: string;
@@ -50,6 +54,7 @@ const ReviewsPage: React.FC = () => {
     comment: '',
     orderNumber: ''
   });
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // Fetch reviews
@@ -139,6 +144,11 @@ const ReviewsPage: React.FC = () => {
         formData.append('orderNumber', reviewForm.orderNumber);
       }
 
+      // Add images if selected
+      selectedImages.forEach((file) => {
+        formData.append('images', file);
+      });
+
       
       // Log FormData contents (TypeScript-safe way)
       const formDataEntries: string[] = [];
@@ -153,6 +163,7 @@ const ReviewsPage: React.FC = () => {
         toast.success('Review submitted successfully!');
         setShowReviewModal(false);
         setReviewForm({ productName: '', rating: 0, comment: '', orderNumber: '' });
+        setSelectedImages([]);
         fetchReviews(); // Refresh reviews
       }
     } catch (error: any) {
@@ -384,6 +395,24 @@ const ReviewsPage: React.FC = () => {
                         {getCommentText(review.comment)}
                       </p>
 
+                      {/* Review Images */}
+                      {review.images && review.images.length > 0 && (
+                        <div className="mb-4">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {review.images.map((image, index) => (
+                              <div key={index} className="relative group">
+                                <img
+                                  src={image.url}
+                                  alt={`Review ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
+                                  onClick={() => window.open(image.url, '_blank')}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Admin Response */}
                       {review.adminResponse && (
                         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 mb-4">
@@ -538,6 +567,76 @@ const ReviewsPage: React.FC = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
                     required
                   />
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Product Images (Optional)
+                  </label>
+                  
+                  {/* Selected Images Preview */}
+                  {selectedImages.length > 0 && (
+                    <div className="mb-4">
+                      <div className="grid grid-cols-3 gap-2">
+                        {selectedImages.map((file, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Product ${index + 1}`}
+                              className="w-full h-20 object-cover rounded-lg border border-gray-300"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setSelectedImages(prev => prev.filter((_, i) => i !== index))}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upload Button */}
+                  <div
+                    className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center"
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const files = Array.from(e.dataTransfer.files);
+                      const imageFiles = files.filter(file => file.type.startsWith('image/'));
+                      setSelectedImages(prev => [...prev, ...imageFiles]);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files) {
+                          const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+                          setSelectedImages(prev => [...prev, ...imageFiles]);
+                        }
+                      }}
+                      className="hidden"
+                      id="review-image-upload"
+                    />
+                    <label
+                      htmlFor="review-image-upload"
+                      className="cursor-pointer flex flex-col items-center gap-2"
+                    >
+                      <ImagePlus className="w-8 h-8 text-gray-400" />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Click to upload images or drag and drop
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        PNG, JPG, GIF up to 5MB each (max 5 images)
+                      </span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-4">
