@@ -208,6 +208,9 @@ export const chatAPI = {
     api.post('/chat/message', messageData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
+  
+  updateChatSession: (chatId: string, data: any) =>
+    api.put(`/chat/session/${chatId}`, data),
 };
 
 // Contact and Support APIs

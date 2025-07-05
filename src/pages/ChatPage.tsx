@@ -55,7 +55,8 @@ const ChatPage: React.FC = () => {
     phone: '',
     subject: ''
   });
-  const [showGuestForm, setShowGuestForm] = useState(!isAuthenticated);
+  const [showGuestForm, setShowGuestForm] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(true);
   
   // File attachment and emoji states
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -67,6 +68,9 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && user) {
       initializeChat();
+    } else if (!isAuthenticated) {
+      // For non-authenticated users, show anonymous option first
+      setShowGuestForm(false);
     }
     
     return () => {
@@ -108,6 +112,11 @@ const ChatPage: React.FC = () => {
         name: user?.name || 'User',
         phone: user?.phone || '',
         email: user?.email || ''
+      } : isAnonymous ? {
+        name: 'Anonymous User',
+        phone: '',
+        email: '',
+        isAnonymous: true
       } : guestForm;
       
       
@@ -317,7 +326,50 @@ const ChatPage: React.FC = () => {
       return;
     }
     setShowGuestForm(false);
+    setIsAnonymous(false);
     initializeChat();
+  };
+
+  const handleAnonymousStart = () => {
+    setIsAnonymous(true);
+    setShowGuestForm(false);
+    initializeChat();
+  };
+
+  const handleUpdateWithDetails = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!guestForm.name || !guestForm.email) {
+      toast.error('Please fill in your name and email');
+      return;
+    }
+    
+    try {
+      // Update the session with user details
+      const response = await chatAPI.updateChatSession(chatSession?.chatId || '', {
+        customerInfo: {
+          name: guestForm.name,
+          email: guestForm.email,
+          phone: guestForm.phone,
+          subject: guestForm.subject,
+          isAnonymous: false
+        }
+      });
+      
+      if (response.data.success) {
+        setIsAnonymous(false);
+        setShowGuestForm(false);
+        toast.success('Your details have been updated');
+        // Refresh the chat session
+        if (chatSession?.chatId) {
+          const messagesResponse = await chatAPI.getChatMessages(chatSession.chatId);
+          const loadedMessages = messagesResponse.data?.data?.messages || [];
+          setMessages(loadedMessages);
+        }
+      }
+    } catch (error: any) {
+      console.error('Error updating session:', error);
+      toast.error('Failed to update your details');
+    }
   };
 
   const scrollToBottom = () => {
@@ -372,70 +424,91 @@ const ChatPage: React.FC = () => {
               Start Live Chat
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
-              Please provide your details to begin chatting with our support team.
+              Choose how you'd like to start chatting with our support team.
             </p>
           </div>
 
-          <form onSubmit={handleGuestSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                value={guestForm.name}
-                onChange={(e) => setGuestForm(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email *
-              </label>
-              <input
-                type="email"
-                value={guestForm.email}
-                onChange={(e) => setGuestForm(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Phone
-              </label>
-              <input
-                type="tel"
-                value={guestForm.phone}
-                onChange={(e) => setGuestForm(prev => ({ ...prev, phone: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Subject
-              </label>
-              <select
-                value={guestForm.subject}
-                onChange={(e) => setGuestForm(prev => ({ ...prev, subject: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="">Select a topic</option>
-                <option value="order">Order Inquiry</option>
-                <option value="delivery">Delivery Issue</option>
-                <option value="payment">Payment Problem</option>
-                <option value="complaint">Complaint</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+          <div className="space-y-4">
+            {/* Anonymous Option */}
             <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300"
+              type="button"
+              onClick={handleAnonymousStart}
+              className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 flex items-center justify-center space-x-2"
             >
-              Start Chat
+              <User className="w-5 h-5" />
+              <span>Start Anonymous Chat</span>
             </button>
-          </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">or</span>
+              </div>
+            </div>
+
+            <form onSubmit={chatSession ? handleUpdateWithDetails : handleGuestSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={guestForm.name}
+                  onChange={(e) => setGuestForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={guestForm.email}
+                  onChange={(e) => setGuestForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={guestForm.phone}
+                  onChange={(e) => setGuestForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Subject
+                </label>
+                <select
+                  value={guestForm.subject}
+                  onChange={(e) => setGuestForm(prev => ({ ...prev, subject: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  <option value="">Select a topic</option>
+                  <option value="order">Order Inquiry</option>
+                  <option value="delivery">Delivery Issue</option>
+                  <option value="payment">Payment Problem</option>
+                  <option value="complaint">Complaint</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300"
+              >
+                {chatSession ? 'Update Details' : 'Start Chat with Details'}
+              </button>
+            </form>
+          </div>
         </motion.div>
       </div>
     );
@@ -475,6 +548,15 @@ const ChatPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
+                {!isAuthenticated && isAnonymous && (
+                  <button 
+                    onClick={() => setShowGuestForm(true)}
+                    className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm"
+                    title="Provide your details"
+                  >
+                    Add Details
+                  </button>
+                )}
                 <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                   <Phone className="w-5 h-5" />
                 </button>
