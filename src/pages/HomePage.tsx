@@ -4,13 +4,12 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import HeroSlider from '../components/common/HeroSlider';
+import ReviewSlider from '../components/common/ReviewSlider';
 import {
   GridSkeleton,
-  ProductCardSkeleton,
-  ReviewCardSkeleton
+  ProductCardSkeleton
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
-import ReviewCard from '../components/review/ReviewCard';
 import { Product, useStore } from '../store/useStore';
 import { contentAPI, productsAPI, reviewsAPI } from '../utils/api';
 
@@ -277,39 +276,24 @@ const HomePage: React.FC = () => {
           </motion.div>
 
           {loadingReviews ? (
-            <GridSkeleton 
-              items={6} 
-              ItemComponent={ReviewCardSkeleton}
-              columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-            />
-          ) : (featuredReviews && featuredReviews.length > 0) ? (
+            <div className="flex justify-center">
+              <div className="animate-pulse">
+                <div className="w-96 h-64 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+              </div>
+            </div>
+          ) : (
             <motion.div
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              transition={{ delay: 0.2 }}
             >
-              {(featuredReviews || []).map((review, index) => (
-                <motion.div
-                  key={review.id}
-                  initial={{ y: 30, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <ReviewCard review={review} />
-                </motion.div>
-              ))}
+              <ReviewSlider 
+                reviews={featuredReviews || []} 
+                autoPlay={true}
+                interval={5000}
+              />
             </motion.div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                {language === 'bn' 
-                  ? 'এখনো কোন রিভিউ নেই। প্রথম রিভিউ দিন!'
-                  : 'No reviews yet. Be the first to review!'
-                }
-              </p>
-            </div>
           )}
 
           <motion.div
