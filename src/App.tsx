@@ -33,6 +33,7 @@ import TrackOrderPage from './pages/TrackOrderPage';
 // User Pages
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import NotificationsPage from './pages/NotificationsPage';
 import OrdersPage from './pages/OrdersPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProfilePage from './pages/ProfilePage';
@@ -95,6 +96,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />

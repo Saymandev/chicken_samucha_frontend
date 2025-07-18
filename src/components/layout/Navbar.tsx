@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import { Skeleton } from '../common/Skeleton';
+import UserNotificationDropdown from '../UserNotificationDropdown';
 
 const Navbar: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -209,6 +210,11 @@ const Navbar: React.FC = () => {
                 {language === 'en' ? 'বাং' : 'EN'}
               </span>
             </button>
+
+            {/* User Notifications */}
+            {user && (
+              <UserNotificationDropdown />
+            )}
 
             {/* Shopping Cart */}
             <Link

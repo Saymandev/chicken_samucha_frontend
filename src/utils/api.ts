@@ -145,6 +145,11 @@ export const authAPI = {
   
   trackGuestOrder: (orderNumber: string, phone: string) =>
     api.post('/auth/track-order', { orderNumber, phone }),
+
+  // User notifications
+  getUserNotifications: (params?: any) => api.get('/users/notifications', { params }),
+  markNotificationAsRead: (id: string) => api.put(`/users/notifications/${id}/read`),
+  markAllNotificationsAsRead: () => api.put('/users/notifications/mark-all-read'),
 };
 
 export const productsAPI = {
