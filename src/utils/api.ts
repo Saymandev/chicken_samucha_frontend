@@ -346,6 +346,11 @@ export const adminAPI = {
   assignChatSession: (chatId: string, adminId: string) => api.put(`/chat/admin/session/${chatId}/assign`, { adminId }),
   closeChatSession: (chatId: string) => api.put(`/chat/session/${chatId}/end`),
   
+  // Notifications
+  getNotifications: (params?: any) => api.get('/admin/notifications', { params }),
+  markNotificationAsRead: (id: string) => api.put(`/admin/notifications/${id}/read`),
+  markAllNotificationsAsRead: () => api.put('/admin/notifications/mark-all-read'),
+  
   // Analytics
   getRevenueStats: (period: string) => api.get(`/admin/analytics/revenue?period=${period}`),
   getOrderStats: (period: string) => api.get(`/admin/analytics/orders?period=${period}`),

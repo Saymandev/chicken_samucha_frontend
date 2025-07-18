@@ -1,26 +1,26 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  BarChart3,
-  Bell,
-  ChevronLeft,
-  FileText,
-  Home,
-  LogOut,
-  Menu,
-  MessageCircle,
-  Moon,
-  Package,
-  Settings,
-  ShoppingBag,
-  Star,
-  Sun,
-  Users,
-  X
+    BarChart3,
+    ChevronLeft,
+    FileText,
+    Home,
+    LogOut,
+    Menu,
+    MessageCircle,
+    Moon,
+    Package,
+    Settings,
+    ShoppingBag,
+    Star,
+    Sun,
+    Users,
+    X
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
+import NotificationDropdown from '../NotificationDropdown';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -399,10 +399,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
           {/* Header Actions */}
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-            </button>
+            <NotificationDropdown />
             
             <Link
               to="/admin/content"

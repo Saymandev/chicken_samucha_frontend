@@ -293,24 +293,33 @@ const AdminOrders: React.FC = () => {
               key={getOrderId(order)}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-4">
+                <div className="flex-1">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     {order.orderNumber}
                   </h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                    <span>{order.customer.name}</span>
-                    <span>{order.customer.phone}</span>
-                    <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">👤</span>
+                      {order.customer.name}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">📞</span>
+                      {order.customer.phone}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">📅</span>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <div className="flex flex-col sm:text-right">
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     ৳{order.finalAmount || order.totalAmount}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <span className={`inline-block px-3 py-1 text-xs rounded-full ${getStatusColor(order.orderStatus)}`}>
                       {order.orderStatus.replace('_', ' ').toUpperCase()}
                     </span>
@@ -327,7 +336,7 @@ const AdminOrders: React.FC = () => {
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
                   Payment Information
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
                     <span className="text-sm text-gray-600 dark:text-gray-300">Method:</span>
                     <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.method.toUpperCase()}</p>
@@ -342,14 +351,14 @@ const AdminOrders: React.FC = () => {
                     </p>
                   </div>
                   {order.paymentInfo.transactionId && (
-                    <div>
+                    <div className="sm:col-span-2 lg:col-span-1">
                       <span className="text-sm text-gray-600 dark:text-gray-300">Transaction ID:</span>
-                      <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.transactionId}</p>
+                      <p className="font-medium text-gray-900 dark:text-white break-all">{order.paymentInfo.transactionId}</p>
                     </div>
                   )}
                 </div>
                 {order.paymentInfo.screenshot && (
-                  <div className="mt-2">
+                  <div className="mt-3">
                     <span className="text-sm text-gray-600 dark:text-gray-300">Payment Screenshot:</span>
                     <button 
                       onClick={() => window.open(order.paymentInfo.screenshot?.url, '_blank')}
@@ -366,90 +375,91 @@ const AdminOrders: React.FC = () => {
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Order Items</h4>
                 <div className="space-y-2">
                   {order.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-1">
-                      <span className="text-gray-900 dark:text-gray-100">{getItemName(item)} x {item.quantity}</span>
-                      <span className="font-medium text-gray-900 dark:text-white">৳{(item.subtotal || item.price * item.quantity)}</span>
+                    <div key={index} className="flex justify-between items-center py-1 flex-wrap gap-2">
+                      <span className="text-gray-900 dark:text-gray-100 flex-1 min-w-0">
+                        {getItemName(item)} x {item.quantity}
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                        ৳{(item.subtotal || item.price * item.quantity)}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 <button 
                   onClick={() => viewOrderDetails(order)}
-                  className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex items-center gap-2 bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
                 >
                   <Eye className="w-4 h-4" />
-                  View Details
+                  <span className="hidden sm:inline">View Details</span>
+                  <span className="sm:hidden">View</span>
                 </button>
                 
                 {order.paymentInfo.status === 'pending' && (
                   <button
                     onClick={() => verifyPayment(getOrderId(order))}
-                    className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                    className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm"
                   >
                     <CheckCircle className="w-4 h-4" />
-                    Verify Payment
+                    <span className="hidden sm:inline">Verify Payment</span>
+                    <span className="sm:hidden">Verify</span>
                   </button>
                 )}
 
                 {order.orderStatus === 'pending' && (
                   <button
                     onClick={() => confirmOrder(getOrderId(order))}
-                    className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                    className="flex items-center gap-2 bg-orange-500 text-white px-3 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm"
                   >
                     <Clock className="w-4 h-4" />
-                    Confirm Order
+                    <span className="hidden sm:inline">Confirm Order</span>
+                    <span className="sm:hidden">Confirm</span>
                   </button>
                 )}
 
                 {order.orderStatus === 'confirmed' && (
                   <button
                     onClick={() => updateOrderStatus(getOrderId(order), 'preparing')}
-                    className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors"
+                    className="flex items-center gap-2 bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm"
                   >
                     <Package className="w-4 h-4" />
-                    Start Preparing
+                    <span className="hidden sm:inline">Start Preparing</span>
+                    <span className="sm:hidden">Preparing</span>
                   </button>
                 )}
 
                 {order.orderStatus === 'ready' && (
                   <button
                     onClick={() => updateOrderStatus(getOrderId(order), 'out_for_delivery')}
-                    className="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
+                    className="flex items-center gap-2 bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm"
                   >
                     <Truck className="w-4 h-4" />
-                    Out for Delivery
-                  </button>
-                )}
-
-                {order.orderStatus === 'ready' && (
-                  <button
-                    onClick={() => updateOrderStatus(getOrderId(order), 'out_for_delivery')}
-                    className="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
-                  >
-                    <Truck className="w-4 h-4" />
-                    Send for Delivery
+                    <span className="hidden sm:inline">Send for Delivery</span>
+                    <span className="sm:hidden">Send</span>
                   </button>
                 )}
 
                 {order.orderStatus === 'out_for_delivery' && (
                   <button
                     onClick={() => updateOrderStatus(getOrderId(order), 'delivered')}
-                    className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                    className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm"
                   >
                     <CheckCircle className="w-4 h-4" />
-                    Mark as Delivered
+                    <span className="hidden sm:inline">Mark as Delivered</span>
+                    <span className="sm:hidden">Delivered</span>
                   </button>
                 )}
 
                 <button 
                   onClick={() => cancelOrder(getOrderId(order))}
-                  className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                  className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
                 >
                   <XCircle className="w-4 h-4" />
-                  Cancel Order
+                  <span className="hidden sm:inline">Cancel Order</span>
+                  <span className="sm:hidden">Cancel</span>
                 </button>
               </div>
             </motion.div>
@@ -490,15 +500,15 @@ const AdminOrders: React.FC = () => {
         {/* Order Details Modal */}
         {showOrderModal && selectedOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     Order Details - {selectedOrder.orderNumber}
                   </h2>
                   <button
                     onClick={() => setShowOrderModal(false)}
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 self-end sm:self-auto"
                   >
                     <XCircle className="w-6 h-6" />
                   </button>
@@ -508,7 +518,7 @@ const AdminOrders: React.FC = () => {
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Customer Information</h3>
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <span className="text-sm text-gray-600 dark:text-gray-300">Name:</span>
                         <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer.name}</p>
@@ -518,7 +528,7 @@ const AdminOrders: React.FC = () => {
                         <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer.phone}</p>
                       </div>
                       {selectedOrder.customer.email && (
-                        <div className="md:col-span-2">
+                        <div className="sm:col-span-2">
                           <span className="text-sm text-gray-600 dark:text-gray-300">Email:</span>
                           <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customer.email}</p>
                         </div>
