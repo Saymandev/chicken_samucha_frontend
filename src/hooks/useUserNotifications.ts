@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { authAPI } from '../utils/api';
 
 export interface UserNotification {
@@ -15,7 +15,7 @@ export const useUserNotifications = (userId?: string) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!userId) return;
     
     try {
@@ -29,7 +29,7 @@ export const useUserNotifications = (userId?: string) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   const markAsRead = async (notificationId: string) => {
     try {
@@ -59,7 +59,7 @@ export const useUserNotifications = (userId?: string) => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [userId]);
+  }, [fetchNotifications]);
 
   return {
     notifications,
