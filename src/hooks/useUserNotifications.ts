@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import io, { Socket } from 'socket.io-client';
 import { authAPI } from '../utils/api';
 
 export interface UserNotification {
@@ -14,6 +15,7 @@ export const useUserNotifications = (userId?: string) => {
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   const fetchNotifications = useCallback(async () => {
     if (!userId) return;
@@ -54,6 +56,50 @@ export const useUserNotifications = (userId?: string) => {
       console.error('Error marking all notifications as read:', error);
     }
   };
+
+  // Socket.IO setup for real-time notifications
+  useEffect(() => {
+    if (!userId) return;
+
+    const API_BASE_URL = process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api';
+    const socketURL = API_BASE_URL.replace('/api', '');
+    
+    const newSocket = io(socketURL, {
+      transports: ['websocket', 'polling']
+    });
+
+    newSocket.on('connect', () => {
+      console.log('Connected to notification socket');
+      // Join user-specific room for notifications
+      newSocket.emit('join-user-room', userId);
+    });
+
+    // Listen for new notifications
+    newSocket.on('new-user-notification', (notification: UserNotification) => {
+      setNotifications(prev => [notification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+    });
+
+    // Listen for order status updates
+    newSocket.on('order-status-updated', (data: any) => {
+      const notification: UserNotification = {
+        id: `order-${Date.now()}`,
+        type: 'order',
+        title: 'Order Status Updated',
+        message: `Your order ${data.orderNumber} is now ${data.newStatus.replace('_', ' ')}`,
+        read: false,
+        timestamp: new Date()
+      };
+      setNotifications(prev => [notification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [userId]);
 
   useEffect(() => {
     fetchNotifications();
