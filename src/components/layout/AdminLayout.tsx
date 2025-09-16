@@ -1,20 +1,21 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    BarChart3,
-    ChevronLeft,
-    FileText,
-    Home,
-    LogOut,
-    Menu,
-    MessageCircle,
-    Moon,
-    Package,
-    Settings,
-    ShoppingBag,
-    Star,
-    Sun,
-    Users,
-    X
+  BarChart3,
+  ChevronLeft,
+  FileText,
+  Home,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Moon,
+  Package,
+  Settings,
+  ShoppingBag,
+  Star,
+  Sun,
+  TicketPercent,
+  Users,
+  X
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
