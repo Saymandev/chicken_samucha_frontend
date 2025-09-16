@@ -27,6 +27,11 @@ interface Product {
   isAvailable: boolean;
   isFeatured: boolean;
   ratings: { average: number; count: number };
+  analytics?: {
+    viewCount: number;
+    addToCartCount: number;
+    purchaseCount: number;
+  };
   createdAt: string;
 }
 
@@ -294,6 +299,30 @@ const AdminProducts: React.FC = () => {
                     Stock: {product.stock || 0}
                   </span>
                 </div>
+
+                {/* Analytics */}
+                {product.analytics && (
+                  <div className="grid grid-cols-3 gap-2 mb-4 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                        {product.analytics.viewCount || 0}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Views</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-green-600 dark:text-green-400">
+                        {product.analytics.addToCartCount || 0}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Cart Adds</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-orange-600 dark:text-orange-400">
+                        {product.analytics.purchaseCount || 0}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Purchases</div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 mb-4">
                   {product.discountPrice ? (

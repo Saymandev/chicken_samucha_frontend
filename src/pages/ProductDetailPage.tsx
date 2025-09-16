@@ -3,8 +3,9 @@ import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react'
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
+import ProductCard from '../components/product/ProductCard';
 import { useStore } from '../store/useStore';
-import { productsAPI } from '../utils/api';
+import { productsAPI, reviewsAPI } from '../utils/api';
 
 interface Product {
   id: string;
@@ -24,6 +25,30 @@ interface Product {
   ratings: { average: number; count: number };
   minOrderQuantity: number;
   maxOrderQuantity: number;
+  analytics?: {
+    viewCount: number;
+    addToCartCount: number;
+    purchaseCount: number;
+  };
+}
+
+interface Review {
+  id: string;
+  customer: {
+    name: string;
+    email?: string;
+    phone?: string;
+    avatar?: { url: string; public_id: string };
+  };
+  rating: number;
+  comment: { en: string; bn: string };
+  images?: Array<{ url: string; public_id: string }>;
+  createdAt: string;
+  isVerified: boolean;
+  adminResponse?: {
+    message: { en: string; bn: string };
+    respondedAt: string;
+  };
 }
 
 const ProductDetailPage: React.FC = () => {
@@ -37,10 +62,16 @@ const ProductDetailPage: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [relatedLoading, setRelatedLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchProduct();
+      fetchReviews();
+      fetchRelatedProducts();
     } else {
       setLoading(false);
     }
@@ -62,12 +93,48 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      const response = await reviewsAPI.getProductReviews(id!, { limit: 10 });
+      if (response.data.success) {
+        setReviews(response.data.data);
+      }
+    } catch (error: any) {
+      console.error('Error fetching reviews:', error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  const fetchRelatedProducts = async () => {
+    try {
+      setRelatedLoading(true);
+      const response = await productsAPI.getRelatedProducts(id!, 4);
+      if (response.data.success) {
+        setRelatedProducts(response.data.products);
+      }
+    } catch (error: any) {
+      console.error('Error fetching related products:', error);
+    } finally {
+      setRelatedLoading(false);
+    }
+  };
+
   const handleAddToCart = async () => {
     if (!product) return;
     
     setIsAddingToCart(true);
     try {
       addToCart(product, quantity);
+      
+      // Track add to cart analytics
+      try {
+        await productsAPI.trackAddToCart(product.id);
+      } catch (error) {
+        console.error('Failed to track add to cart:', error);
+      }
+      
       toast.success(`Added ${quantity} ${language === 'bn' ? product.name.bn : product.name.en} to cart!`);
     } catch (error) {
       toast.error('Failed to add to cart');
@@ -381,6 +448,130 @@ const ProductDetailPage: React.FC = () => {
                   </span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Reviews Section */}
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+              Customer Reviews ({product.ratings.count})
+            </h3>
+            
+            {reviewsLoading ? (
+              <div className="animate-pulse space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                      <div className="space-y-1">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                      </div>
+                    </div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                  </div>
+                ))}
+              </div>
+            ) : reviews.length > 0 ? (
+              <div className="space-y-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+                        <span className="text-orange-600 dark:text-orange-400 font-semibold text-sm">
+                          {review.customer.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            {review.customer.name}
+                          </h4>
+                          {review.isVerified && (
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                              Verified
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          {renderStars(review.rating)}
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300">
+                          {language === 'bn' && review.comment.bn ? review.comment.bn : review.comment.en}
+                        </p>
+                        
+                        {review.images && review.images.length > 0 && (
+                          <div className="flex gap-2 mt-3">
+                            {review.images.map((image, index) => (
+                              <img
+                                key={index}
+                                src={image.url}
+                                alt="Review"
+                                className="w-16 h-16 object-cover rounded-lg"
+                              />
+                            ))}
+                          </div>
+                        )}
+                        
+                        {review.adminResponse && (
+                          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                Admin Response
+                              </span>
+                              <span className="text-xs text-blue-600 dark:text-blue-400">
+                                {new Date(review.adminResponse.respondedAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                              {language === 'bn' && review.adminResponse.message.bn 
+                                ? review.adminResponse.message.bn 
+                                : review.adminResponse.message.en}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Star className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">
+                  No reviews yet. Be the first to review this product!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Related Products Section */}
+          {relatedProducts.length > 0 && (
+            <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                Related Products
+              </h3>
+              
+              {relatedLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {relatedProducts.map((relatedProduct) => (
+                    <ProductCard key={relatedProduct.id} product={relatedProduct} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </motion.div>

@@ -156,6 +156,14 @@ export const productsAPI = {
   getFeaturedProducts: (limit?: number) =>
     api.get('/products/featured', { params: { limit } }),
   getProduct: (id: string) => api.get(`/products/${id}`),
+  getRelatedProducts: (id: string, limit?: number) =>
+    api.get(`/products/${id}/related`, { params: { limit } }),
+  trackAddToCart: (productId: string) =>
+    api.post(`/products/${productId}/track-cart`),
+  trackPurchase: (productId: string, quantity: number) =>
+    api.post('/products/track-purchase', { productId, quantity }),
+  getProductAnalytics: (id: string) => api.get(`/products/${id}/analytics`),
+  getAllProductsAnalytics: (params?: any) => api.get('/products/analytics/all', { params }),
 };
 
 export const ordersAPI = {
@@ -180,9 +188,9 @@ export const reviewsAPI = {
   getReviews: (params?: any) => api.get('/reviews', { params }),
   getFeaturedReviews: (limit?: number) =>
     api.get('/reviews/featured', { params: { limit } }),
-  
+  getProductReviews: (productId: string, params?: any) =>
+    api.get('/reviews', { params: { productId, ...params } }),
   getMyReviews: (params?: any) => api.get('/reviews/my-reviews', { params }),
-  
   createReview: (reviewData: FormData) =>
     api.post('/reviews', reviewData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -359,7 +367,39 @@ export const adminAPI = {
   getRevenueStats: (period: string) => api.get(`/admin/analytics/revenue?period=${period}`),
   getOrderStats: (period: string) => api.get(`/admin/analytics/orders?period=${period}`),
   getUserStats: (period: string) => api.get(`/admin/analytics/users?period=${period}`),
-  getProductPerformance: () => api.get('/admin/analytics/products')
+  getProductPerformance: () => api.get('/admin/analytics/products'),
+  
+  // Product Analytics
+  getAllProductsAnalytics: (params?: any) => api.get('/products/analytics/all', { params }),
+  getProductAnalytics: (id: string) => api.get(`/products/${id}/analytics`)
+};
+
+// Coupon API
+export const couponAPI = {
+  // Get active coupons (public)
+  getActiveCoupons: () => api.get('/coupons/active'),
+  
+  // Validate coupon
+  validateCoupon: (data: {
+    code: string;
+    orderAmount: number;
+    userId?: string;
+    orderProducts?: string[];
+  }) => api.post('/coupons/validate', data),
+  
+  // Apply coupon
+  applyCoupon: (data: {
+    code: string;
+    orderAmount: number;
+    orderProducts?: string[];
+  }) => api.post('/coupons/apply', data),
+  
+  // Admin coupon management
+  getAllCoupons: (params?: any) => api.get('/coupons', { params }),
+  getCoupon: (id: string) => api.get(`/coupons/${id}`),
+  createCoupon: (couponData: any) => api.post('/coupons', couponData),
+  updateCoupon: (id: string, couponData: any) => api.put(`/coupons/${id}`, couponData),
+  deleteCoupon: (id: string) => api.delete(`/coupons/${id}`)
 };
 
 // Bangladesh Mobile Payment API

@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { contentAPI, ordersAPI } from '../utils/api';
+import { contentAPI, couponAPI, ordersAPI } from '../utils/api';
 
 interface CustomerInfo {
   name: string;
@@ -30,6 +30,16 @@ interface PaymentInfo {
   method: 'bkash' | 'nagad' | 'rocket' | 'upay' | 'cash_on_delivery';
   transactionId?: string;
   screenshot?: File;
+}
+
+interface AppliedCoupon {
+  id: string;
+  code: string;
+  name: { en: string; bn: string };
+  type: 'percentage' | 'fixed';
+  value: number;
+  discount: number;
+  maxDiscountAmount?: number;
 }
 
 const CheckoutPage: React.FC = () => {
@@ -58,11 +68,18 @@ const CheckoutPage: React.FC = () => {
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState<any>(null);
   const [loadingSettings, setLoadingSettings] = useState(true);
+  
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   // Free delivery for orders ≥ ৳500
   const baseDeliveryCharge = paymentSettings?.cashOnDelivery?.deliveryCharge || 60;
   const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= 500 ? 0 : baseDeliveryCharge);
-  const finalTotal = cartTotal + deliveryCharge;
+  const couponDiscount = appliedCoupon?.discount || 0;
+  const finalTotal = Math.max(0, cartTotal + deliveryCharge - couponDiscount);
 
   useEffect(() => {
     fetchPaymentSettings();
@@ -88,6 +105,44 @@ const CheckoutPage: React.FC = () => {
     } finally {
       setLoadingSettings(false);
     }
+  };
+
+  // Coupon functions
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    try {
+      setIsValidatingCoupon(true);
+      setCouponError('');
+      
+      const orderProducts = cart.map(item => item.product.id);
+      const response = await couponAPI.validateCoupon({
+        code: couponCode.trim(),
+        orderAmount: cartTotal + deliveryCharge,
+        userId: user?.id,
+        orderProducts
+      });
+
+      if (response.data.success) {
+        setAppliedCoupon(response.data.coupon);
+        toast.success('Coupon applied successfully!');
+        setCouponCode('');
+      }
+    } catch (error: any) {
+      console.error('Error applying coupon:', error);
+      setCouponError(error.response?.data?.message || 'Invalid coupon code');
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError('');
+    setCouponCode('');
   };
 
   // Bangladesh mobile payment methods (filtered by admin settings)
@@ -712,11 +767,70 @@ const CheckoutPage: React.FC = () => {
                   ))}
                 </div>
 
+                {/* Coupon Section */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                    Coupon Code
+                  </h3>
+                  
+                  {!appliedCoupon ? (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          placeholder="Enter coupon code"
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                          disabled={isValidatingCoupon}
+                        />
+                        <button
+                          onClick={handleApplyCoupon}
+                          disabled={isValidatingCoupon || !couponCode.trim()}
+                          className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isValidatingCoupon ? 'Applying...' : 'Apply'}
+                        </button>
+                      </div>
+                      {couponError && (
+                        <p className="text-sm text-red-600 dark:text-red-400">{couponError}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-green-800 dark:text-green-200">
+                            {language === 'bn' ? appliedCoupon.name.bn : appliedCoupon.name.en}
+                          </p>
+                          <p className="text-sm text-green-600 dark:text-green-400">
+                            {appliedCoupon.type === 'percentage' 
+                              ? `${appliedCoupon.value}% off` 
+                              : `৳${appliedCoupon.value} off`}
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleRemoveCoupon}
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
                   <div className="flex justify-between text-gray-600 dark:text-gray-400">
                     <span>Subtotal</span>
                     <span>৳{cartTotal}</span>
                   </div>
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-green-600 dark:text-green-400">
+                      <span>Discount ({appliedCoupon.code})</span>
+                      <span>-৳{couponDiscount}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-600 dark:text-gray-400">
                     <span>
                       {deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery Charge'}

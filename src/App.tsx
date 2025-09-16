@@ -41,6 +41,7 @@ import ProfilePage from './pages/ProfilePage';
 // Admin Pages
 import AdminChat from './pages/admin/AdminChat';
 import AdminContent from './pages/admin/AdminContent';
+import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminReviews from './pages/admin/AdminReviews';
@@ -173,6 +174,16 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <AdminContent />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/coupons"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminCoupons />
                 </AdminLayout>
               </ProtectedRoute>
             }

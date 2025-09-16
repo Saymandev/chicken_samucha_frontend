@@ -83,6 +83,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: 'Content',
       icon: <FileText className="w-5 h-5" />,
       path: '/admin/content'
+    },
+    {
+      id: 'coupons',
+      label: 'Coupons',
+      icon: <TicketPercent className="w-5 h-5" />,
+      path: '/admin/coupons'
     }
   ];
 
