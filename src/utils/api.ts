@@ -83,9 +83,8 @@ api.interceptors.response.use(
       
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
+          // Unauthorized - clear token and let route guards handle navigation
           localStorage.removeItem('token');
-          window.location.href = '/login';
           toast.error('Session expired. Please login again.');
           break;
         case 403:
