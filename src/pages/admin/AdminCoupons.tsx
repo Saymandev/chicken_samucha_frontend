@@ -119,11 +119,18 @@ const AdminCoupons: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Convert date strings to proper ISO dates
+      const submitData = {
+        ...formData,
+        validFrom: new Date(formData.validFrom).toISOString(),
+        validUntil: new Date(formData.validUntil).toISOString()
+      };
+
       if (editingCoupon) {
-        await couponAPI.updateCoupon(editingCoupon.id, formData);
+        await couponAPI.updateCoupon(editingCoupon.id, submitData);
         toast.success('Coupon updated');
       } else {
-        await couponAPI.createCoupon(formData);
+        await couponAPI.createCoupon(submitData);
         toast.success('Coupon created');
       }
       setShowModal(false);
