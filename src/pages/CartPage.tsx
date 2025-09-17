@@ -39,6 +39,13 @@ const CartPage: React.FC = () => {
     navigate('/checkout');
   };
 
+  const truncateWords = (text: string, maxWords: number): string => {
+    if (!text) return '';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '…';
+  };
+
   if (cartCount === 0) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -130,8 +137,8 @@ const CartPage: React.FC = () => {
 
                         {/* Product Details */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">
-                            {language === 'bn' ? item.product.name.bn : item.product.name.en}
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate" title={language === 'bn' ? item.product.name.bn : item.product.name.en}>
+                            {truncateWords(language === 'bn' ? item.product.name.bn : item.product.name.en, 5)}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                             {language === 'bn' ? item.product.category.bn : item.product.category.en}

@@ -148,7 +148,7 @@ const HomePage: React.FC = () => {
             <GridSkeleton 
               items={6} 
               ItemComponent={ProductCardSkeleton}
-              columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              columns="grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
             />
           ) : (
             <motion.div
@@ -156,7 +156,7 @@ const HomePage: React.FC = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-8"
             >
               {(featuredProducts || []).map((product, index) => (
                 <motion.div

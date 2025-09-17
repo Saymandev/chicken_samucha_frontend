@@ -137,6 +137,13 @@ const AdminProducts: React.FC = () => {
     handleModalClose();
   };
 
+  const truncateWords = (text: string, maxWords: number): string => {
+    if (!text) return '';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '…';
+  };
+
   const categories = [
     { value: 'all', label: 'All Categories' },
     { value: 'samosa', label: 'Samosa' },
@@ -284,8 +291,8 @@ const AdminProducts: React.FC = () => {
               </div>
 
               <div className="p-4">
-                <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2">
-                  {language === 'bn' ? product.name?.bn || product.name?.en : product.name?.en}
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2" title={language === 'bn' ? (product.name?.bn || product.name?.en) : product.name?.en}>
+                  {truncateWords(language === 'bn' ? (product.name?.bn || product.name?.en) : product.name?.en, 5)}
                 </h3>
                 
                 <div className="flex items-center gap-4 mb-3">

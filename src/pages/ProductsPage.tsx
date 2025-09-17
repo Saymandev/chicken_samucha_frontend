@@ -283,7 +283,7 @@ const ProductsPage: React.FC = () => {
             <GridSkeleton 
               items={12} 
               ItemComponent={ProductCardSkeleton}
-              columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              columns="grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
             />
           ) : (
             <ListSkeleton 
@@ -297,7 +297,7 @@ const ProductsPage: React.FC = () => {
             animate={{ opacity: 1 }}
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6'
                 : 'space-y-6'
             }
           >

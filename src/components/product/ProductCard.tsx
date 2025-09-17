@@ -23,6 +23,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [quantity, setQuantity] = useState(product.minOrderQuantity || 1);
   const [isAdding, setIsAdding] = useState(false);
 
+  // Truncate a title to a specific number of words
+  const truncateWords = (text: string | undefined, maxWords: number): string => {
+    if (!text) return '';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '…';
+  };
+
   // Check if product is already in cart
   const cartItem = cart.find(item => item.product.id === product.id);
   const isInCart = !!cartItem;
@@ -98,7 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
       transition={{ duration: 0.3 }}
-      className="card overflow-hidden hover:shadow-xl transition-all duration-300"
+      className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
@@ -151,17 +159,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className="p-4 space-y-3">
+        <div className="p-3 space-y-2 min-h-[120px]">
           {/* Title */}
-          <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-2 ${
-            language === 'bn' ? 'font-bengali text-lg' : 'text-base'
-          }`}>
-            {product.name[language]}
+          <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
+            language === 'bn' ? 'font-bengali text-base' : 'text-sm md:text-base'
+          }`} title={product.name[language]}>
+            {truncateWords(product.name[language], 5)}
           </h3>
 
           {/* Short Description */}
           {product.shortDescription && (
-            <p className={`text-sm text-gray-600 dark:text-gray-400 line-clamp-2 ${
+            <p className={`text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {product.shortDescription[language]}
@@ -191,7 +199,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* Price */}
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary-600">
+            <span className="text-lg md:text-xl font-bold text-primary-600">
               ৳{currentPrice}
             </span>
             {hasDiscount && (
@@ -211,7 +219,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Quick Add to Cart Section */}
       {showQuickActions && (
-        <div className="p-4 pt-0 space-y-3">
+        <div className="p-3 pt-0 space-y-3">
           {/* Quantity Selector */}
           {product.stock > 0 && (
             <div className="flex items-center justify-center gap-3">
