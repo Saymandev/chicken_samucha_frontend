@@ -16,7 +16,7 @@ import {
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
-import { productsAPI } from '../utils/api';
+import { productsAPI, reportsAPI } from '../utils/api';
 
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -38,6 +38,7 @@ const ProductsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
 
   // Categories for filtering
   const categories = [
@@ -63,7 +64,7 @@ const ProductsPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, priceRange, sortBy]);
 
-  // Load recently viewed on mount
+  // Load recently viewed and best sellers on mount
   useEffect(() => {
     try {
       const raw = localStorage.getItem('recentlyViewedProducts');
@@ -72,6 +73,7 @@ const ProductsPage: React.FC = () => {
     } catch {
       setRecentlyViewed([]);
     }
+    fetchBestSellers();
   }, []);
 
   const fetchProducts = async (page = 1, isNewSearch = false) => {
@@ -145,6 +147,23 @@ const ProductsPage: React.FC = () => {
   };
 
   // Recently Viewed products - using Swiper slider
+
+  // Fetch best sellers
+  const fetchBestSellers = async () => {
+    try {
+      const res = await reportsAPI.getSalesAnalytics({ period: '90d' });
+      if (res.data.success && res.data.data?.productPerformance) {
+        const byQuantity = res.data.data.productPerformance
+          .sort((a: any, b: any) => b.totalQuantity - a.totalQuantity)
+          .slice(0, 10)
+          .map((row: any) => ({ ...row.product, salesQuantity: row.totalQuantity }));
+        setBestSellers(byQuantity);
+      }
+    } catch (error) {
+      console.error('Error fetching best sellers:', error);
+      toast.error('Failed to load best sellers');
+    }
+  };
 
 
   return (
@@ -370,6 +389,47 @@ const ProductsPage: React.FC = () => {
                 : (language === 'bn' ? 'আরো পণ্য লোড করুন' : 'Load More Products')
               }
             </button>
+          </div>
+        )}
+
+        {bestSellers.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+              {language === 'bn' ? 'সেরা বিক্রিত পণ্য' : 'Best Sellers'}
+            </h2>
+            <div className="bg-white dark:bg-gray-800 card p-6">
+              <Swiper
+                modules={[Pagination]}
+                spaceBetween={16}
+                slidesPerView={2}
+                pagination={{
+                  clickable: true,
+                  bulletClass: 'swiper-pagination-bullet',
+                  bulletActiveClass: 'swiper-pagination-bullet-active',
+                }}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 2,
+                    spaceBetween: 16,
+                  },
+                  768: {
+                    slidesPerView: 3,
+                    spaceBetween: 20,
+                  },
+                  1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                  },
+                }}
+                className="best-sellers-swiper"
+              >
+                {bestSellers.map((product: any, index: number) => (
+                  <SwiperSlide key={product.id || index}>
+                    <ProductCard product={product} showQuickActions={false} compact={true} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
           </div>
         )}
 
