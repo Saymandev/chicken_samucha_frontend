@@ -109,10 +109,11 @@ const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({ isOpen, onClo
           ) : (
             <div className="space-y-4">
               {cart.map((item) => {
-                const isUpdating = updatingItems.has(item.product.id);
+                const productId = item.product.id || (item.product as any)._id;
+                const isUpdating = updatingItems.has(productId);
                 return (
                    <motion.div
-                     key={item.product.id}
+                     key={productId}
                      initial={{ opacity: 0, y: 20 }}
                      animate={{ opacity: 1, y: 0 }}
                      exit={{ opacity: 0, y: -20 }}
@@ -135,7 +136,7 @@ const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({ isOpen, onClo
                        {/* Quantity Controls */}
                        <div className="flex items-center gap-2 mt-3">
                          <button
-                           onClick={() => handleQuantityUpdate(item.product.id, item.quantity - 1)}
+                           onClick={() => handleQuantityUpdate(productId, item.quantity - 1)}
                            disabled={isUpdating || item.quantity <= 1}
                            className="w-6 h-6 rounded-full bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center shadow-sm"
                          >
@@ -155,7 +156,7 @@ const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({ isOpen, onClo
                          </span>
                          
                          <button
-                           onClick={() => handleQuantityUpdate(item.product.id, item.quantity + 1)}
+                           onClick={() => handleQuantityUpdate(productId, item.quantity + 1)}
                            disabled={isUpdating || item.quantity >= item.product.maxOrderQuantity}
                            className="w-6 h-6 rounded-full bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center shadow-sm"
                          >
@@ -169,7 +170,7 @@ const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({ isOpen, onClo
                          ৳{item.subtotal}
                        </span>
                        <button
-                         onClick={() => handleRemoveItem(item.product.id)}
+                         onClick={() => handleRemoveItem(productId)}
                          disabled={isUpdating}
                          className="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors p-1"
                          title={language === 'bn' ? 'মুছে ফেলুন' : 'Remove item'}

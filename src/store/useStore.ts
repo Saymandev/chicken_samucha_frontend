@@ -195,16 +195,21 @@ export const useStore = create<AppStore>()(
       // Cart actions
       addToCart: (product, quantity) => {
         const state = get();
-        const existingItem = state.cart.find(item => item.product.id === product.id);
+        const productId = product.id || (product as any)._id;
+        const existingItem = state.cart.find(item => {
+          const itemId = item.product.id || (item.product as any)._id;
+          return itemId === productId;
+        });
         
         if (existingItem) {
           const newQuantity = existingItem.quantity + quantity;
           if (newQuantity <= product.maxOrderQuantity) {
-            const updatedCart = state.cart.map(item =>
-              item.product.id === product.id
+            const updatedCart = state.cart.map(item => {
+              const itemId = item.product.id || (item.product as any)._id;
+              return itemId === productId
                 ? { ...item, quantity: newQuantity, subtotal: item.price * newQuantity }
-                : item
-            );
+                : item;
+            });
             const cartCount = updatedCart.reduce((sum, item) => sum + item.quantity, 0);
             const cartTotal = updatedCart.reduce((sum, item) => sum + item.subtotal, 0);
             
@@ -213,7 +218,7 @@ export const useStore = create<AppStore>()(
         } else {
           const price = product.discountPrice || product.price;
           const newItem: CartItem = {
-            product,
+            product: { ...product, id: productId },
             quantity,
             price,
             subtotal: price * quantity
@@ -233,11 +238,12 @@ export const useStore = create<AppStore>()(
           return;
         }
         
-        const updatedCart = state.cart.map(item =>
-          item.product.id === productId
+        const updatedCart = state.cart.map(item => {
+          const itemId = item.product.id || (item.product as any)._id;
+          return itemId === productId
             ? { ...item, quantity, subtotal: item.price * quantity }
-            : item
-        );
+            : item;
+        });
         const cartCount = updatedCart.reduce((sum, item) => sum + item.quantity, 0);
         const cartTotal = updatedCart.reduce((sum, item) => sum + item.subtotal, 0);
         
@@ -246,7 +252,10 @@ export const useStore = create<AppStore>()(
       
       removeFromCart: (productId) => {
         const state = get();
-        const updatedCart = state.cart.filter(item => item.product.id !== productId);
+        const updatedCart = state.cart.filter(item => {
+          const itemId = item.product.id || (item.product as any)._id;
+          return itemId !== productId;
+        });
         const cartCount = updatedCart.reduce((sum, item) => sum + item.quantity, 0);
         const cartTotal = updatedCart.reduce((sum, item) => sum + item.subtotal, 0);
         

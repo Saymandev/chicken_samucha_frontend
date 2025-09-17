@@ -40,7 +40,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const totalSold: number | undefined = (product as any).analytics?.purchaseCount ?? (product as any).salesQuantity;
 
   // Check if product is already in cart
-  const cartItem = cart.find(item => item.product.id === product.id);
+  const productId = product.id || (product as any)._id;
+  const cartItem = cart.find(item => {
+    const itemId = item.product.id || (item.product as any)._id;
+    return itemId === productId;
+  });
   const isInCart = !!cartItem;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -75,11 +79,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
     // Add a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    addToCart(product, quantity);
+    addToCart({ ...product, id: productId }, quantity);
 
     // Track add to cart (fire and forget)
     try {
-      const productId = (product as any).id || (product as any)._id;
       if (productId) {
         productsAPI.trackAddToCart(productId).catch(() => {});
       }

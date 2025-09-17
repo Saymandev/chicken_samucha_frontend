@@ -67,6 +67,7 @@ const ProductDetailPage: React.FC = () => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [relatedLoading, setRelatedLoading] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -91,10 +92,23 @@ const ProductDetailPage: React.FC = () => {
           const key = 'recentlyViewedProducts';
           const existingRaw = localStorage.getItem(key);
           const existing: Product[] = existingRaw ? JSON.parse(existingRaw) : [];
-          const filtered = existing.filter((p) => (p as any).id !== (prod as any).id && (p as any)._id !== (prod as any)._id);
+          const currentId = (prod as any).id || (prod as any)._id;
+          
+          // Remove if already exists, then add to front
+          const filtered = existing.filter((p) => {
+            const pId = (p as any).id || (p as any)._id;
+            return pId !== currentId;
+          });
+          
+          // Add current product to front and limit to 12
           const updated = [prod, ...filtered].slice(0, 12);
           localStorage.setItem(key, JSON.stringify(updated));
-          setRecentlyViewed(updated.filter((p) => (p as any).id !== (prod as any).id));
+          
+          // Set recently viewed (exclude current product)
+          setRecentlyViewed(updated.filter((p) => {
+            const pId = (p as any).id || (p as any)._id;
+            return pId !== currentId;
+          }));
         } catch {}
       }
     } catch (error: any) {
@@ -259,6 +273,18 @@ const ProductDetailPage: React.FC = () => {
   const currentPrice = product.discountPrice || product.price;
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
 
+  // Truncate description to 120 words
+  const truncateDescription = (text: string, maxWords: number = 120) => {
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
+  };
+
+  const getDescription = () => {
+    const desc = language === 'bn' ? product.description.bn : product.description.en;
+    return showFullDescription ? desc : truncateDescription(desc);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
@@ -359,9 +385,24 @@ const ProductDetailPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   Description
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300">
-                  {language === 'bn' ? product.description.bn : product.description.en}
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {getDescription()}
                 </p>
+                {(() => {
+                  const desc = language === 'bn' ? product.description.bn : product.description.en;
+                  const wordCount = desc.trim().split(/\s+/).length;
+                  return wordCount > 120 && (
+                    <button
+                      onClick={() => setShowFullDescription(!showFullDescription)}
+                      className="mt-2 text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
+                    >
+                      {showFullDescription 
+                        ? (language === 'bn' ? 'কম দেখান' : 'Show Less')
+                        : (language === 'bn' ? 'আরো দেখান' : 'Read More')
+                      }
+                    </button>
+                  );
+                })()}
               </div>
 
               {/* Product Details */}
