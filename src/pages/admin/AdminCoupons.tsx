@@ -72,11 +72,18 @@ const AdminCoupons: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this coupon?')) return;
     try {
+      console.log('Deleting coupon with ID:', id);
+      console.log('ID type:', typeof id);
+      if (!id || id === 'undefined') {
+        toast.error('Invalid coupon ID');
+        return;
+      }
       await couponAPI.deleteCoupon(id);
-      toast.success('Deleted');
+      toast.success('Coupon deleted successfully');
       fetchCoupons();
-    } catch (e) {
-      toast.error('Failed to delete');
+    } catch (e: any) {
+      console.error('Delete error:', e);
+      toast.error(e.response?.data?.message || 'Failed to delete coupon');
     }
   };
 
@@ -187,7 +194,10 @@ const AdminCoupons: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {coupons.map((c) => (
+            {coupons.map((c) => {
+              console.log('Coupon object:', c);
+              console.log('Coupon ID:', c.id);
+              return (
               <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl shadow bg-white dark:bg-gray-800 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -208,7 +218,8 @@ const AdminCoupons: React.FC = () => {
                   <button onClick={() => handleDelete(c.id)} className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         )}
 
