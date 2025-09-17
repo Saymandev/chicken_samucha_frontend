@@ -141,7 +141,7 @@ const ProductsPage: React.FC = () => {
   };
 
   // Recently Viewed slider functions - custom slider
-  const [itemsPerSlide, setItemsPerSlide] = useState(3);
+  const [itemsPerSlide, setItemsPerSlide] = useState(4);
   const totalSlides = Math.ceil(recentlyViewed.length / itemsPerSlide);
 
   // Update items per slide on window resize
@@ -160,7 +160,7 @@ const ProductsPage: React.FC = () => {
     handleResize(); // Set initial value
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [recentlyViewed.length]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => {
@@ -408,6 +408,10 @@ const ProductsPage: React.FC = () => {
               {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed Products'}
             </h2>
             <div className="relative bg-white dark:bg-gray-800 card p-6">
+              {/* Debug info - remove in production */}
+              <div className="text-xs text-gray-500 mb-2">
+                Debug: {recentlyViewed.length} products, {itemsPerSlide} per slide, {totalSlides} total slides, current: {currentSlide}
+              </div>
               {/* Navigation Arrows */}
               {totalSlides > 1 && (
                 <>
@@ -439,7 +443,7 @@ const ProductsPage: React.FC = () => {
                   {Array.from({ length: totalSlides }, (_, slideIndex) => (
                     <div
                       key={slideIndex}
-                      className="flex gap-2 sm:gap-3"
+                      className="flex gap-2 sm:gap-3 flex-shrink-0"
                       style={{ width: `${100 / totalSlides}%` }}
                     >
                       {recentlyViewed
