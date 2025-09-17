@@ -32,6 +32,7 @@ const ProductsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
 
   // Categories for filtering
   const categories = [
@@ -56,6 +57,17 @@ const ProductsPage: React.FC = () => {
     fetchProducts(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, priceRange, sortBy]);
+
+  // Load recently viewed on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('recentlyViewedProducts');
+      const list = raw ? JSON.parse(raw) : [];
+      setRecentlyViewed(Array.isArray(list) ? list.slice(0, 12) : []);
+    } catch {
+      setRecentlyViewed([]);
+    }
+  }, []);
 
   const fetchProducts = async (page = 1, isNewSearch = false) => {
     if (isNewSearch) {
@@ -349,6 +361,23 @@ const ProductsPage: React.FC = () => {
                 : (language === 'bn' ? 'আরো পণ্য লোড করুন' : 'Load More Products')
               }
             </button>
+          </div>
+        )}
+
+        {recentlyViewed.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed'}
+            </h2>
+            <div className="relative bg-white dark:bg-gray-800 card p-3">
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+                {recentlyViewed.map((rv: any, idx: number) => (
+                  <div key={rv.id || idx} className="min-w-[60%] sm:min-w-[45%] md:min-w-[30%] xl:min-w-[20%] snap-start">
+                    <ProductCard product={rv} />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
