@@ -238,7 +238,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
       transition={{ duration: 0.3 }}
-      className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full p-3"
+      className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full p-1 sm:p-3"
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
