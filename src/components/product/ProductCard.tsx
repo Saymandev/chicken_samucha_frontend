@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { Product, useStore } from '../../store/useStore';
+import { productsAPI } from '../../utils/api';
 
 interface ProductCardProps {
   product: Product;
@@ -59,6 +60,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
     await new Promise(resolve => setTimeout(resolve, 300));
     
     addToCart(product, quantity);
+
+    // Track add to cart (fire and forget)
+    try {
+      const productId = (product as any).id || (product as any)._id;
+      if (productId) {
+        productsAPI.trackAddToCart(productId).catch(() => {});
+      }
+    } catch {}
     
     toast.success(
       language === 'bn' 

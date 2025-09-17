@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
 import {
-  CreditCard,
-  MapPin,
-  Phone,
-  ShoppingCart,
-  Upload,
-  User
+    CreditCard,
+    MapPin,
+    Phone,
+    ShoppingCart,
+    Upload,
+    User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { contentAPI, couponAPI, ordersAPI } from '../utils/api';
+import { contentAPI, couponAPI, ordersAPI, productsAPI } from '../utils/api';
 
 interface CustomerInfo {
   name: string;
@@ -395,6 +395,16 @@ const CheckoutPage: React.FC = () => {
       const response = await ordersAPI.createOrder(formData);
       
       if (response.data.success) {
+        // Track purchase counts for each item (best-effort)
+        try {
+          for (const item of cart) {
+            const productId = (item.product as any).id || (item.product as any)._id;
+            if (productId) {
+              productsAPI.trackPurchase(productId, item.quantity).catch(() => {});
+            }
+          }
+        } catch {}
+
         clearCart();
         toast.success('Order placed successfully!');
         navigate(`/track-order?orderNumber=${response.data.order.orderNumber}`);
