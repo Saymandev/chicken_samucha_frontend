@@ -140,17 +140,43 @@ const ProductsPage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  // Recently Viewed slider functions - like ReviewSlider
+  // Recently Viewed slider functions - responsive items per slide
+  const getItemsPerSlide = () => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 640) return 2; // small: 2 items
+      if (window.innerWidth < 1024) return 3; // medium: 3 items
+      return 4; // large: 4 items
+    }
+    return 4; // default
+  };
+
+  const [itemsPerSlide, setItemsPerSlide] = useState(4);
+  const totalSlides = Math.ceil(recentlyViewed.length / itemsPerSlide);
+
+  // Update items per slide on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerSlide(getItemsPerSlide());
+      setCurrentSlide(0); // Reset to first slide on resize
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % recentlyViewed.length);
+    setCurrentSlide((prev) => {
+      const next = prev + 1;
+      return next >= totalSlides ? 0 : next;
+    });
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + recentlyViewed.length) % recentlyViewed.length);
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
+    setCurrentSlide((prev) => {
+      const prevSlide = prev - 1;
+      return prevSlide < 0 ? totalSlides - 1 : prevSlide;
+    });
   };
 
 
@@ -384,64 +410,70 @@ const ProductsPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed Products'}
             </h2>
-            <div className="relative max-w-6xl mx-auto">
-              <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700">
-                {/* Navigation Arrows */}
-                {recentlyViewed.length > 1 && (
-                  <>
-                    <button
-                      onClick={prevSlide}
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-800 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                      aria-label="Previous product"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    </button>
-                    <button
-                      onClick={nextSlide}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-800 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                      aria-label="Next product"
-                    >
-                      <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    </button>
-                  </>
-                )}
-
-                {/* Slider Container */}
-                <div className="overflow-hidden">
-                  <motion.div
-                    key={currentSlide}
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    className="p-6"
+            <div className="relative bg-white dark:bg-gray-800 card p-6">
+              {/* Navigation Arrows */}
+              {totalSlides > 1 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600"
+                    disabled={currentSlide === 0}
                   >
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  </button>
+                  
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600"
+                    disabled={currentSlide === totalSlides - 1}
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  </button>
+                </>
+              )}
+
+              {/* Slider Container */}
+              <div className="overflow-hidden">
+                <motion.div
+                  className="flex transition-transform duration-300 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentSlide * 100}%)`,
+                    width: `${totalSlides * 100}%`
+                  }}
+                >
+                  {Array.from({ length: totalSlides }, (_, slideIndex) => (
+                    <div
+                      key={slideIndex}
+                      className="flex gap-2 sm:gap-3"
+                      style={{ width: `${100 / totalSlides}%` }}
+                    >
                       {recentlyViewed
-                        .slice(currentSlide, currentSlide + 4)
+                        .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
                         .map((rv: any, idx: number) => (
-                          <div key={rv.id || idx}>
+                          <div
+                            key={rv.id || idx}
+                            className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                          >
                             <ProductCard product={rv} showQuickActions={false} compact={true} />
                           </div>
                         ))}
                     </div>
-                  </motion.div>
-                </div>
+                  ))}
+                </motion.div>
               </div>
 
               {/* Dots Indicator */}
-              {recentlyViewed.length > 1 && (
-                <div className="flex justify-center mt-6 space-x-3">
-                  {Array.from({ length: Math.ceil(recentlyViewed.length / 4) }, (_, index) => (
+              {totalSlides > 1 && (
+                <div className="flex justify-center mt-4 space-x-2">
+                  {Array.from({ length: totalSlides }, (_, index) => (
                     <button
                       key={index}
-                      onClick={() => goToSlide(index)}
-                      className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                        Math.floor(currentSlide / 4) === index
-                          ? 'bg-primary-600 scale-125 shadow-lg'
-                          : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 hover:scale-110'
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        index === currentSlide
+                          ? 'bg-primary-500 w-6'
+                          : 'bg-gray-300 dark:bg-gray-600'
                       }`}
-                      aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
                 </div>
