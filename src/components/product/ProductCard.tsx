@@ -121,11 +121,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
-        <div className={`relative overflow-hidden ${compact ? 'aspect-square h-24' : 'aspect-square h-32'}`}>
+        <div className={`relative overflow-hidden flex justify-center items-center ${compact ? 'aspect-square h-24' : 'aspect-square h-32'}`}>
           <img
             src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+            className="w-4/5 h-4/5 object-cover transition-transform duration-300 hover:scale-110"
             loading="lazy"
           />
           
