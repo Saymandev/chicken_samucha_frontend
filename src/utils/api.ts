@@ -451,6 +451,9 @@ export const reportsAPI = {
   stopScheduler: () => api.post('/admin/scheduler/stop'),
   updateSchedule: (jobName: string, cronExpression: string) => 
     api.put('/admin/scheduler/update', { jobName, cronExpression }),
+  
+  // Email Service Testing
+  testEmailService: () => api.post('/admin/email/test'),
 };
 
 export default api;

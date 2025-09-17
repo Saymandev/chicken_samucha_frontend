@@ -153,6 +153,14 @@ const AdminReports: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching scheduler status:', error);
+      // Set a default status if the service is not available
+      setSchedulerStatus({
+        isRunning: false,
+        emailService: {
+          initialized: false,
+          hasCredentials: false
+        }
+      });
     }
   }, []);
 
@@ -259,6 +267,24 @@ const AdminReports: React.FC = () => {
 
   const removeRecipient = (email: string) => {
     setEmailRecipients(emailRecipients.filter(e => e !== email));
+  };
+
+  const handleTestEmail = async () => {
+    try {
+      const response = await reportsAPI.testEmailService();
+      if (response.data.success) {
+        toast.success('Test email sent successfully! Check your inbox.');
+      } else {
+        toast.error(response.data.message || 'Failed to send test email');
+      }
+    } catch (error: any) {
+      console.error('Test email error:', error);
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Failed to send test email');
+      }
+    }
   };
 
   const formatCurrency = (amount: number) => `৳${amount.toLocaleString()}`;
@@ -440,30 +466,66 @@ const AdminReports: React.FC = () => {
               )}
             </div>
 
+            {/* Email Service Status */}
+            {schedulerStatus?.emailService && (
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-3">Email Service Status</h4>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${schedulerStatus.emailService.initialized ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {schedulerStatus.emailService.initialized ? 'Initialized' : 'Not Initialized'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${schedulerStatus.emailService.hasCredentials ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {schedulerStatus.emailService.hasCredentials ? 'Credentials Found' : 'No Credentials'}
+                    </span>
+                  </div>
+                </div>
+                {!schedulerStatus.emailService.initialized && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                    Email service is not initialized. Please check your email credentials in the environment variables.
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Manual Report Sending */}
             <div>
               <h4 className="font-medium text-gray-900 dark:text-white mb-3">Send Reports Now</h4>
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
                 <button
                   onClick={() => handleSendEmailReport('daily')}
-                  className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                  disabled={!schedulerStatus?.emailService?.initialized}
+                  className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                   Send Daily Report
                 </button>
                 <button
                   onClick={() => handleSendEmailReport('weekly')}
-                  className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  disabled={!schedulerStatus?.emailService?.initialized}
+                  className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                   Send Weekly Report
                 </button>
                 <button
                   onClick={() => handleSendEmailReport('monthly')}
-                  className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors"
+                  disabled={!schedulerStatus?.emailService?.initialized}
+                  className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                   Send Monthly Report
+                </button>
+                <button
+                  onClick={handleTestEmail}
+                  className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                  Test Email
                 </button>
               </div>
             </div>
