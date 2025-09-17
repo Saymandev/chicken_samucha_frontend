@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Filter, Grid, List, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Grid, List, Search } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +33,7 @@ const ProductsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Categories for filtering
   const categories = [
@@ -138,6 +139,19 @@ const ProductsPage: React.FC = () => {
     setSortBy('featured');
     setSearchParams(new URLSearchParams());
   };
+
+  // Recently Viewed slider functions
+  const itemsPerSlide = 4; // Show 4 items per slide
+  const totalSlides = Math.ceil(recentlyViewed.length / itemsPerSlide);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -366,20 +380,77 @@ const ProductsPage: React.FC = () => {
 
         {recentlyViewed.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed'}
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+              {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed Products'}
             </h2>
-            <div className="relative bg-white dark:bg-gray-800 card p-3">
-              <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide">
-                {recentlyViewed.map((rv: any, idx: number) => (
-                  <div
-                    key={rv.id || idx}
-                    className="snap-start flex-shrink-0 w-48 sm:w-52 md:w-56 lg:w-60"
+            <div className="relative bg-white dark:bg-gray-800 card p-6">
+              {/* Navigation Arrows */}
+              {totalSlides > 1 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600"
+                    disabled={currentSlide === 0}
                   >
-                    <ProductCard product={rv} showQuickActions={false} compact={true} />
-                  </div>
-                ))}
+                    <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  </button>
+                  
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600"
+                    disabled={currentSlide === totalSlides - 1}
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  </button>
+                </>
+              )}
+
+              {/* Slider Container */}
+              <div className="overflow-hidden">
+                <motion.div
+                  className="flex gap-4 transition-transform duration-300 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentSlide * 100}%)`,
+                    width: `${totalSlides * 100}%`
+                  }}
+                >
+                  {Array.from({ length: totalSlides }, (_, slideIndex) => (
+                    <div
+                      key={slideIndex}
+                      className="flex gap-4"
+                      style={{ width: `${100 / totalSlides}%` }}
+                    >
+                      {recentlyViewed
+                        .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
+                        .map((rv: any, idx: number) => (
+                          <div
+                            key={rv.id || idx}
+                            className="flex-shrink-0 w-1/4"
+                          >
+                            <ProductCard product={rv} showQuickActions={false} compact={true} />
+                          </div>
+                        ))}
+                    </div>
+                  ))}
+                </motion.div>
               </div>
+
+              {/* Dots Indicator */}
+              {totalSlides > 1 && (
+                <div className="flex justify-center mt-4 space-x-2">
+                  {Array.from({ length: totalSlides }, (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        index === currentSlide
+                          ? 'bg-primary-500 w-6'
+                          : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
