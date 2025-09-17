@@ -31,6 +31,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return words.slice(0, maxWords).join(' ') + '…';
   };
 
+  // Determine stock availability robustly (API may omit stock on some lists)
+  const inStock = (product as any).isAvailable !== false && (
+    (product as any).stock == null ? true : (product as any).stock > 0
+  );
+
   // Check if product is already in cart
   const cartItem = cart.find(item => item.product.id === product.id);
   const isInCart = !!cartItem;
@@ -133,7 +138,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Stock Status */}
-          {(product.stock < 1) && (
+          {(!inStock) && (
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg">
                 {t('products.outOfStock')}
@@ -221,7 +226,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {showQuickActions && (
         <div className="p-3 pt-0 space-y-3">
           {/* Quantity Selector */}
-          {product.stock > 0 && (
+          {inStock && (
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={(e) => {
@@ -256,11 +261,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Add to Cart Button */}
           <motion.button
             onClick={handleAddToCart}
-            disabled={product.stock < 1 || isAdding}
-            whileHover={product.stock > 0 && !isAdding ? { scale: 1.02 } : {}}
-            whileTap={product.stock > 0 && !isAdding ? { scale: 0.98 } : {}}
+            disabled={!inStock || isAdding}
+            whileHover={inStock && !isAdding ? { scale: 1.02 } : {}}
+            whileTap={inStock && !isAdding ? { scale: 0.98 } : {}}
             className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-              product.stock > 0 && !isAdding
+              inStock && !isAdding
                 ? isInCart
                   ? 'bg-green-500 hover:bg-green-600 text-white'
                   : 'btn-primary hover:bg-primary-700'
@@ -276,7 +281,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 />
                 {language === 'bn' ? 'যোগ করা হচ্ছে...' : 'Adding...'}
               </>
-            ) : product.stock > 0 ? (
+            ) : inStock ? (
               <>
                 <ShoppingCart className="w-4 h-4" />
                 {isInCart 
@@ -293,11 +298,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </motion.button>
 
           {/* Stock Info */}
-          {product.stock > 0 && product.stock <= 5 && (
+          {inStock && typeof (product as any).stock === 'number' && (product as any).stock <= 5 && (
             <p className="text-xs text-orange-600 text-center">
               {language === 'bn' 
-                ? `শুধু ${product.stock}টি অবশিষ্ট`
-                : `Only ${product.stock} left in stock`
+                ? `শুধু ${(product as any).stock}টি অবশিষ্ট`
+                : `Only ${(product as any).stock} left in stock`
               }
             </p>
           )}
