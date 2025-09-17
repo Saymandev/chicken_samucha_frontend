@@ -128,9 +128,12 @@ const ProductDetailPage: React.FC = () => {
     try {
       addToCart(product, quantity);
       
-      // Track add to cart analytics
+      // Track add to cart analytics (ensure we send a valid id)
       try {
-        await productsAPI.trackAddToCart(product.id);
+        const productId = (product as any).id || (product as any)._id || id;
+        if (productId) {
+          await productsAPI.trackAddToCart(productId);
+        }
       } catch (error) {
         console.error('Failed to track add to cart:', error);
       }
