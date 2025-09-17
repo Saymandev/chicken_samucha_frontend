@@ -140,23 +140,20 @@ const ProductsPage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  // Recently Viewed slider functions - responsive items per slide
-  const getItemsPerSlide = () => {
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth < 640) return 2; // small: 2 items
-      if (window.innerWidth < 1024) return 3; // medium: 3 items
-      return 4; // large: 4 items
-    }
-    return 4; // default
-  };
-
-  const [itemsPerSlide, setItemsPerSlide] = useState(4);
+  // Recently Viewed slider functions - custom slider
+  const [itemsPerSlide, setItemsPerSlide] = useState(3);
   const totalSlides = Math.ceil(recentlyViewed.length / itemsPerSlide);
 
   // Update items per slide on window resize
   useEffect(() => {
     const handleResize = () => {
-      setItemsPerSlide(getItemsPerSlide());
+      if (window.innerWidth < 640) {
+        setItemsPerSlide(2); // small: 2 items
+      } else if (window.innerWidth < 1024) {
+        setItemsPerSlide(3); // medium: 3 items
+      } else {
+        setItemsPerSlide(4); // large: 4 items
+      }
       setCurrentSlide(0); // Reset to first slide on resize
     };
 
@@ -416,16 +413,14 @@ const ProductsPage: React.FC = () => {
                 <>
                   <button
                     onClick={prevSlide}
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600"
-                    disabled={currentSlide === 0}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </button>
                   
                   <button
                     onClick={nextSlide}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600"
-                    disabled={currentSlide === totalSlides - 1}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </button>
@@ -434,7 +429,7 @@ const ProductsPage: React.FC = () => {
 
               {/* Slider Container */}
               <div className="overflow-hidden">
-                <motion.div
+                <div
                   className="flex transition-transform duration-300 ease-in-out"
                   style={{
                     transform: `translateX(-${currentSlide * 100}%)`,
@@ -452,14 +447,15 @@ const ProductsPage: React.FC = () => {
                         .map((rv: any, idx: number) => (
                           <div
                             key={rv.id || idx}
-                            className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
+                            className="flex-shrink-0"
+                            style={{ width: `${100 / itemsPerSlide}%` }}
                           >
                             <ProductCard product={rv} showQuickActions={false} compact={true} />
                           </div>
                         ))}
                     </div>
                   ))}
-                </motion.div>
+                </div>
               </div>
 
               {/* Dots Indicator */}

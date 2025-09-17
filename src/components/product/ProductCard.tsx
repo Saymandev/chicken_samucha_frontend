@@ -148,6 +148,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
 
+          {/* Right side discount amount badge */}
+          {hasDiscount && (
+            <div className={`absolute top-2 right-2`}>
+              <span className={`bg-red-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
+                ৳{Math.round(product.price - currentPrice)} DISCOUNT
+              </span>
+            </div>
+          )}
+
           {/* Stock Status */}
           {(!inStock) && (
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
