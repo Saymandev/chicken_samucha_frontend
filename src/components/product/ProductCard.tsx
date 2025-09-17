@@ -175,7 +175,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className={`${compact ? 'p-2 space-y-1 min-h-[60px]' : 'p-3 space-y-2 min-h-[120px]'}`}>
+        <div className={`${compact ? 'p-2 space-y-1 min-h-[60px]' : 'p-3 space-y-2 min-h-[100px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
@@ -230,8 +230,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Additional Info */}
           {!compact && (
             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>{product.preparationTime}</span>
-              <span className="flex items-center gap-1">
+              <span className="truncate">{product.preparationTime}</span>
+              <span className="flex items-center gap-1 truncate">
                 {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
                   <>
                     <span>Sold:</span>
@@ -240,7 +240,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     </span>
                   </>
                 ) : (
-                  <span>{product.servingSize}</span>
+                  <span className="truncate">{product.servingSize}</span>
                 )}
               </span>
             </div>
