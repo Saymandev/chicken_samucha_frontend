@@ -189,7 +189,7 @@
 
 /* Card styles */
 .card {
-  @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200;
+  @apply bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow duration-200;
 }
 
 .dark .card {
