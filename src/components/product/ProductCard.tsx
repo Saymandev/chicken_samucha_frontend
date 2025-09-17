@@ -35,6 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const inStock = (product as any).isAvailable !== false && (
     (product as any).stock == null ? true : (product as any).stock > 0
   );
+  const totalSold: number | undefined = (product as any).analytics?.purchaseCount ?? (product as any).salesQuantity;
 
   // Check if product is already in cart
   const cartItem = cart.find(item => item.product.id === product.id);
@@ -128,6 +129,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {hasDiscount && (
               <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                 {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
+              </span>
+            )}
+            {typeof totalSold === 'number' && totalSold >= 50 && (
+              <span className="bg-yellow-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">
+                Best Seller
               </span>
             )}
             {product.isFeatured && (
