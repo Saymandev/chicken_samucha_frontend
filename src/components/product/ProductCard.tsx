@@ -217,7 +217,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Additional Info */}
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>{product.preparationTime}</span>
-            <span>{product.servingSize}</span>
+            <span className="flex items-center gap-1">
+              {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
+                <>
+                  <span>Sold:</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                  </span>
+                </>
+              ) : (
+                <span>{product.servingSize}</span>
+              )}
+            </span>
           </div>
         </div>
       </Link>

@@ -11,7 +11,7 @@ import {
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
-import { contentAPI, productsAPI, reviewsAPI } from '../utils/api';
+import { contentAPI, productsAPI, reportsAPI, reviewsAPI } from '../utils/api';
 
 interface SliderItem {
   id: string;
@@ -38,6 +38,7 @@ const HomePage: React.FC = () => {
   
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [featuredReviews, setFeaturedReviews] = useState<Review[]>([]);
   
   const [loadingSlider, setLoadingSlider] = useState(true);
@@ -47,6 +48,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     fetchSliderItems();
     fetchFeaturedProducts();
+    fetchBestSellers();
     fetchFeaturedReviews();
   }, []);
 
@@ -99,6 +101,24 @@ const HomePage: React.FC = () => {
       setFeaturedReviews([]); // Ensure it's always an array
     } finally {
       setLoadingReviews(false);
+    }
+  };
+
+  const fetchBestSellers = async () => {
+    try {
+      const response = await reportsAPI.getSalesAnalytics({ period: '90d' });
+      if (response.data.success && response.data.data?.productPerformance) {
+        const perf = response.data.data.productPerformance as any[];
+        const byQuantity = perf
+          .sort((a, b) => (b.totalQuantity || 0) - (a.totalQuantity || 0))
+          .slice(0, 10)
+          .map((row) => ({ ...row.product, salesQuantity: row.totalQuantity }));
+        setBestSellers(byQuantity as unknown as Product[]);
+      } else {
+        setBestSellers([]);
+      }
+    } catch {
+      setBestSellers([]);
     }
   };
 
@@ -187,6 +207,40 @@ const HomePage: React.FC = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Best Sellers Section */}
+      {bestSellers.length > 0 && (
+        <section className="py-16 bg-gray-50 dark:bg-gray-800">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
+                language === 'bn' ? 'font-bengali' : ''
+              }`}>
+                {language === 'bn' ? 'সর্বাধিক বিক্রিত' : 'Best Sellers'}
+              </h2>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-8"
+            >
+              {bestSellers.map((product, index) => (
+                <motion.div key={(product as any).id || index} initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.05 }}>
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">

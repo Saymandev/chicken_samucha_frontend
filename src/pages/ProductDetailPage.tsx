@@ -66,6 +66,7 @@ const ProductDetailPage: React.FC = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [relatedLoading, setRelatedLoading] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -83,7 +84,18 @@ const ProductDetailPage: React.FC = () => {
       setLoading(true);
       const response = await productsAPI.getProduct(id!);
       if (response.data.success) {
-        setProduct(response.data.product);
+        const prod = response.data.product;
+        setProduct(prod);
+        try {
+          // Update recently viewed list in localStorage
+          const key = 'recentlyViewedProducts';
+          const existingRaw = localStorage.getItem(key);
+          const existing: Product[] = existingRaw ? JSON.parse(existingRaw) : [];
+          const filtered = existing.filter((p) => (p as any).id !== (prod as any).id && (p as any)._id !== (prod as any)._id);
+          const updated = [prod, ...filtered].slice(0, 12);
+          localStorage.setItem(key, JSON.stringify(updated));
+          setRecentlyViewed(updated.filter((p) => (p as any).id !== (prod as any).id));
+        } catch {}
       }
     } catch (error: any) {
       console.error('Error fetching product:', error);
@@ -575,6 +587,24 @@ const ProductDetailPage: React.FC = () => {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Recently Viewed Products Slider */}
+          {recentlyViewed.length > 0 && (
+            <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Recently Viewed
+              </h3>
+              <div className="relative">
+                <div id="recentlyViewedTrack" className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2">
+                  {recentlyViewed.map((rv) => (
+                    <div key={(rv as any).id} className="min-w-[60%] sm:min-w-[45%] md:min-w-[30%] lg:min-w-[30%] snap-start">
+                      <ProductCard product={rv} />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </motion.div>
