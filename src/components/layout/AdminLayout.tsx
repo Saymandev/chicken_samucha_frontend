@@ -1,21 +1,21 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  BarChart3,
-  ChevronLeft,
-  FileText,
-  Home,
-  LogOut,
-  Menu,
-  MessageCircle,
-  Moon,
-  Package,
-  Settings,
-  ShoppingBag,
-  Star,
-  Sun,
-  TicketPercent,
-  Users,
-  X
+    BarChart3,
+    ChevronLeft,
+    FileText,
+    Home,
+    LogOut,
+    Menu,
+    MessageCircle,
+    Moon,
+    Package,
+    Settings,
+    ShoppingBag,
+    Star,
+    Sun,
+    TicketPercent,
+    Users,
+    X
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -90,6 +90,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: 'Coupons',
       icon: <TicketPercent className="w-5 h-5" />,
       path: '/admin/coupons'
+    },
+    {
+      id: 'reports',
+      label: 'Reports',
+      icon: <BarChart3 className="w-5 h-5" />,
+      path: '/admin/reports'
     }
   ];
 

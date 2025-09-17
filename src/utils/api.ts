@@ -434,4 +434,23 @@ export const bdPaymentAPI = {
   }
 };
 
+// Reports & Analytics API
+export const reportsAPI = {
+  getSalesAnalytics: (params?: any) => api.get('/admin/reports/sales-analytics', { params }),
+  getDashboardMetrics: () => api.get('/admin/reports/dashboard-metrics'),
+  generateReport: (params?: any) => api.get('/admin/reports/generate', { params }),
+  
+  // Email Reports
+  sendDailyReport: (recipients: string[]) => api.post('/admin/reports/send-daily', { recipients }),
+  sendWeeklyReport: (recipients: string[]) => api.post('/admin/reports/send-weekly', { recipients }),
+  sendMonthlyReport: (recipients: string[]) => api.post('/admin/reports/send-monthly', { recipients }),
+  
+  // Scheduler Management
+  getSchedulerStatus: () => api.get('/admin/scheduler/status'),
+  startScheduler: () => api.post('/admin/scheduler/start'),
+  stopScheduler: () => api.post('/admin/scheduler/stop'),
+  updateSchedule: (jobName: string, cronExpression: string) => 
+    api.put('/admin/scheduler/update', { jobName, cronExpression }),
+};
+
 export default api;
