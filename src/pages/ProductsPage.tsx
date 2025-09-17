@@ -350,7 +350,7 @@ const ProductsPage: React.FC = () => {
             animate={{ opacity: 1 }}
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6'
+                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 md:gap-3'
                 : 'space-y-6'
             }
           >

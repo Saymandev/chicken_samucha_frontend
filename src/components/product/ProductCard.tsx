@@ -121,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
-        <div className={`relative overflow-hidden ${compact ? 'aspect-square h-24' : 'aspect-square'}`}>
+        <div className={`relative overflow-hidden ${compact ? 'aspect-square h-24' : 'aspect-square h-32'}`}>
           <img
             src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
@@ -175,12 +175,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className={`${compact ? 'p-2 space-y-1 min-h-[60px]' : 'p-3 space-y-2 min-h-[120px]'}`}>
+        <div className={`${compact ? 'p-2 space-y-1 min-h-[60px]' : 'p-2 space-y-1 min-h-[100px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
               ? (language === 'bn' ? 'font-bengali text-sm' : 'text-xs')
-              : (language === 'bn' ? 'font-bengali text-base' : 'text-sm md:text-base')
+              : (language === 'bn' ? 'font-bengali text-sm' : 'text-xs md:text-sm')
           }`} title={product.name[language]}>
             {truncateWords(product.name[language], compact ? 3 : 5)}
           </h3>
@@ -217,7 +217,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* Price */}
           <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
-            <span className={`font-bold text-primary-600 ${compact ? 'text-xs' : 'text-lg md:text-xl'}`}>
+            <span className={`font-bold text-primary-600 ${compact ? 'text-xs' : 'text-sm md:text-base'}`}>
               ৳{currentPrice}
             </span>
             {hasDiscount && (
