@@ -7,7 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
   GridSkeleton,
@@ -317,7 +317,7 @@ const ProductsPage: React.FC = () => {
             animate={{ opacity: 1 }}
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 md:gap-3'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'
                 : 'space-y-6'
             }
           >
@@ -379,13 +379,9 @@ const ProductsPage: React.FC = () => {
             </h2>
             <div className="bg-white dark:bg-gray-800 card p-6">
               <Swiper
-                modules={[Navigation, Pagination]}
+                modules={[Pagination]}
                 spaceBetween={16}
                 slidesPerView={2}
-                navigation={{
-                  nextEl: '.swiper-button-next',
-                  prevEl: '.swiper-button-prev',
-                }}
                 pagination={{
                   clickable: true,
                   bulletClass: 'swiper-pagination-bullet',
@@ -413,10 +409,6 @@ const ProductsPage: React.FC = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-              
-              {/* Custom Navigation Buttons */}
-              <div className="swiper-button-prev !left-2 !w-10 !h-10 !mt-0 !text-gray-600 dark:!text-gray-300 !bg-white dark:!bg-gray-700 !rounded-full !shadow-lg hover:!shadow-xl !transition-all !duration-200 !border !border-gray-200 dark:!border-gray-600 hover:!bg-gray-50 dark:hover:!bg-gray-600"></div>
-              <div className="swiper-button-next !right-2 !w-10 !h-10 !mt-0 !text-gray-600 dark:!text-gray-300 !bg-white dark:!bg-gray-700 !rounded-full !shadow-lg hover:!shadow-xl !transition-all !duration-200 !border !border-gray-200 dark:!border-gray-600 hover:!bg-gray-50 dark:hover:!bg-gray-600"></div>
             </div>
           </div>
         )}

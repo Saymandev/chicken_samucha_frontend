@@ -1,7 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { useStore } from '../../store/useStore';
 
 interface SliderItem {
@@ -26,46 +30,10 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   autoPlay = true, 
   interval = 5000 
 }) => {
- 
   const { language } = useStore();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(autoPlay);
 
   // Filter active items and sort by order
   const activeItems = items.filter(item => item.isActive).sort((a, b) => a.order - b.order);
-
-  // Auto-play functionality
-  useEffect(() => {
-    if (!isAutoPlaying || activeItems.length <= 1) return;
-
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === activeItems.length - 1 ? 0 : prevIndex + 1
-      );
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [isAutoPlaying, activeItems.length, interval]);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const goToPrevious = () => {
-    setCurrentIndex(currentIndex === 0 ? activeItems.length - 1 : currentIndex - 1);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex(currentIndex === activeItems.length - 1 ? 0 : currentIndex + 1);
-  };
-
-  const handleMouseEnter = () => {
-    setIsAutoPlaying(false);
-  };
-
-  const handleMouseLeave = () => {
-    setIsAutoPlaying(autoPlay);
-  };
 
   if (activeItems.length === 0) {
     return (
@@ -85,121 +53,101 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
     );
   }
 
-  const currentItem = activeItems[currentIndex];
-
   return (
-    <div 
-      className="relative h-96 md:h-[500px] overflow-hidden"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          className="absolute inset-0"
-        >
-          {/* Background Image */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${currentItem.image.url})` }}
-          />
-          
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black bg-opacity-40" />
-          
-          {/* Content */}
-          <div className="relative z-10 h-full flex items-center justify-center">
-            <div className="text-center text-white max-w-4xl mx-auto px-4">
-              <motion.h1
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
-                className={`text-4xl md:text-6xl font-bold mb-4 ${
-                  language === 'bn' ? 'font-bengali' : ''
-                }`}
-              >
-                {currentItem.title[language]}
-              </motion.h1>
+    <div className="relative h-96 md:h-[500px] overflow-hidden">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        spaceBetween={0}
+        slidesPerView={1}
+        navigation={{
+          nextEl: '.hero-swiper-button-next',
+          prevEl: '.hero-swiper-button-prev',
+        }}
+        pagination={{
+          clickable: true,
+          bulletClass: 'hero-swiper-pagination-bullet',
+          bulletActiveClass: 'hero-swiper-pagination-bullet-active',
+        }}
+        autoplay={autoPlay ? {
+          delay: interval,
+          disableOnInteraction: false,
+        } : false}
+        loop={activeItems.length > 1}
+        className="hero-swiper h-full"
+      >
+        {activeItems.map((item, index) => (
+          <SwiperSlide key={item.id}>
+            <div className="relative h-full">
+              {/* Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${item.image.url})` }}
+              />
               
-              <motion.p
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className={`text-xl md:text-2xl mb-8 opacity-90 ${
-                  language === 'bn' ? 'font-bengali' : ''
-                }`}
-              >
-                {currentItem.description[language]}
-              </motion.p>
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black bg-opacity-40" />
               
-              {currentItem.linkUrl && (
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6, duration: 0.8 }}
-                  className="flex flex-col sm:flex-row gap-4 justify-center"
-                >
-                  <Link
-                    to={currentItem.linkUrl}
-                    className="btn-primary text-lg px-8 py-3 hover:scale-105 transition-transform"
+              {/* Content */}
+              <div className="relative z-10 h-full flex items-center justify-center">
+                <div className="text-center text-white max-w-4xl mx-auto px-4">
+                  <motion.h1
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.8 }}
+                    className={`text-4xl md:text-6xl font-bold mb-4 ${
+                      language === 'bn' ? 'font-bengali' : ''
+                    }`}
                   >
-                    {currentItem.buttonText[language]}
-                  </Link>
-                </motion.div>
-              )}
+                    {item.title[language]}
+                  </motion.h1>
+                  
+                  <motion.p
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.8 }}
+                    className={`text-xl md:text-2xl mb-8 opacity-90 ${
+                      language === 'bn' ? 'font-bengali' : ''
+                    }`}
+                  >
+                    {item.description[language]}
+                  </motion.p>
+                  
+                  {item.linkUrl && (
+                    <motion.div
+                      initial={{ y: 30, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.6, duration: 0.8 }}
+                      className="flex flex-col sm:flex-row gap-4 justify-center"
+                    >
+                      <Link
+                        to={item.linkUrl}
+                        className="btn-primary text-lg px-8 py-3 hover:scale-105 transition-transform"
+                      >
+                        {item.buttonText[language]}
+                      </Link>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
-      {/* Navigation Arrows */}
+      {/* Custom Navigation Buttons */}
       {activeItems.length > 1 && (
         <>
-          <button
-            onClick={goToPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          
-          <button
-            onClick={goToNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
+          <div className="hero-swiper-button-prev absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all cursor-pointer">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+          <div className="hero-swiper-button-next absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all cursor-pointer">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </>
-      )}
-
-      {/* Dots Indicator */}
-      {activeItems.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
-          {activeItems.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                currentIndex === index 
-                  ? 'bg-white scale-125' 
-                  : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Slide Counter */}
-      {activeItems.length > 1 && (
-        <div className="absolute top-6 right-6 z-20 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-          {currentIndex + 1} / {activeItems.length}
-        </div>
       )}
     </div>
   );

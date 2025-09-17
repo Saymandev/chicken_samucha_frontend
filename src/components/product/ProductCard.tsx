@@ -113,6 +113,126 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const currentPrice = product.discountPrice || product.price;
   const hasDiscount = !!product.discountPrice;
 
+  // For horizontal layout (image two style) - only for main product cards
+  if (!compact) {
+    return (
+      <motion.div
+        whileHover={{ y: -2, scale: 1.01 }}
+        transition={{ duration: 0.3 }}
+        className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
+      >
+        <Link to={`/products/${product.id || (product as any)._id}`} className="block">
+          <div className="flex h-32">
+            {/* Product Image - Left Side */}
+            <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
+              <img
+                src={product.images[0]?.url || '/placeholder-product.jpg'}
+                alt={product.name[language]}
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                loading="lazy"
+              />
+              
+              {/* Badges */}
+              <div className="absolute top-1 left-1 flex flex-col gap-1">
+                {hasDiscount && (
+                  <span className="bg-red-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px]">
+                    {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
+                  </span>
+                )}
+                {product.isFeatured && (
+                  <span className="bg-orange-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px]">
+                    {language === 'bn' ? 'বৈশিষ্ট্য' : 'FEATURED'}
+                  </span>
+                )}
+              </div>
+
+              {/* Stock Status */}
+              {(!inStock) && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <span className="bg-red-500 text-white font-bold px-2 py-1 rounded text-xs">
+                    {t('products.outOfStock')}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Product Info - Right Side */}
+            <div className="flex-1 p-3 flex flex-col justify-between">
+              {/* Top Section */}
+              <div>
+                {/* Title */}
+                <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-2 mb-1 ${
+                  language === 'bn' ? 'font-bengali text-sm' : 'text-sm'
+                }`} title={product.name[language]}>
+                  {product.name[language]}
+                </h3>
+
+                {/* Category Tag */}
+                <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded-full mb-2">
+                  {typeof product.category === 'string' ? product.category : 'food'}
+                </span>
+
+                {/* Price */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-bold text-gray-900 dark:text-white text-lg">
+                    ৳{currentPrice}
+                  </span>
+                  {hasDiscount && (
+                    <span className="text-gray-500 line-through text-sm">
+                      ৳{product.price}
+                    </span>
+                  )}
+                </div>
+
+                {/* Short Description */}
+                {product.shortDescription && (
+                  <p className={`text-gray-600 dark:text-gray-400 text-xs line-clamp-2 mb-2 ${
+                    language === 'bn' ? 'font-bengali' : ''
+                  }`}>
+                    {product.shortDescription[language]}
+                  </p>
+                )}
+              </div>
+
+              {/* Bottom Section - Quick Add Button */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {product.preparationTime}
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAddToCart(e);
+                  }}
+                  disabled={!inStock || isAdding}
+                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 border ${
+                    isInCart
+                      ? 'bg-green-500 border-green-500 text-white'
+                      : inStock
+                      ? 'bg-orange-500 border-orange-500 text-white hover:bg-orange-600'
+                      : 'bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isAdding ? (
+                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                  ) : isInCart ? (
+                    'In Cart'
+                  ) : inStock ? (
+                    'Quick Add'
+                  ) : (
+                    'Out of Stock'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </motion.div>
+    );
+  }
+
+  // Compact vertical layout for recently viewed products
   return (
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
