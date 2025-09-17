@@ -1,9 +1,14 @@
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Filter, Grid, List, Search } from 'lucide-react';
+import { Filter, Grid, List, Search } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import {
   GridSkeleton,
   ListSkeleton,
@@ -33,7 +38,6 @@ const ProductsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Categories for filtering
   const categories = [
@@ -140,46 +144,7 @@ const ProductsPage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  // Recently Viewed slider functions - custom slider
-  const [itemsPerSlide, setItemsPerSlide] = useState(4);
-  const totalSlides = Math.max(1, Math.ceil(recentlyViewed.length / itemsPerSlide));
-
-  // Update items per slide on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setItemsPerSlide(2); // small: 2 items
-      } else if (window.innerWidth < 1024) {
-        setItemsPerSlide(3); // medium: 3 items
-      } else {
-        setItemsPerSlide(4); // large: 4 items
-      }
-      setCurrentSlide(0); // Reset to first slide on resize
-    };
-
-    handleResize(); // Set initial value
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [recentlyViewed.length]);
-
-  // Reset to first slide when products change
-  useEffect(() => {
-    setCurrentSlide(0);
-  }, [recentlyViewed.length, itemsPerSlide]);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => {
-      const next = prev + 1;
-      return next >= totalSlides ? 0 : next;
-    });
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => {
-      const prevSlide = prev - 1;
-      return prevSlide < 0 ? totalSlides - 1 : prevSlide;
-    });
-  };
+  // Recently Viewed products - using Swiper slider
 
 
   return (
@@ -412,105 +377,46 @@ const ProductsPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed Products'}
             </h2>
-            <div className="relative bg-white dark:bg-gray-800 card p-6">
-              {/* Debug info - remove in production */}
-              <div className="text-xs text-gray-500 mb-2">
-                Debug: {recentlyViewed.length} products, {itemsPerSlide} per slide, {totalSlides} total slides, current: {currentSlide}
-              </div>
+            <div className="bg-white dark:bg-gray-800 card p-6">
+              <Swiper
+                modules={[Navigation, Pagination]}
+                spaceBetween={16}
+                slidesPerView={2}
+                navigation={{
+                  nextEl: '.swiper-button-next',
+                  prevEl: '.swiper-button-prev',
+                }}
+                pagination={{
+                  clickable: true,
+                  bulletClass: 'swiper-pagination-bullet',
+                  bulletActiveClass: 'swiper-pagination-bullet-active',
+                }}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 2,
+                    spaceBetween: 16,
+                  },
+                  768: {
+                    slidesPerView: 3,
+                    spaceBetween: 20,
+                  },
+                  1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                  },
+                }}
+                className="recently-viewed-swiper"
+              >
+                {recentlyViewed.map((product: any, index: number) => (
+                  <SwiperSlide key={product.id || index}>
+                    <ProductCard product={product} showQuickActions={false} compact={true} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
               
-              {/* Fallback: Show all products if slider has issues */}
-              {totalSlides <= 1 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-                  {recentlyViewed.map((rv: any, idx: number) => (
-                    <div key={rv.id || idx}>
-                      <ProductCard product={rv} showQuickActions={false} compact={true} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <>
-                  {/* Navigation Arrows */}
-                  {totalSlides > 1 && (
-                    <>
-                      <button
-                        onClick={prevSlide}
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-                      >
-                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                      </button>
-                      
-                      <button
-                        onClick={nextSlide}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-                      >
-                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                      </button>
-                    </>
-                  )}
-
-              {/* Slider Container */}
-              <div className="overflow-hidden">
-                <div
-                  className="flex transition-transform duration-300 ease-in-out"
-                  style={{
-                    transform: `translateX(-${currentSlide * 100}%)`,
-                    width: `${totalSlides * 100}%`
-                  }}
-                >
-                  {Array.from({ length: totalSlides }, (_, slideIndex) => {
-                    const startIndex = slideIndex * itemsPerSlide;
-                    const endIndex = startIndex + itemsPerSlide;
-                    const slideProducts = recentlyViewed.slice(startIndex, endIndex);
-                    
-                    return (
-                      <div
-                        key={slideIndex}
-                        className="flex gap-2 sm:gap-3 flex-shrink-0"
-                        style={{ width: `${100 / totalSlides}%` }}
-                      >
-                        {slideProducts.map((rv: any, idx: number) => (
-                          <div
-                            key={rv.id || idx}
-                            className="flex-shrink-0"
-                            style={{ width: `${100 / itemsPerSlide}%` }}
-                          >
-                            <ProductCard product={rv} showQuickActions={false} compact={true} />
-                          </div>
-                        ))}
-                        {/* Fill empty spaces if needed */}
-                        {slideProducts.length < itemsPerSlide && 
-                          Array.from({ length: itemsPerSlide - slideProducts.length }, (_, emptyIdx) => (
-                            <div
-                              key={`empty-${emptyIdx}`}
-                              className="flex-shrink-0"
-                              style={{ width: `${100 / itemsPerSlide}%` }}
-                            />
-                          ))
-                        }
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-                  {/* Dots Indicator */}
-                  {totalSlides > 1 && (
-                    <div className="flex justify-center mt-4 space-x-2">
-                      {Array.from({ length: totalSlides }, (_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentSlide(index)}
-                          className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                            index === currentSlide
-                              ? 'bg-primary-500 w-6'
-                              : 'bg-gray-300 dark:bg-gray-600'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
+              {/* Custom Navigation Buttons */}
+              <div className="swiper-button-prev !left-2 !w-10 !h-10 !mt-0 !text-gray-600 dark:!text-gray-300 !bg-white dark:!bg-gray-700 !rounded-full !shadow-lg hover:!shadow-xl !transition-all !duration-200 !border !border-gray-200 dark:!border-gray-600 hover:!bg-gray-50 dark:hover:!bg-gray-600"></div>
+              <div className="swiper-button-next !right-2 !w-10 !h-10 !mt-0 !text-gray-600 dark:!text-gray-300 !bg-white dark:!bg-gray-700 !rounded-full !shadow-lg hover:!shadow-xl !transition-all !duration-200 !border !border-gray-200 dark:!border-gray-600 hover:!bg-gray-50 dark:hover:!bg-gray-600"></div>
             </div>
           </div>
         )}
