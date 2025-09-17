@@ -47,13 +47,17 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminUsers from './pages/admin/AdminUsers';
 
 // Components
-import FloatingCartButton from './components/common/FloatingCartButton';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ShoppingCartSidebar from './components/common/ShoppingCartSidebar';
+
+// Contexts
+import { CartProvider, useCart } from './contexts/CartContext';
 
 // Component to handle layout based on route
 function AppContent() {
   const { theme } = useStore();
+  const { isCartOpen, closeCart } = useCart();
   const location = useLocation();
   
   // Check if current route is an admin route
@@ -209,8 +213,13 @@ function AppContent() {
       {/* Only show Footer for non-admin routes */}
       {!isAdminRoute && <Footer />}
       
-      {/* Floating Cart Button - Only show for non-admin routes */}
-      {!isAdminRoute && <FloatingCartButton />}
+      {/* Shopping Cart Sidebar - Only show for non-admin routes */}
+      {!isAdminRoute && (
+        <ShoppingCartSidebar
+          isOpen={isCartOpen}
+          onClose={closeCart}
+        />
+      )}
       
       {/* Global Loading Spinner */}
       <LoadingSpinner />
@@ -250,7 +259,9 @@ function App() {
 
   return (
     <Router>
-      <AppContent />
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
     </Router>
   );
 }

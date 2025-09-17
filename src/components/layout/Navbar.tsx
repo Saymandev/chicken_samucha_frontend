@@ -16,6 +16,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useCart } from '../../contexts/CartContext';
 import { useStore } from '../../store/useStore';
 import { Skeleton } from '../common/Skeleton';
 import UserNotificationDropdown from '../UserNotificationDropdown';
@@ -28,13 +29,14 @@ const Navbar: React.FC = () => {
   const { 
     isAuthenticated, 
     user, 
-    cart, 
+    cartCount,
     theme, 
     language,
     toggleTheme, 
     setLanguage, 
     logout 
   } = useStore();
+  const { openCart } = useCart();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -66,7 +68,6 @@ const Navbar: React.FC = () => {
     setIsUserMenuOpen(false);
   };
 
-  const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   const navItems = [
     {
@@ -210,21 +211,21 @@ const Navbar: React.FC = () => {
             )}
 
             {/* Shopping Cart */}
-            <Link
-              to="/cart"
+            <button
+              onClick={openCart}
               className="relative z-40 p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors pointer-events-auto"
             >
               <ShoppingCart className="w-5 h-5" />
-              {cartItemsCount > 0 && (
+              {cartCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium"
                 >
-                  {cartItemsCount}
+                  {cartCount}
                 </motion.span>
               )}
-            </Link>
+            </button>
 
             {/* User Menu or Auth Buttons */}
             {isAuthenticated && user ? (

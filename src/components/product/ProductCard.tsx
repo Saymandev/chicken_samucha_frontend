@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useCart } from '../../contexts/CartContext';
 import { Product, useStore } from '../../store/useStore';
-import QuickAddModal from '../common/QuickAddModal';
 
 interface ProductCardProps {
   product: Product;
@@ -16,17 +17,69 @@ const ProductCard: React.FC<ProductCardProps> = ({
   showQuickActions = true 
 }) => {
   const { t } = useTranslation();
-  const { language, cart } = useStore();
-  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+  const { language, addToCart, cart } = useStore();
+  const { openCart } = useCart();
+  const [quantity, setQuantity] = useState(product.minOrderQuantity || 1);
+  const [isAdding, setIsAdding] = useState(false);
 
   // Check if product is already in cart
   const cartItem = cart.find(item => item.product.id === product.id);
   const isInCart = !!cartItem;
 
-  const handleQuickAdd = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setShowQuickAddModal(true);
+    
+    if (product.stock < 1) {
+      toast.error(t('products.outOfStock'));
+      return;
+    }
+
+    if (quantity < product.minOrderQuantity) {
+      toast.error(
+        language === 'bn' 
+          ? `ন্যূনতম ${product.minOrderQuantity}টি অর্ডার করুন`
+          : `Minimum order quantity is ${product.minOrderQuantity}`
+      );
+      return;
+    }
+
+    if (quantity > product.maxOrderQuantity) {
+      toast.error(
+        language === 'bn' 
+          ? `সর্বোচ্চ ${product.maxOrderQuantity}টি অর্ডার করতে পারেন`
+          : `Maximum order quantity is ${product.maxOrderQuantity}`
+      );
+      return;
+    }
+
+    setIsAdding(true);
+    
+    // Add a small delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    addToCart(product, quantity);
+    
+    toast.success(
+      language === 'bn' 
+        ? `${product.name.bn} (${quantity}টি) কার্টে যোগ করা হয়েছে`
+        : `${product.name.en} (${quantity}) added to cart`,
+      {
+        duration: 2000,
+        icon: '🛒',
+      }
+    );
+    
+    setIsAdding(false);
+    
+    // Open cart sidebar after adding
+    openCart();
+  };
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= product.minOrderQuantity && newQuantity <= product.maxOrderQuantity) {
+      setQuantity(newQuantity);
+    }
   };
 
   const currentPrice = product.discountPrice || product.price;
@@ -147,32 +200,84 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </Link>
 
-      {/* Quick Add Button */}
+      {/* Quick Add to Cart Section */}
       {showQuickActions && (
-        <div className="p-4 pt-0">
+        <div className="p-4 pt-0 space-y-3">
+          {/* Quantity Selector */}
+          {product.stock > 0 && (
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleQuantityChange(quantity - 1);
+                }}
+                disabled={quantity <= product.minOrderQuantity}
+                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Minus className="w-4 h-4 text-gray-600" />
+              </button>
+              
+              <span className="min-w-[2rem] text-center font-medium text-gray-900 dark:text-white">
+                {quantity}
+              </span>
+              
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleQuantityChange(quantity + 1);
+                }}
+                disabled={quantity >= product.maxOrderQuantity}
+                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Plus className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+          )}
+
+          {/* Add to Cart Button */}
           <motion.button
-            onClick={handleQuickAdd}
-            disabled={product.stock < 1}
-            whileHover={product.stock > 0 ? { scale: 1.02 } : {}}
-            whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
+            onClick={handleAddToCart}
+            disabled={product.stock < 1 || isAdding}
+            whileHover={product.stock > 0 && !isAdding ? { scale: 1.02 } : {}}
+            whileTap={product.stock > 0 && !isAdding ? { scale: 0.98 } : {}}
             className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-              product.stock > 0
+              product.stock > 0 && !isAdding
                 ? isInCart
                   ? 'bg-green-500 hover:bg-green-600 text-white'
                   : 'btn-primary hover:bg-primary-700'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            <ShoppingCart className="w-4 h-4" />
-            {product.stock > 0 
-              ? (language === 'bn' ? 'দ্রুত যোগ করুন' : 'Quick Add')
-              : (language === 'bn' ? 'স্টকে নেই' : 'Out of Stock')
-            }
+            {isAdding ? (
+              <>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                />
+                {language === 'bn' ? 'যোগ করা হচ্ছে...' : 'Adding...'}
+              </>
+            ) : product.stock > 0 ? (
+              <>
+                <ShoppingCart className="w-4 h-4" />
+                {isInCart 
+                  ? (language === 'bn' ? 'কার্টে আছে' : 'In Cart')
+                  : t('products.addToCart')
+                }
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4" />
+                {t('products.outOfStock')}
+              </>
+            )}
           </motion.button>
 
           {/* Stock Info */}
           {product.stock > 0 && product.stock <= 5 && (
-            <p className="text-xs text-orange-600 text-center mt-2">
+            <p className="text-xs text-orange-600 text-center">
               {language === 'bn' 
                 ? `শুধু ${product.stock}টি অবশিষ্ট`
                 : `Only ${product.stock} left in stock`
@@ -181,13 +286,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
       )}
-
-      {/* Quick Add Modal */}
-      <QuickAddModal
-        product={product}
-        isOpen={showQuickAddModal}
-        onClose={() => setShowQuickAddModal(false)}
-      />
     </motion.div>
   );
 };
