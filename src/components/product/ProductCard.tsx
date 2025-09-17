@@ -121,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
-        <div className={`relative overflow-hidden ${compact ? 'aspect-square' : 'aspect-square'}`}>
+        <div className={`relative overflow-hidden ${compact ? 'aspect-square h-24' : 'aspect-square'}`}>
           <img
             src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
@@ -130,19 +130,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
           
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className={`absolute top-2 left-2 flex flex-col ${compact ? 'gap-1' : 'gap-2'}`}>
             {hasDiscount && (
-              <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              <span className={`bg-red-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
                 {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
               </span>
             )}
             {typeof totalSold === 'number' && totalSold >= 50 && (
-              <span className="bg-yellow-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">
+              <span className={`bg-yellow-500 text-white font-bold px-2 py-1 rounded-full uppercase tracking-wide ${compact ? 'text-[8px]' : 'text-[10px]'}`}>
                 Best Seller
               </span>
             )}
             {product.isFeatured && (
-              <span className="bg-primary-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              <span className={`bg-primary-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
                 {language === 'bn' ? 'বৈশিষ্ট্য' : 'FEATURED'}
               </span>
             )}
@@ -175,7 +175,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className={`p-3 space-y-2 ${compact ? 'min-h-[80px]' : 'min-h-[120px]'}`}>
+        <div className={`${compact ? 'p-2 space-y-1 min-h-[60px]' : 'p-3 space-y-2 min-h-[120px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
@@ -216,8 +216,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
 
           {/* Price */}
-          <div className="flex items-center gap-2">
-            <span className={`font-bold text-primary-600 ${compact ? 'text-sm' : 'text-lg md:text-xl'}`}>
+          <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
+            <span className={`font-bold text-primary-600 ${compact ? 'text-xs' : 'text-lg md:text-xl'}`}>
               ৳{currentPrice}
             </span>
             {hasDiscount && (

@@ -140,16 +140,43 @@ const ProductsPage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  // Recently Viewed slider functions
-  const itemsPerSlide = 4; // Show 4 items per slide
+  // Recently Viewed slider functions - responsive items per slide
+  const getItemsPerSlide = () => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 640) return 2; // small: 2 items
+      if (window.innerWidth < 1024) return 3; // medium: 3 items
+      return 4; // large: 4 items
+    }
+    return 4; // default
+  };
+
+  const [itemsPerSlide, setItemsPerSlide] = useState(4);
   const totalSlides = Math.ceil(recentlyViewed.length / itemsPerSlide);
 
+  // Update items per slide on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerSlide(getItemsPerSlide());
+      setCurrentSlide(0); // Reset to first slide on resize
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    setCurrentSlide((prev) => {
+      const next = prev + 1;
+      return next >= totalSlides ? 0 : next;
+    });
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+    setCurrentSlide((prev) => {
+      const prevSlide = prev - 1;
+      return prevSlide < 0 ? totalSlides - 1 : prevSlide;
+    });
   };
 
 
@@ -408,7 +435,7 @@ const ProductsPage: React.FC = () => {
               {/* Slider Container */}
               <div className="overflow-hidden">
                 <motion.div
-                  className="flex gap-4 transition-transform duration-300 ease-in-out"
+                  className="flex transition-transform duration-300 ease-in-out"
                   style={{
                     transform: `translateX(-${currentSlide * 100}%)`,
                     width: `${totalSlides * 100}%`
@@ -417,7 +444,7 @@ const ProductsPage: React.FC = () => {
                   {Array.from({ length: totalSlides }, (_, slideIndex) => (
                     <div
                       key={slideIndex}
-                      className="flex gap-4"
+                      className="flex gap-2 sm:gap-3"
                       style={{ width: `${100 / totalSlides}%` }}
                     >
                       {recentlyViewed
@@ -425,7 +452,7 @@ const ProductsPage: React.FC = () => {
                         .map((rv: any, idx: number) => (
                           <div
                             key={rv.id || idx}
-                            className="flex-shrink-0 w-1/4"
+                            className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4"
                           >
                             <ProductCard product={rv} showQuickActions={false} compact={true} />
                           </div>
