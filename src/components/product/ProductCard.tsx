@@ -242,11 +242,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
-        <div className={`relative overflow-hidden flex justify-center items-center w-full h-36`}>
+        <div className={`relative overflow-hidden flex justify-center items-center w-full ${compact ? 'h-48' : 'h-36'}`}>
           <img
             src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
-            className="w-4/5 h-4/5 object-cover transition-transform duration-300 hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             loading="lazy"
           />
           
@@ -305,81 +305,143 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className={`${compact ? 'p-2 space-y-1 min-h-[60px]' : 'p-2 space-y-1 min-h-[100px]'}`}>
+        <div className={`${compact ? 'p-3 space-y-2 min-h-[140px]' : 'p-2 space-y-1 min-h-[100px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
-              ? (language === 'bn' ? 'font-bengali text-sm' : 'text-xs')
+              ? (language === 'bn' ? 'font-bengali text-sm' : 'text-sm')
               : (language === 'bn' ? 'font-bengali text-sm' : 'text-xs md:text-sm')
           }`} title={product.name[language]}>
-            {truncateWords(product.name[language], compact ? 3 : 5)}
+            {truncateWords(product.name[language], compact ? 4 : 5)}
           </h3>
 
-          {/* Short Description */}
-          {product.shortDescription && !compact && (
-            <p className={`text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 ${
-              language === 'bn' ? 'font-bengali' : ''
-            }`}>
-              {product.shortDescription[language]}
-            </p>
-          )}
-
           {/* Rating */}
-          {product.ratings.count > 0 && !compact && (
-            <div className="flex items-center gap-2">
+          {product.ratings.count > 0 && (
+            <div className="flex items-center gap-1">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-4 h-4 ${
-                      i < Math.floor(product.ratings.average)
+                    className={`w-3 h-3 ${
+                      i < Math.round(product.ratings.average)
                         ? 'text-yellow-400 fill-current'
-                        : 'text-gray-300'
+                        : 'text-gray-300 dark:text-gray-600'
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {product.ratings.average.toFixed(1)} ({product.ratings.count})
               </span>
             </div>
           )}
 
           {/* Price */}
-          <div className={`flex items-center ${compact ? 'gap-1' : 'gap-2'}`}>
-            <span className={`font-bold text-primary-600 ${compact ? 'text-xs' : 'text-sm md:text-base'}`}>
+          <div className={`flex items-center gap-2`}>
+            <span className={`font-bold text-primary-600 ${compact ? 'text-lg' : 'text-sm md:text-base'}`}>
               ৳{currentPrice}
             </span>
             {hasDiscount && (
-              <span className={`text-gray-500 line-through ${compact ? 'text-xs' : 'text-sm'}`}>
+              <span className={`text-gray-500 line-through ${compact ? 'text-sm' : 'text-sm'}`}>
                 ৳{product.price}
               </span>
             )}
           </div>
 
           {/* Additional Info */}
-          {!compact && (
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>{product.preparationTime}</span>
-              <span className="flex items-center gap-1">
-                {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
-                  <>
-                    <span>Sold:</span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
-                    </span>
-                  </>
-                ) : (
-                  <span>{product.servingSize}</span>
-                )}
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>{product.preparationTime}</span>
+            <span className="flex items-center gap-1">
+              {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
+                <>
+                  <span>Sold:</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                  </span>
+                </>
+              ) : (
+                <span>{product.servingSize}</span>
+              )}
+            </span>
+          </div>
+
+          {/* Quantity Selector */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleQuantityChange(-1);
+                }}
+                disabled={quantity <= 1}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="px-3 py-2 text-sm font-medium min-w-[2rem] text-center">
+                {quantity}
               </span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleQuantityChange(1);
+                }}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
-          )}
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {product.servingSize}
+            </span>
+          </div>
         </div>
       </Link>
 
+      {/* Add to Cart Button for Compact Cards */}
+      {compact && (
+        <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleAddToCart(e);
+            }}
+            disabled={!inStock || isAdding}
+            className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+              isInCart
+                ? 'bg-green-500 hover:bg-green-600 text-white'
+                : inStock
+                ? 'bg-primary-500 hover:bg-primary-600 text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {isAdding ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                {t('products.adding')}
+              </>
+            ) : isInCart ? (
+              <>
+                <ShoppingCart className="w-4 h-4" />
+                {t('products.inCart')}
+              </>
+            ) : inStock ? (
+              <>
+                <ShoppingCart className="w-4 h-4" />
+                {t('products.addToCart')}
+              </>
+            ) : (
+              t('products.outOfStock')
+            )}
+          </button>
+        </div>
+      )}
+
       {/* Quick Add to Cart Section */}
-      {showQuickActions && (
+      {showQuickActions && !compact && (
         <div className="p-3 pt-0 space-y-3">
           {/* Quantity Selector */}
           {inStock && (
