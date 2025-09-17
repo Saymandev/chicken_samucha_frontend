@@ -425,7 +425,7 @@ const ProductsPage: React.FC = () => {
               >
                 {bestSellers.map((product: any, index: number) => (
                   <SwiperSlide key={product.id || index}>
-                    <ProductCard product={product} showQuickActions={false} compact={true} />
+                    <ProductCard product={product} showQuickActions={true} compact={true} />
                   </SwiperSlide>
                 ))}
               </Swiper>
@@ -466,7 +466,7 @@ const ProductsPage: React.FC = () => {
               >
                 {recentlyViewed.map((product: any, index: number) => (
                   <SwiperSlide key={product.id || index}>
-                    <ProductCard product={product} showQuickActions={false} compact={true} />
+                    <ProductCard product={product} showQuickActions={true} compact={true} />
                   </SwiperSlide>
                 ))}
               </Swiper>
