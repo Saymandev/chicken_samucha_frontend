@@ -9,7 +9,6 @@ import {
   Package,
   Settings,
   ShoppingCart,
-  Star,
   Sun,
   User,
   X
@@ -81,12 +80,6 @@ const Navbar: React.FC = () => {
       label: t('nav.products'),
       icon: <Package className="w-4 h-4" />,
       active: location.pathname.startsWith('/products')
-    },
-    {
-      path: '/reviews',
-      label: t('nav.reviews'),
-      icon: <Star className="w-4 h-4" />,
-      active: location.pathname === '/reviews'
     },
     {
       path: '/chat',

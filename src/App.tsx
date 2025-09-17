@@ -26,7 +26,6 @@ import RefundPolicyPage from './pages/RefundPolicyPage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ReturnPolicyPage from './pages/ReturnPolicyPage';
-import ReviewsPage from './pages/ReviewsPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import TrackOrderPage from './pages/TrackOrderPage';
 
@@ -48,6 +47,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminUsers from './pages/admin/AdminUsers';
 
 // Components
+import FloatingCartButton from './components/common/FloatingCartButton';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
@@ -73,7 +73,6 @@ function AppContent() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />
-          <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/chat" element={<ChatPage />} />
           
           {/* Auth Routes */}
@@ -209,6 +208,9 @@ function AppContent() {
       
       {/* Only show Footer for non-admin routes */}
       {!isAdminRoute && <Footer />}
+      
+      {/* Floating Cart Button - Only show for non-admin routes */}
+      {!isAdminRoute && <FloatingCartButton />}
       
       {/* Global Loading Spinner */}
       <LoadingSpinner />

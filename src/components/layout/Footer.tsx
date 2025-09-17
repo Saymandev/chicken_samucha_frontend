@@ -23,7 +23,6 @@ const Footer: React.FC = () => {
       links: [
         { name: t('nav.home'), path: '/' },
         { name: t('nav.products'), path: '/products' },
-        { name: t('nav.reviews'), path: '/reviews' },
         { name: t('nav.chat'), path: '/chat' }
       ]
     },

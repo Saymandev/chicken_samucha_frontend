@@ -296,19 +296,6 @@ const HomePage: React.FC = () => {
             </motion.div>
           )}
 
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <Link
-              to="/reviews"
-              className="btn-outline text-lg px-8 py-3 hover:scale-105 transition-transform"
-            >
-              {language === 'bn' ? 'সব রিভিউ দেখুন' : 'View All Reviews'}
-            </Link>
-          </motion.div>
         </div>
       </section>
 
