@@ -1,8 +1,15 @@
 import { motion } from 'framer-motion';
-import { Edit, Plus, Search, TicketPercent, Trash2, X } from 'lucide-react';
+import { Edit, Plus, Search, TicketPercent, Trash2, User, X } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { couponAPI } from '../../utils/api';
+import { adminAPI, couponAPI } from '../../utils/api';
+
+interface CouponUser {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
 
 interface Coupon {
   _id: string;
@@ -35,6 +42,10 @@ const AdminCoupons: React.FC = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [users, setUsers] = useState<CouponUser[]>([]);
+  const [userSearch, setUserSearch] = useState('');
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<CouponUser[]>([]);
   const [formData, setFormData] = useState({
     code: '',
     name: { en: '', bn: '' },
@@ -70,6 +81,17 @@ const AdminCoupons: React.FC = () => {
     }
   }, [statusFilter, search]);
 
+  const fetchUsers = useCallback(async (searchTerm: string = '') => {
+    try {
+      const res = await adminAPI.getAllUsers({ search: searchTerm, limit: 20 });
+      if (res.data.success) {
+        setUsers(res.data.users || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch users:', e);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCoupons();
   }, [fetchCoupons]);
@@ -102,8 +124,47 @@ const AdminCoupons: React.FC = () => {
     }
   };
 
+  const handleUserSearch = (searchTerm: string) => {
+    setUserSearch(searchTerm);
+    if (searchTerm.length > 2) {
+      fetchUsers(searchTerm);
+      setShowUserSearch(true);
+    } else {
+      setShowUserSearch(false);
+    }
+  };
+
+  const handleUserSelect = (user: CouponUser) => {
+    if (!selectedUsers.find(u => u._id === user._id)) {
+      setSelectedUsers([...selectedUsers, user]);
+      setFormData({
+        ...formData,
+        userRestrictions: {
+          ...formData.userRestrictions,
+          specificUsers: [...formData.userRestrictions.specificUsers, user._id]
+        }
+      });
+    }
+    setUserSearch('');
+    setShowUserSearch(false);
+  };
+
+  const handleUserRemove = (userId: string) => {
+    setSelectedUsers(selectedUsers.filter(u => u._id !== userId));
+    setFormData({
+      ...formData,
+      userRestrictions: {
+        ...formData.userRestrictions,
+        specificUsers: formData.userRestrictions.specificUsers.filter(id => id !== userId)
+      }
+    });
+  };
+
   const handleCreate = () => {
     setEditingCoupon(null);
+    setSelectedUsers([]);
+    setUserSearch('');
+    setShowUserSearch(false);
     setFormData({
       code: '',
       name: { en: '', bn: '' },
@@ -127,8 +188,31 @@ const AdminCoupons: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = (coupon: Coupon) => {
+  const handleEdit = async (coupon: Coupon) => {
     setEditingCoupon(coupon);
+    setUserSearch('');
+    setShowUserSearch(false);
+    
+    // Load selected users if any
+    if (coupon.userRestrictions?.specificUsers && coupon.userRestrictions.specificUsers.length > 0) {
+      try {
+        const userPromises = coupon.userRestrictions.specificUsers.map(userId => 
+          adminAPI.getAllUsers({ userId })
+        );
+        const userResponses = await Promise.all(userPromises);
+        const users = userResponses
+          .filter(res => res.data.success)
+          .map(res => res.data.users?.[0])
+          .filter(Boolean);
+        setSelectedUsers(users);
+      } catch (e) {
+        console.error('Failed to load selected users:', e);
+        setSelectedUsers([]);
+      }
+    } else {
+      setSelectedUsers([]);
+    }
+    
     setFormData({
       code: coupon.code,
       name: coupon.name,
@@ -443,6 +527,67 @@ const AdminCoupons: React.FC = () => {
                         min="0"
                       />
                     </div>
+                  </div>
+
+                  {/* Specific Users Selection */}
+                  <div className="space-y-3">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Specific Users (Optional)
+                    </label>
+                    
+                    {/* User Search Input */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={userSearch}
+                        onChange={(e) => handleUserSearch(e.target.value)}
+                        placeholder="Search users by name or email..."
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                      <User className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      
+                      {/* User Search Results */}
+                      {showUserSearch && users.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {users.map((user) => (
+                            <div
+                              key={user._id}
+                              onClick={() => handleUserSelect(user)}
+                              className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                            >
+                              <div className="font-medium text-gray-900 dark:text-white">{user.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Selected Users */}
+                    {selectedUsers.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Selected Users ({selectedUsers.length}):
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedUsers.map((user) => (
+                            <div
+                              key={user._id}
+                              className="flex items-center gap-2 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-3 py-1 rounded-full text-sm"
+                            >
+                              <span>{user.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleUserRemove(user._id)}
+                                className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
