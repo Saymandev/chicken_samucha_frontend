@@ -142,7 +142,7 @@ const ProductsPage: React.FC = () => {
 
   // Recently Viewed slider functions - custom slider
   const [itemsPerSlide, setItemsPerSlide] = useState(4);
-  const totalSlides = Math.ceil(recentlyViewed.length / itemsPerSlide);
+  const totalSlides = Math.max(1, Math.ceil(recentlyViewed.length / itemsPerSlide));
 
   // Update items per slide on window resize
   useEffect(() => {
@@ -160,6 +160,11 @@ const ProductsPage: React.FC = () => {
     handleResize(); // Set initial value
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, [recentlyViewed.length]);
+
+  // Reset to first slide when products change
+  useEffect(() => {
+    setCurrentSlide(0);
   }, [recentlyViewed.length]);
 
   const nextSlide = () => {
@@ -440,15 +445,18 @@ const ProductsPage: React.FC = () => {
                     width: `${totalSlides * 100}%`
                   }}
                 >
-                  {Array.from({ length: totalSlides }, (_, slideIndex) => (
-                    <div
-                      key={slideIndex}
-                      className="flex gap-2 sm:gap-3 flex-shrink-0"
-                      style={{ width: `${100 / totalSlides}%` }}
-                    >
-                      {recentlyViewed
-                        .slice(slideIndex * itemsPerSlide, (slideIndex + 1) * itemsPerSlide)
-                        .map((rv: any, idx: number) => (
+                  {Array.from({ length: totalSlides }, (_, slideIndex) => {
+                    const startIndex = slideIndex * itemsPerSlide;
+                    const endIndex = startIndex + itemsPerSlide;
+                    const slideProducts = recentlyViewed.slice(startIndex, endIndex);
+                    
+                    return (
+                      <div
+                        key={slideIndex}
+                        className="flex gap-2 sm:gap-3 flex-shrink-0"
+                        style={{ width: `${100 / totalSlides}%` }}
+                      >
+                        {slideProducts.map((rv: any, idx: number) => (
                           <div
                             key={rv.id || idx}
                             className="flex-shrink-0"
@@ -457,8 +465,19 @@ const ProductsPage: React.FC = () => {
                             <ProductCard product={rv} showQuickActions={false} compact={true} />
                           </div>
                         ))}
-                    </div>
-                  ))}
+                        {/* Fill empty spaces if needed */}
+                        {slideProducts.length < itemsPerSlide && 
+                          Array.from({ length: itemsPerSlide - slideProducts.length }, (_, emptyIdx) => (
+                            <div
+                              key={`empty-${emptyIdx}`}
+                              className="flex-shrink-0"
+                              style={{ width: `${100 / itemsPerSlide}%` }}
+                            />
+                          ))
+                        }
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
