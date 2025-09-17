@@ -121,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <motion.div
         whileHover={{ y: -2, scale: 1.01 }}
         transition={{ duration: 0.3 }}
-        className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
+        className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full p-0!important"
       >
         <Link to={`/products/${product.id || (product as any)._id}`} className="block">
           <div className="flex h-32">
@@ -365,38 +365,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           </div>
 
-          {/* Quantity Selector */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleQuantityChange(-1);
-                }}
-                disabled={quantity <= 1}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="px-3 py-2 text-sm font-medium min-w-[2rem] text-center">
-                {quantity}
-              </span>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleQuantityChange(1);
-                }}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {product.servingSize}
-            </span>
-          </div>
+         
         </div>
       </Link>
 
@@ -426,7 +395,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ) : isInCart ? (
               <>
                 <ShoppingCart className="w-4 h-4" />
-                {t('products.inCart')}
+                {t('In Cart')}
               </>
             ) : inStock ? (
               <>
@@ -441,7 +410,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       )}
 
       {/* Quick Add to Cart Section */}
-      {showQuickActions && !compact && (
+      {showQuickActions && (
         <div className="p-3 pt-0 space-y-3">
           {/* Quantity Selector */}
           {inStock && (
