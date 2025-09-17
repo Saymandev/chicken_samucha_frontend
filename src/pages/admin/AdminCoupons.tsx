@@ -5,7 +5,8 @@ import toast from 'react-hot-toast';
 import { couponAPI } from '../../utils/api';
 
 interface Coupon {
-  id: string;
+  _id: string;
+  id?: string; // For backward compatibility
   code: string;
   name: { en: string; bn: string };
   description?: { en?: string; bn?: string };
@@ -18,6 +19,13 @@ interface Coupon {
   isActive: boolean;
   validFrom: string;
   validUntil: string;
+  applicableProducts?: string[];
+  applicableCategories?: { en: string; bn: string }[];
+  userRestrictions?: {
+    firstTimeOnly: boolean;
+    minOrderCount: number;
+    specificUsers: string[];
+  };
 }
 
 const AdminCoupons: React.FC = () => {
@@ -38,7 +46,14 @@ const AdminCoupons: React.FC = () => {
     usageLimit: 0,
     isActive: true,
     validFrom: new Date().toISOString().split('T')[0],
-    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    applicableProducts: [] as string[],
+    applicableCategories: [] as { en: string; bn: string }[],
+    userRestrictions: {
+      firstTimeOnly: false,
+      minOrderCount: 0,
+      specificUsers: [] as string[]
+    }
   });
 
   const fetchCoupons = useCallback(async () => {
@@ -61,7 +76,7 @@ const AdminCoupons: React.FC = () => {
 
   const handleToggleActive = async (c: Coupon) => {
     try {
-      await couponAPI.updateCoupon(c.id, { isActive: !c.isActive });
+      await couponAPI.updateCoupon(c._id, { isActive: !c.isActive });
       toast.success(`Coupon ${!c.isActive ? 'activated' : 'deactivated'}`);
       fetchCoupons();
     } catch (e) {
@@ -100,7 +115,14 @@ const AdminCoupons: React.FC = () => {
       usageLimit: 0,
       isActive: true,
       validFrom: new Date().toISOString().split('T')[0],
-      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      applicableProducts: [],
+      applicableCategories: [],
+      userRestrictions: {
+        firstTimeOnly: false,
+        minOrderCount: 0,
+        specificUsers: []
+      }
     });
     setShowModal(true);
   };
@@ -118,7 +140,14 @@ const AdminCoupons: React.FC = () => {
       usageLimit: coupon.usageLimit || 0,
       isActive: coupon.isActive,
       validFrom: new Date(coupon.validFrom).toISOString().split('T')[0],
-      validUntil: new Date(coupon.validUntil).toISOString().split('T')[0]
+      validUntil: new Date(coupon.validUntil).toISOString().split('T')[0],
+      applicableProducts: coupon.applicableProducts || [],
+      applicableCategories: coupon.applicableCategories || [],
+      userRestrictions: coupon.userRestrictions || {
+        firstTimeOnly: false,
+        minOrderCount: 0,
+        specificUsers: []
+      }
     });
     setShowModal(true);
   };
@@ -134,7 +163,7 @@ const AdminCoupons: React.FC = () => {
       };
 
       if (editingCoupon) {
-        await couponAPI.updateCoupon(editingCoupon.id, submitData);
+        await couponAPI.updateCoupon(editingCoupon._id, submitData);
         toast.success('Coupon updated');
       } else {
         await couponAPI.createCoupon(submitData);
@@ -196,9 +225,9 @@ const AdminCoupons: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {coupons.map((c) => {
               console.log('Coupon object:', c);
-              console.log('Coupon ID:', c.id);
+              console.log('Coupon ID:', c._id);
               return (
-              <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl shadow bg-white dark:bg-gray-800 p-4">
+              <motion.div key={c._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl shadow bg-white dark:bg-gray-800 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <TicketPercent className="w-5 h-5 text-orange-500" />
@@ -215,7 +244,7 @@ const AdminCoupons: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleToggleActive(c)} className={`px-3 py-1 rounded-lg text-sm ${c.isActive ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{c.isActive ? 'Deactivate' : 'Activate'}</button>
                   <button onClick={() => handleEdit(c)} className="px-3 py-1 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => handleDelete(c.id)} className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => handleDelete(c._id)} className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </motion.div>
               );
@@ -282,6 +311,29 @@ const AdminCoupons: React.FC = () => {
                       onChange={(e) => setFormData({...formData, name: {...formData.name, bn: e.target.value}})}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="২০% ছাড়"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (EN)</label>
+                    <textarea
+                      value={formData.description.en}
+                      onChange={(e) => setFormData({...formData, description: {...formData.description, en: e.target.value}})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      placeholder="Get 20% off on your order"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (BN)</label>
+                    <textarea
+                      value={formData.description.bn}
+                      onChange={(e) => setFormData({...formData, description: {...formData.description, bn: e.target.value}})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      placeholder="আপনার অর্ডারে ২০% ছাড় পান"
+                      rows={2}
                     />
                   </div>
                 </div>
@@ -358,6 +410,39 @@ const AdminCoupons: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       required
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">User Restrictions</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="firstTimeOnly"
+                        checked={formData.userRestrictions.firstTimeOnly}
+                        onChange={(e) => setFormData({
+                          ...formData, 
+                          userRestrictions: {...formData.userRestrictions, firstTimeOnly: e.target.checked}
+                        })}
+                        className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                      />
+                      <label htmlFor="firstTimeOnly" className="text-sm text-gray-700 dark:text-gray-300">First time users only</label>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum Order Count</label>
+                      <input
+                        type="number"
+                        value={formData.userRestrictions.minOrderCount}
+                        onChange={(e) => setFormData({
+                          ...formData, 
+                          userRestrictions: {...formData.userRestrictions, minOrderCount: Number(e.target.value)}
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        placeholder="0"
+                        min="0"
+                      />
+                    </div>
                   </div>
                 </div>
 
