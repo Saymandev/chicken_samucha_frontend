@@ -165,7 +165,7 @@ const ProductsPage: React.FC = () => {
   // Reset to first slide when products change
   useEffect(() => {
     setCurrentSlide(0);
-  }, [recentlyViewed.length]);
+  }, [recentlyViewed.length, itemsPerSlide]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => {
@@ -417,24 +417,36 @@ const ProductsPage: React.FC = () => {
               <div className="text-xs text-gray-500 mb-2">
                 Debug: {recentlyViewed.length} products, {itemsPerSlide} per slide, {totalSlides} total slides, current: {currentSlide}
               </div>
-              {/* Navigation Arrows */}
-              {totalSlides > 1 && (
+              
+              {/* Fallback: Show all products if slider has issues */}
+              {totalSlides <= 1 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+                  {recentlyViewed.map((rv: any, idx: number) => (
+                    <div key={rv.id || idx}>
+                      <ProductCard product={rv} showQuickActions={false} compact={true} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
                 <>
-                  <button
-                    onClick={prevSlide}
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  </button>
-                  
-                  <button
-                    onClick={nextSlide}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  </button>
-                </>
-              )}
+                  {/* Navigation Arrows */}
+                  {totalSlides > 1 && (
+                    <>
+                      <button
+                        onClick={prevSlide}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                      >
+                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                      </button>
+                      
+                      <button
+                        onClick={nextSlide}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                      >
+                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                      </button>
+                    </>
+                  )}
 
               {/* Slider Container */}
               <div className="overflow-hidden">
@@ -481,21 +493,23 @@ const ProductsPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Dots Indicator */}
-              {totalSlides > 1 && (
-                <div className="flex justify-center mt-4 space-x-2">
-                  {Array.from({ length: totalSlides }, (_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                        index === currentSlide
-                          ? 'bg-primary-500 w-6'
-                          : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
-                    />
-                  ))}
-                </div>
+                  {/* Dots Indicator */}
+                  {totalSlides > 1 && (
+                    <div className="flex justify-center mt-4 space-x-2">
+                      {Array.from({ length: totalSlides }, (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentSlide(index)}
+                          className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                            index === currentSlide
+                              ? 'bg-primary-500 w-6'
+                              : 'bg-gray-300 dark:bg-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

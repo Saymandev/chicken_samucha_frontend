@@ -66,7 +66,7 @@ const ProductDetailPage: React.FC = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [relatedLoading, setRelatedLoading] = useState(false);
-  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+ 
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   useEffect(() => {
@@ -103,12 +103,7 @@ const ProductDetailPage: React.FC = () => {
           // Add current product to front and limit to 12
           const updated = [prod, ...filtered].slice(0, 12);
           localStorage.setItem(key, JSON.stringify(updated));
-          
           // Set recently viewed (exclude current product)
-          setRecentlyViewed(updated.filter((p) => {
-            const pId = (p as any).id || (p as any)._id;
-            return pId !== currentId;
-          }));
         } catch {}
       }
     } catch (error: any) {
@@ -506,7 +501,32 @@ const ProductDetailPage: React.FC = () => {
               </div>
             </div>
           )}
-
+          {/* Related Products Section */}
+          {relatedProducts.length > 0 && (
+            <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                Related Products
+              </h3>
+              
+              {relatedLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {relatedProducts.map((relatedProduct) => (
+                    <ProductCard key={relatedProduct.id} product={relatedProduct} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {/* Reviews Section */}
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
@@ -604,50 +624,7 @@ const ProductDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* Related Products Section */}
-          {relatedProducts.length > 0 && (
-            <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                Related Products
-              </h3>
-              
-              {relatedLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="animate-pulse">
-                      <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {relatedProducts.map((relatedProduct) => (
-                    <ProductCard key={relatedProduct.id} product={relatedProduct} />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Recently Viewed Products Slider */}
-          {recentlyViewed.length > 0 && (
-            <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Recently Viewed
-              </h3>
-              <div className="relative">
-                <div id="recentlyViewedTrack" className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2">
-                  {recentlyViewed.map((rv) => (
-                    <div key={(rv as any).id} className="min-w-[60%] sm:min-w-[45%] md:min-w-[30%] lg:min-w-[30%] snap-start">
-                      <ProductCard product={rv} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+          
         </motion.div>
       </div>
     </div>
