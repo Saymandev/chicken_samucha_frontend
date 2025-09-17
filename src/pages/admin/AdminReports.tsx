@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
 import {
-    BarChart3,
-    Calendar,
-    Clock,
-    DollarSign,
-    Download,
-    Mail,
-    Package,
-    Play,
-    ShoppingCart,
-    Square,
-    TrendingUp,
-    Users
+  BarChart3,
+  Calendar,
+  Clock,
+  DollarSign,
+  Download,
+  Mail,
+  Package,
+  Play,
+  ShoppingCart,
+  Square,
+  TrendingUp,
+  Users
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -166,6 +166,11 @@ const AdminReports: React.FC = () => {
 
   useEffect(() => {
     fetchSchedulerStatus();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchSchedulerStatus, 30000);
+    
+    return () => clearInterval(interval);
   }, [fetchSchedulerStatus]);
 
   const handleExportReport = async (type: string, format: string) => {
@@ -387,12 +392,21 @@ const AdminReports: React.FC = () => {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">📧 Email Reports</h3>
-              <button
-                onClick={() => setShowEmailSettings(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                <Square className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fetchSchedulerStatus}
+                  className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200 text-sm"
+                  title="Refresh Status"
+                >
+                  Refresh
+                </button>
+                <button
+                  onClick={() => setShowEmailSettings(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <Square className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Scheduler Status */}
