@@ -12,12 +12,14 @@ interface ProductCardProps {
   product: Product;
   showQuickActions?: boolean;
   compact?: boolean;
+  viewMode?: 'grid' | 'list';
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
   showQuickActions = true,
-  compact = false
+  compact = false,
+  viewMode = 'grid'
 }) => {
   const { t } = useTranslation();
   const { language, addToCart, cart } = useStore();
@@ -113,8 +115,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const currentPrice = product.discountPrice || product.price;
   const hasDiscount = !!product.discountPrice;
 
-  // For horizontal layout (image two style) - only for main product cards
-  if (!compact) {
+  // Horizontal layout for list view (like the image)
+  if (viewMode === 'list' && !compact) {
     return (
       <motion.div
         whileHover={{ y: -2, scale: 1.01 }}
@@ -232,7 +234,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     );
   }
 
-  // Compact vertical layout for recently viewed products
   return (
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
