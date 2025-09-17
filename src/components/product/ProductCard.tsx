@@ -369,45 +369,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </Link>
 
-      {/* Add to Cart Button for Compact Cards */}
-      {compact && (
-        <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleAddToCart(e);
-            }}
-            disabled={!inStock || isAdding}
-            className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-              isInCart
-                ? 'bg-green-500 hover:bg-green-600 text-white'
-                : inStock
-                ? 'bg-primary-500 hover:bg-primary-600 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isAdding ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {t('products.adding')}
-              </>
-            ) : isInCart ? (
-              <>
-                <ShoppingCart className="w-4 h-4" />
-                {t('In Cart')}
-              </>
-            ) : inStock ? (
-              <>
-                <ShoppingCart className="w-4 h-4" />
-                {t('products.addToCart')}
-              </>
-            ) : (
-              t('products.outOfStock')
-            )}
-          </button>
-        </div>
-      )}
+      
 
       {/* Quick Add to Cart Section */}
       {showQuickActions && (
