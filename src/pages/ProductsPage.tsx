@@ -370,13 +370,13 @@ const ProductsPage: React.FC = () => {
               {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed'}
             </h2>
             <div className="relative bg-white dark:bg-gray-800 card p-3">
-              <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
+              <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide">
                 {recentlyViewed.map((rv: any, idx: number) => (
                   <div
                     key={rv.id || idx}
-                    className="snap-start min-w-[170px] sm:min-w-[190px] md:min-w-[210px] xl:min-w-[230px]"
+                    className="snap-start flex-shrink-0 w-48 sm:w-52 md:w-56 lg:w-60"
                   >
-                    <ProductCard product={rv} showQuickActions={false} />
+                    <ProductCard product={rv} showQuickActions={false} compact={true} />
                   </div>
                 ))}
               </div>

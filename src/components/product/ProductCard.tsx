@@ -11,11 +11,13 @@ import { productsAPI } from '../../utils/api';
 interface ProductCardProps {
   product: Product;
   showQuickActions?: boolean;
+  compact?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
-  showQuickActions = true 
+  showQuickActions = true,
+  compact = false
 }) => {
   const { t } = useTranslation();
   const { language, addToCart, cart } = useStore();
@@ -116,7 +118,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
         {/* Product Image */}
-        <div className="relative overflow-hidden aspect-square">
+        <div className={`relative overflow-hidden ${compact ? 'aspect-square' : 'aspect-square'}`}>
           <img
             src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
@@ -170,16 +172,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className="p-3 space-y-2 min-h-[120px]">
+        <div className={`p-3 space-y-2 ${compact ? 'min-h-[80px]' : 'min-h-[120px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
-            language === 'bn' ? 'font-bengali text-base' : 'text-sm md:text-base'
+            compact 
+              ? (language === 'bn' ? 'font-bengali text-sm' : 'text-xs')
+              : (language === 'bn' ? 'font-bengali text-base' : 'text-sm md:text-base')
           }`} title={product.name[language]}>
-            {truncateWords(product.name[language], 5)}
+            {truncateWords(product.name[language], compact ? 3 : 5)}
           </h3>
 
           {/* Short Description */}
-          {product.shortDescription && (
+          {product.shortDescription && !compact && (
             <p className={`text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
@@ -188,7 +192,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
 
           {/* Rating */}
-          {product.ratings.count > 0 && (
+          {product.ratings.count > 0 && !compact && (
             <div className="flex items-center gap-2">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
@@ -210,32 +214,34 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* Price */}
           <div className="flex items-center gap-2">
-            <span className="text-lg md:text-xl font-bold text-primary-600">
+            <span className={`font-bold text-primary-600 ${compact ? 'text-sm' : 'text-lg md:text-xl'}`}>
               ৳{currentPrice}
             </span>
             {hasDiscount && (
-              <span className="text-sm text-gray-500 line-through">
+              <span className={`text-gray-500 line-through ${compact ? 'text-xs' : 'text-sm'}`}>
                 ৳{product.price}
               </span>
             )}
           </div>
 
           {/* Additional Info */}
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>{product.preparationTime}</span>
-            <span className="flex items-center gap-1">
-              {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
-                <>
-                  <span>Sold:</span>
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                    {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
-                  </span>
-                </>
-              ) : (
-                <span>{product.servingSize}</span>
-              )}
-            </span>
-          </div>
+          {!compact && (
+            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>{product.preparationTime}</span>
+              <span className="flex items-center gap-1">
+                {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
+                  <>
+                    <span>Sold:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                    </span>
+                  </>
+                ) : (
+                  <span>{product.servingSize}</span>
+                )}
+              </span>
+            </div>
+          )}
         </div>
       </Link>
 
