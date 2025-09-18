@@ -32,6 +32,7 @@ interface Category {
   icon: string;
   color: string;
   productCount: number;
+  children?: Category[];
 }
 
 const NewNavbar: React.FC = () => {
@@ -246,28 +247,46 @@ const NewNavbar: React.FC = () => {
                               ))}
                             </div>
                           ) : categories.length > 0 ? (
-                            <div className="space-y-1 max-h-48 overflow-y-auto">
+                            <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
                               {categories.map((category) => (
-                                <Link
-                                  key={category._id}
-                                  to={`/products?category=${category.slug}`}
-                                  className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                >
-                                  <div 
-                                    className="w-6 h-6 rounded flex items-center justify-center text-sm"
-                                    style={{ backgroundColor: category.color + '20' }}
+                                <div key={category._id} className="">
+                                  <Link
+                                    to={`/products?category=${category.slug}`}
+                                    className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                   >
-                                    {category.icon}
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="font-medium text-gray-900 dark:text-white text-sm">
-                                      {category.name[language]}
+                                    <div 
+                                      className="w-6 h-6 rounded flex items-center justify-center text-sm"
+                                      style={{ backgroundColor: category.color + '20' }}
+                                    >
+                                      {category.icon}
                                     </div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                                      {category.productCount} products
+                                    <div className="flex-1">
+                                      <div className="font-medium text-gray-900 dark:text-white text-sm">
+                                        {category.name[language]}
+                                      </div>
+                                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {category.productCount} products
+                                      </div>
                                     </div>
-                                  </div>
-                                </Link>
+                                  </Link>
+                                  {category.children && category.children.length > 0 && (
+                                    <div className="ml-10 space-y-1">
+                                      {category.children.map((child) => (
+                                        <Link
+                                          key={child._id}
+                                          to={`/products?category=${child.slug}`}
+                                          className="flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+                                        >
+                                          <span className="text-gray-400">•</span>
+                                          <span className="flex-1 text-gray-700 dark:text-gray-300">
+                                            {child.name[language]}
+                                          </span>
+                                          <span className="text-xs text-gray-500">{child.productCount}</span>
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
                               ))}
                             </div>
                           ) : (

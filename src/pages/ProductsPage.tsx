@@ -16,7 +16,7 @@ import {
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
-import { productsAPI, reportsAPI } from '../utils/api';
+import { categoriesAPI, productsAPI, reportsAPI } from '../utils/api';
 
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -41,14 +41,8 @@ const ProductsPage: React.FC = () => {
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
 
-  // Categories for filtering
-  const categories = [
-    { id: '', name: { en: 'All Categories', bn: 'সব ক্যাটাগরি' } },
-    { id: 'chicken', name: { en: 'Chicken Samosa', bn: 'চিকেন সমুচা' } },
-    { id: 'vegetable', name: { en: 'Vegetable Samosa', bn: 'সবজি সমুচা' } },
-    { id: 'beef', name: { en: 'Beef Samosa', bn: 'গরুর মাংসের সমুচা' } },
-    { id: 'combo', name: { en: 'Combo Packs', bn: 'কম্বো প্যাক' } }
-  ];
+// Categories fetched from API
+const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: { en: string; bn: string } }>>([]);
 
   const sortOptions = [
     { value: 'featured', label: { en: 'Featured', bn: 'বৈশিষ্ট্য' } },
@@ -91,6 +85,15 @@ const ProductsPage: React.FC = () => {
       setRecentlyViewed([]);
     }
     fetchBestSellers();
+    (async () => {
+      try {
+        const res = await categoriesAPI.getAllCategories();
+        if (res.data.success) {
+          const items = (res.data.data || []).map((c: any) => ({ slug: c.slug, name: c.name }));
+          setAllCategories(items);
+        }
+      } catch {}
+    })();
   }, []);
 
   const fetchProducts = async (page = 1, isNewSearch = false) => {
@@ -101,12 +104,39 @@ const ProductsPage: React.FC = () => {
     }
     
     try {
+      // Map sort keys to backend fields and order
+      let sortByField = 'displayOrder';
+      let sortOrder: 'asc' | 'desc' = 'asc';
+      switch (sortBy) {
+        case 'featured':
+          sortByField = 'isFeatured';
+          sortOrder = 'desc';
+          break;
+        case 'price_low':
+          sortByField = 'price';
+          sortOrder = 'asc';
+          break;
+        case 'price_high':
+          sortByField = 'price';
+          sortOrder = 'desc';
+          break;
+        case 'rating':
+          sortByField = 'ratings.average';
+          sortOrder = 'desc';
+          break;
+        case 'newest':
+          sortByField = 'createdAt';
+          sortOrder = 'desc';
+          break;
+      }
+
       const params = {
         search: searchTerm,
         category: selectedCategory,
         minPrice: priceRange.min,
         maxPrice: priceRange.max,
-        sortBy,
+        sortBy: sortByField,
+        sortOrder,
         filter,
         page,
         limit: 12
@@ -288,8 +318,9 @@ const ProductsPage: React.FC = () => {
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="input w-full"
                   >
-                    {categories.map(category => (
-                      <option key={category.id} value={category.id}>
+                    <option value="">{language === 'bn' ? 'সব ক্যাটাগরি' : 'All Categories'}</option>
+                    {allCategories.map(category => (
+                      <option key={category.slug} value={category.slug}>
                         {category.name[language]}
                       </option>
                     ))}

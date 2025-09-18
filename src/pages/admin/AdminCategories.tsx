@@ -34,6 +34,8 @@ interface Category {
   productCount: number;
   createdAt: string;
   updatedAt: string;
+  parentCategory?: { _id: string; name: { en: string; bn: string } } | null;
+  isSubcategory?: boolean;
 }
 
 const AdminCategories: React.FC = () => {
@@ -48,7 +50,9 @@ const AdminCategories: React.FC = () => {
     icon: '📦',
     color: '#3B82F6',
     isActive: true,
-    sortOrder: 0
+    sortOrder: 0,
+    parentCategory: '',
+    isSubcategory: false
   });
 
   // Color presets
@@ -112,7 +116,9 @@ const AdminCategories: React.FC = () => {
       icon: category.icon,
       color: category.color,
       isActive: category.isActive,
-      sortOrder: category.sortOrder
+      sortOrder: category.sortOrder,
+      parentCategory: (category.parentCategory as any)?._id || '',
+      isSubcategory: Boolean(category.isSubcategory)
     });
     setShowModal(true);
   };
@@ -149,7 +155,9 @@ const AdminCategories: React.FC = () => {
       icon: '📦',
       color: '#3B82F6',
       isActive: true,
-      sortOrder: 0
+      sortOrder: 0,
+      parentCategory: '',
+      isSubcategory: false
     });
   };
 
@@ -258,6 +266,19 @@ const AdminCategories: React.FC = () => {
                   {category.productCount}
                 </span>
               </div>
+              {category.parentCategory && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Parent:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {(category.parentCategory as any).name?.en}
+                  </span>
+                </div>
+              )}
+              {category.isSubcategory && (
+                <div className="text-xs inline-block px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                  Subcategory
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Slug:</span>
                 <span className="font-mono text-xs text-gray-600 dark:text-gray-400">
@@ -470,6 +491,39 @@ const AdminCategories: React.FC = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, sortOrder: parseInt(e.target.value) || 0 }))}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     />
+                  </div>
+
+                  {/* Subcategory Toggle & Parent Selector */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="isSubcategory"
+                        checked={formData.isSubcategory}
+                        onChange={(e) => setFormData(prev => ({ ...prev, isSubcategory: e.target.checked, parentCategory: e.target.checked ? prev.parentCategory : '' }))}
+                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                      />
+                      <label htmlFor="isSubcategory" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Is Subcategory
+                      </label>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Parent Category {formData.isSubcategory ? '*' : ''}
+                      </label>
+                      <select
+                        value={formData.parentCategory}
+                        onChange={(e) => setFormData(prev => ({ ...prev, parentCategory: e.target.value }))}
+                        className="input w-full dark:bg-gray-700 dark:text-white"
+                        disabled={!formData.isSubcategory}
+                        required={formData.isSubcategory}
+                      >
+                        <option value="">Select parent</option>
+                        {categories.map((c) => (
+                          <option key={c._id} value={c._id}>{c.name.en}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   {/* Active Status */}
