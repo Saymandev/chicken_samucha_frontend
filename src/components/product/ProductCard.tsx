@@ -309,12 +309,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
       transition={{ duration: 0.3 }}
-      className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full min-w-0"
-      
+      className="group card overflow-hidden hover:shadow-xl transition-all duration-300 h-full min-w-0"
     >
-      <Link to={`/products/${product.id || (product as any)._id}`} className="block">
-        {/* Product Image */}
-        <div className={`relative overflow-hidden flex justify-center items-center w-full ${compact ? 'h-48' : 'h-36'}`}>
+      <div className="flex h-full">
+        <Link to={`/products/${product.id || (product as any)._id}`} className="flex-1 flex">
+          {/* Product Image */}
+          <div className={`relative overflow-hidden flex justify-center items-center w-32 sm:w-40 flex-shrink-0 ${compact ? 'h-32' : 'h-28 sm:h-32'}`}>
           <img
             src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
@@ -383,8 +383,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        {/* Product Info */}
-        <div className={`${compact ? 'p-2 space-y-2 min-h-[80px]' : 'p-2 space-y-1 min-h-[70px]'}`}>
+          {/* Product Info */}
+          <div className={`flex-1 p-3 space-y-2 min-h-0 flex flex-col justify-between`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
@@ -467,98 +467,98 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
 
-         
-        </div>
-      </Link>
+          </div>
+        </Link>
 
-      
-
-      {/* Quick Add to Cart Section */}
-      {showQuickActions && (
-        <div className="p-3 pt-0 space-y-3">
-          {/* Quantity Selector */}
-          {inStock && (
-            <div className="flex items-center justify-center gap-2 sm:gap-3">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleQuantityChange(quantity - 1);
-                }}
-                disabled={quantity <= minOrderQty}
-                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Minus className="w-4 h-4 text-gray-600" />
-              </button>
-              
-              <span className="min-w-[1.75rem] text-center font-medium text-gray-900 dark:text-white text-sm sm:text-base">
-                {quantity}
-              </span>
-              
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleQuantityChange(quantity + 1);
-                }}
-                disabled={quantity >= maxOrderQty}
-                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Plus className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-          )}
-
-          {/* Add to Cart Button */}
-          <motion.button
-            onClick={handleAddToCart}
-            disabled={!inStock || isAdding}
-            whileHover={inStock && !isAdding ? { scale: 1.02 } : {}}
-            whileTap={inStock && !isAdding ? { scale: 0.98 } : {}}
-            className={`w-full flex items-center justify-center gap-2 py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
-              inStock && !isAdding
-                ? isInCart
-                  ? 'bg-green-500 hover:bg-green-600 text-white'
-                  : 'btn-primary hover:bg-primary-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isAdding ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                />
-                {language === 'bn' ? 'যোগ করা হচ্ছে...' : 'Adding...'}
-              </>
-            ) : inStock ? (
-              <>
-                <ShoppingCart className="w-4 h-4" />
-                {isInCart 
-                  ? (language === 'bn' ? 'কার্টে আছে' : 'In Cart')
-                  : t('products.addToCart')
-                }
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-4 h-4" />
-                {t('products.outOfStock')}
-              </>
+        {/* Quick Add to Cart Section */}
+        {showQuickActions && (
+          <div className="p-3 flex flex-col justify-center space-y-2 w-24 sm:w-28 flex-shrink-0">
+            {/* Quantity Selector */}
+            {inStock && (
+              <div className="flex items-center justify-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleQuantityChange(quantity - 1);
+                  }}
+                  disabled={quantity <= minOrderQty}
+                  className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Minus className="w-3 h-3 text-gray-600" />
+                </button>
+                
+                <span className="min-w-[1.5rem] text-center font-medium text-gray-900 dark:text-white text-xs">
+                  {quantity}
+                </span>
+                
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleQuantityChange(quantity + 1);
+                  }}
+                  disabled={quantity >= maxOrderQty}
+                  className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Plus className="w-3 h-3 text-gray-600" />
+                </button>
+              </div>
             )}
-          </motion.button>
 
-          {/* Stock Info */}
-          {inStock && typeof (product as any).stock === 'number' && (product as any).stock <= 5 && (
-            <p className="text-xs text-orange-600 text-center">
-              {language === 'bn' 
-                ? `শুধু ${(product as any).stock}টি অবশিষ্ট`
-                : `Only ${(product as any).stock} left in stock`
-              }
-            </p>
-          )}
-        </div>
-      )}
+            {/* Add to Cart Button */}
+            <motion.button
+              onClick={handleAddToCart}
+              disabled={!inStock || isAdding}
+              whileHover={inStock && !isAdding ? { scale: 1.02 } : {}}
+              whileTap={inStock && !isAdding ? { scale: 0.98 } : {}}
+              className={`w-full flex items-center justify-center gap-1 py-2 px-2 rounded-lg font-medium transition-all duration-200 text-xs ${
+                inStock && !isAdding
+                  ? isInCart
+                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                    : 'btn-primary hover:bg-primary-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {isAdding ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-3 h-3 border-2 border-white border-t-transparent rounded-full"
+                  />
+                  <span className="hidden sm:inline">{language === 'bn' ? 'যোগ করা হচ্ছে...' : 'Adding...'}</span>
+                </>
+              ) : inStock ? (
+                <>
+                  <ShoppingCart className="w-3 h-3" />
+                  <span className="hidden sm:inline">
+                    {isInCart 
+                      ? (language === 'bn' ? 'কার্টে আছে' : 'In Cart')
+                      : t('products.addToCart')
+                    }
+                  </span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="w-3 h-3" />
+                  <span className="hidden sm:inline">{t('products.outOfStock')}</span>
+                </>
+              )}
+            </motion.button>
+
+            {/* Stock Info */}
+            {inStock && typeof (product as any).stock === 'number' && (product as any).stock <= 5 && (
+              <p className="text-xs text-orange-600 text-center">
+                {language === 'bn' 
+                  ? `শুধু ${(product as any).stock}টি`
+                  : `Only ${(product as any).stock} left`
+                }
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 };
