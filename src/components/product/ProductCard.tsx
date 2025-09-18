@@ -53,6 +53,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
+    console.log('Quick add button clicked for product:', product.name[language]);
+    console.log('Product stock:', product.stock);
+    console.log('In stock:', inStock);
+    
     if (product.stock < 1) {
       toast.error(t('products.outOfStock'));
       return;
@@ -121,7 +125,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <motion.div
         whileHover={{ y: -2, scale: 1.01 }}
         transition={{ duration: 0.3 }}
-        className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
+        className="group card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
       >
         <Link to={`/products/${product.id || (product as any)._id}`} className="block">
           <div className="flex h-32">
