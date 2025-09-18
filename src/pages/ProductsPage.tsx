@@ -442,7 +442,7 @@ const ProductsPage: React.FC = () => {
           </div>
         )}
 
-        {bestSellers.length > 0 && (
+        {bestSellers.length > 0 && filter !== 'best-seller' && (
           <div className="mt-16">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               {language === 'bn' ? 'সেরা বিক্রিত পণ্য' : 'Best Sellers'}
