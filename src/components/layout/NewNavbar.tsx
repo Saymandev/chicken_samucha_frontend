@@ -284,31 +284,6 @@ const NewNavbar: React.FC = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* Language Toggle */}
-            <div className="relative">
-              <button
-                onClick={() => handleLanguageChange(language === 'en' ? 'bn' : 'en')}
-                className="flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Globe className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  {language === 'en' ? 'EN' : 'বাং'}
-                </span>
-              </button>
-            </div>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              {theme === 'light' ? (
-                <Moon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              ) : (
-                <Sun className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              )}
-            </button>
-
             {/* Cart */}
             <button
               onClick={openCart}
@@ -347,8 +322,35 @@ const NewNavbar: React.FC = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2"
+                      className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2"
                     >
+                      {/* Quick Settings inside user dropdown */}
+                      <button
+                        onClick={() => handleLanguageChange(language === 'en' ? 'bn' : 'en')}
+                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Globe className="w-4 h-4" />
+                          <span>Language</span>
+                        </div>
+                        <span className="text-xs opacity-80">{language.toUpperCase()}</span>
+                      </button>
+                      <button
+                        onClick={toggleTheme}
+                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          {theme === 'light' ? (
+                            <Moon className="w-4 h-4" />
+                          ) : (
+                            <Sun className="w-4 h-4" />
+                          )}
+                          <span>Theme</span>
+                        </div>
+                        <span className="text-xs opacity-80">{theme === 'light' ? 'Light' : 'Dark'}</span>
+                      </button>
+                      <hr className="my-1 border-gray-200 dark:border-gray-700" />
+
                       {userMenuItems.map((item) => (
                         <Link
                           key={item.path}
