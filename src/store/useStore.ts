@@ -60,6 +60,7 @@ export interface Product {
   };
   minOrderQuantity: number;
   maxOrderQuantity: number;
+  youtubeVideoUrl?: string;
 }
 
 export interface CartItem {

@@ -16,6 +16,7 @@ interface Product {
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
+  youtubeVideoUrl?: string;
 }
 
 interface ProductFormModalProps {
@@ -45,7 +46,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     category: '',
     stock: 0,
     isAvailable: true,
-    isFeatured: false
+    isFeatured: false,
+    youtubeVideoUrl: ''
   });
   
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
@@ -65,7 +67,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         category: product.category || '',
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
-        isFeatured: product.isFeatured ?? false
+        isFeatured: product.isFeatured ?? false,
+        youtubeVideoUrl: product.youtubeVideoUrl || ''
       });
       setImages(product.images || []);
     } else {
@@ -78,7 +81,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         category: '',
         stock: 0,
         isAvailable: true,
-        isFeatured: false
+        isFeatured: false,
+        youtubeVideoUrl: ''
       });
       setImages([]);
     }
@@ -240,6 +244,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('stock', formData.stock.toString());
       submitData.append('isAvailable', formData.isAvailable.toString());
       submitData.append('isFeatured', formData.isFeatured.toString());
+      submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
       
       // Add new image files from state
       
@@ -381,6 +386,23 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
           </div>
 
           {/* Ingredients removed */}
+
+          {/* YouTube Video URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              YouTube Video URL (Optional)
+            </label>
+            <input
+              type="url"
+              value={formData.youtubeVideoUrl}
+              onChange={(e) => handleInputChange('youtubeVideoUrl', e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Add a YouTube video URL to showcase your product
+            </p>
+          </div>
 
           {/* Price and Category */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

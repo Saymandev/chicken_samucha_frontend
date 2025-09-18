@@ -234,6 +234,41 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     )}
                   </p>
                 )}
+
+                {/* Additional Info: Stock, Sold count */}
+                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  {/* Stock Status */}
+                  <div className="flex items-center gap-1">
+                    <span>Stock:</span>
+                    <span className={`font-medium ${
+                      inStock 
+                        ? 'text-green-600 dark:text-green-400' 
+                        : 'text-red-600 dark:text-red-400'
+                    }`}>
+                      {inStock ? product.stock : 'Out'}
+                    </span>
+                  </div>
+
+                  {/* Sold count */}
+                  {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) && (
+                    <div className="flex items-center gap-1">
+                      <span>Sold:</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Rating */}
+                  {product.ratings.count > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                      <span className="font-medium">
+                        {product.ratings.average.toFixed(1)} ({product.ratings.count})
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Bottom Section - Quick Add Button */}
@@ -400,21 +435,39 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
 
-          {/* Additional Info: show Sold count if available */}
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span className="flex items-center gap-1">
-              {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
-                <>
-                  <span>Sold:</span>
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                    {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
-                  </span>
-                </>
-              ) : (
-                <span>&nbsp;</span>
-              )}
-            </span>
-            <span>&nbsp;</span>
+          {/* Additional Info: Category, Stock, Sold count */}
+          <div className="space-y-1">
+            {/* Category */}
+            {getCategoryLabel() && (
+              <div className="flex items-center gap-1 text-xs">
+                <span className="text-gray-500 dark:text-gray-400">Category:</span>
+                <span className="font-medium text-orange-600 dark:text-orange-400">
+                  {getCategoryLabel()}
+                </span>
+              </div>
+            )}
+            
+            {/* Stock Status */}
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-gray-500 dark:text-gray-400">Stock:</span>
+              <span className={`font-medium ${
+                inStock 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
+                {inStock ? `${product.stock} available` : 'Out of Stock'}
+              </span>
+            </div>
+
+            {/* Sold count */}
+            {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) && (
+              <div className="flex items-center gap-1 text-xs">
+                <span className="text-gray-500 dark:text-gray-400">Sold:</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                </span>
+              </div>
+            )}
           </div>
 
          

@@ -7,7 +7,7 @@ import ProductCard from '../components/product/ProductCard';
 import { useStore } from '../store/useStore';
 import { productsAPI, reviewsAPI } from '../utils/api';
 
-  interface Product {
+interface Product {
   id: string;
   name: { en: string; bn: string };
   description: { en: string; bn: string };
@@ -20,13 +20,14 @@ import { productsAPI, reviewsAPI } from '../utils/api';
     name: { en: string; bn: string };
     slug: string;
   };
-    // removed: ingredients, preparationTime, servingSize
+  // removed: ingredients, preparationTime, servingSize
   isFeatured: boolean;
   isAvailable: boolean;
   stock: number;
   ratings: { average: number; count: number };
   minOrderQuantity: number;
   maxOrderQuantity: number;
+  youtubeVideoUrl?: string;
   analytics?: {
     viewCount: number;
     addToCartCount: number;
@@ -58,6 +59,13 @@ const ProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
   // const { t } = useTranslation(); // Unused variable
   const { language, addToCart } = useStore();
+
+  // Extract YouTube video ID from URL
+  const getYouTubeVideoId = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -339,6 +347,27 @@ const ProductDetailPage: React.FC = () => {
                       />
                     </button>
                   ))}
+                </div>
+              )}
+
+              {/* YouTube Video */}
+              {product.youtubeVideoUrl && getYouTubeVideoId(product.youtubeVideoUrl) && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    Product Video
+                  </h3>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                    <div className="aspect-video">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(product.youtubeVideoUrl)}`}
+                        title={`${language === 'bn' ? product.name.bn : product.name.en} Video`}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
