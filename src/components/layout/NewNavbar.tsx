@@ -23,7 +23,7 @@ import { Skeleton } from '../common/Skeleton';
 import UserNotificationDropdown from '../UserNotificationDropdown';
 
 interface Category {
-  _id: string;
+  id: string;
   name: {
     en: string;
     bn: string;
@@ -32,7 +32,7 @@ interface Category {
   icon: string;
   color: string;
   productCount: number;
-  parentCategory?: { _id: string } | null;
+  parentCategory?: { id: string } | null;
   children?: Category[];
 }
 
@@ -83,20 +83,19 @@ const NewNavbar: React.FC = () => {
           // Build tree from flat list using parentCategory
           const idToNode = new Map<string, Category>();
           flat.forEach((c: any) => {
-            idToNode.set(c._id, { ...c, children: [] });
+            idToNode.set(c.id, { ...c, children: [] });
           });
           const roots: Category[] = [];
           flat.forEach((c: any) => {
-            if (c.parentCategory && c.parentCategory._id) {
-              const parent = idToNode.get(c.parentCategory._id);
+            const parentId = c.parentCategory?.id;
+            if (parentId) {
+              const parent = idToNode.get(parentId);
               if (parent) {
-                (parent.children as Category[]).push(idToNode.get(c._id)!);
-              } else {
-                roots.push(idToNode.get(c._id)!);
+                (parent.children as Category[]).push(idToNode.get(c.id)!);
+                return;
               }
-            } else {
-              roots.push(idToNode.get(c._id)!);
             }
+            roots.push(idToNode.get(c.id)!);
           });
           setCategories(roots);
         }
@@ -274,7 +273,7 @@ const NewNavbar: React.FC = () => {
                           ) : categories.length > 0 ? (
                             <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
                               {categories.map((category) => (
-                                <div key={category._id} className="">
+                                <div key={category.id} className="">
                                   <Link
                                     to={`/products?category=${category.slug}`}
                                     className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -298,7 +297,7 @@ const NewNavbar: React.FC = () => {
                                     <div className="ml-10 space-y-1">
                                       {category.children.map((child) => (
                                         <Link
-                                          key={child._id}
+                                          key={child.id}
                                           to={`/products?category=${child.slug}`}
                                           className="flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
                                         >
@@ -490,7 +489,7 @@ const NewNavbar: React.FC = () => {
                   <div className="ml-6 space-y-2">
                     {categories.map((category) => (
                       <Link
-                        key={category._id}
+                        key={category.id}
                         to={`/products?category=${category.slug}`}
                         className="block text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
