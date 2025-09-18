@@ -189,8 +189,8 @@ const NewNavbar: React.FC = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex flex-1 min-w-0 items-center justify-center md:space-x-6 lg:space-x-8 overflow-x-auto lg:overflow-visible flex-nowrap pr-2">
+          {/* Desktop Navigation (lg and up) */}
+          <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center space-x-8 overflow-visible flex-nowrap pr-2">
             {navItems.map((item) => (
               <div
                 key={item.path}
@@ -396,10 +396,10 @@ const NewNavbar: React.FC = () => {
               </div>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button (visible below lg) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -410,14 +410,14 @@ const NewNavbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu (below lg) */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-gray-200 dark:border-gray-700"
+              className="lg:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <div className="px-4 py-4 space-y-4">
                 {/* Top-level links: Home, Offer Zone, Best Sellers, All Products */}
