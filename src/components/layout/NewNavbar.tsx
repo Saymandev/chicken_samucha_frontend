@@ -190,7 +190,7 @@ const NewNavbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center md:space-x-6 lg:space-x-8 overflow-x-auto">
             {navItems.map((item) => (
               <div key={item.path} className="relative">
                 {item.hasDropdown ? (
@@ -283,7 +283,7 @@ const NewNavbar: React.FC = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
             {/* Cart */}
             <button
               onClick={openCart}
@@ -310,7 +310,7 @@ const NewNavbar: React.FC = () => {
                   <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="hidden xl:block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {user?.name || 'User'}
                   </span>
                   <ChevronDown className="w-4 h-4 text-gray-500" />
