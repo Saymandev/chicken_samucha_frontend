@@ -319,7 +319,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className={`${compact ? 'p-3 space-y-2 min-h-[140px]' : 'p-2 space-y-1 min-h-[100px]'}`}>
+        <div className={`${compact ? 'p-3 space-y-2 min-h-[140px]' : 'p-2 space-y-1 min-h-[70px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
