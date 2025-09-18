@@ -478,7 +478,7 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               {language === 'bn' ? 'সেরা বিক্রিত পণ্য' : 'Best Sellers'}
             </h2>
-            <div className="bg-white dark:bg-gray-800 card">
+            <div className="bg-white dark:bg-gray-800">
               <Swiper
                 modules={[Pagination]}
                 spaceBetween={16}
@@ -519,7 +519,7 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               {language === 'bn' ? 'সম্প্রতি দেখা পণ্য' : 'Recently Viewed Products'}
             </h2>
-          <div className="bg-white dark:bg-gray-800 card">
+          <div className="bg-white dark:bg-gray-800">
               <Swiper
                 modules={[Pagination]}
                 spaceBetween={16}
