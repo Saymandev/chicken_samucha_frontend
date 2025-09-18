@@ -3,7 +3,7 @@ import { ImagePlus, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useStore } from '../../store/useStore';
-import { adminAPI } from '../../utils/api';
+import { adminAPI, categoriesAPI } from '../../utils/api';
 
 interface Product {
   _id?: string;
@@ -12,7 +12,7 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: { en: string; bn: string };
+  category: string;
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
@@ -26,13 +26,6 @@ interface ProductFormModalProps {
   onSuccess: () => void;
 }
 
-const categories = [
-  { en: 'Samosa', bn: 'সমুচা' },
-  { en: 'Appetizer', bn: 'অ্যাপেটাইজার' },
-  { en: 'Snack', bn: 'স্ন্যাক্স' },
-  { en: 'Beverage', bn: 'পানীয়' },
-  { en: 'Dessert', bn: 'মিষ্টি' }
-];
 
 const ProductFormModal: React.FC<ProductFormModalProps> = ({
   isOpen,
@@ -42,6 +35,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
 }) => {
   const { language } = useStore();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Array<{ _id: string; name: { en: string; bn: string } }>>([]);
   
   
   const [formData, setFormData] = useState({
@@ -49,7 +43,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     description: { en: '', bn: '' },
     price: 0,
     discountPrice: 0,
-    category: { en: 'Samosa', bn: 'সমুচা' },
+    category: '',
     stock: 0,
     isAvailable: true,
     isFeatured: false,
@@ -60,13 +54,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const [newImages, setNewImages] = useState<File[]>([]);
 
   useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     if (product) {
       setFormData({
         name: product.name || { en: '', bn: '' },
         description: product.description || { en: '', bn: '' },
         price: product.price || 0,
         discountPrice: product.discountPrice || 0,
-        category: product.category || { en: 'Samosa', bn: 'সমুচা' },
+        category: product.category || '',
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,
@@ -80,7 +78,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         description: { en: '', bn: '' },
         price: 0,
         discountPrice: 0,
-        category: { en: 'Samosa', bn: 'সমুচা' },
+        category: '',
         stock: 0,
         isAvailable: true,
         isFeatured: false,
@@ -90,6 +88,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     }
     setNewImages([]);
   }, [product, isOpen]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await categoriesAPI.getAllCategories();
+      if (response.data.success) {
+        setCategories(response.data.data);
+      }
+    } catch (error) {
+      console.error('Fetch categories error:', error);
+    }
+  };
 
   const handleInputChange = (field: string, value: any, lang?: string) => {
     if (lang) {
@@ -109,13 +118,10 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
   };
 
   const handleCategoryChange = (value: string) => {
-    const selectedCategory = categories.find(cat => cat.en === value);
-    if (selectedCategory) {
-      setFormData(prev => ({
-        ...prev,
-        category: selectedCategory
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      category: value
+    }));
   };
 
   const handleImageUpload = (files: FileList | null) => {
@@ -441,14 +447,15 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 Category *
               </label>
               <select
-                value={formData.category.en}
+                value={formData.category}
                 onChange={(e) => handleCategoryChange(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
               >
+                <option value="">Select Category</option>
                 {categories.map((category) => (
-                  <option key={category.en} value={category.en}>
-                    {language === 'bn' ? category.bn : category.en}
+                  <option key={category._id} value={category._id}>
+                    {language === 'bn' ? category.name.bn : category.name.en}
                   </option>
                 ))}
               </select>

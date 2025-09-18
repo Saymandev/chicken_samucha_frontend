@@ -9,10 +9,10 @@ interface FloatingChatButtonProps {
 }
 
 const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' }) => {
-  const { isAuthenticated, user, language } = useStore();
+  const { isAuthenticated,  language } = useStore();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  
   const chatRef = useRef<HTMLDivElement>(null);
 
   // Close chat when clicking outside

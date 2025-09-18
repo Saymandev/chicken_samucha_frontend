@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import ProductFormModal from '../../components/admin/ProductFormModal';
 import { useStore } from '../../store/useStore';
-import { adminAPI } from '../../utils/api';
+import { adminAPI, categoriesAPI } from '../../utils/api';
 
 interface Product {
   _id: string;
@@ -22,7 +22,7 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: { en: string; bn: string };
+  category: string;
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
@@ -46,6 +46,7 @@ const AdminProducts: React.FC = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [categories, setCategories] = useState<Array<{ value: string; label: string }>>([]);
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,9 +79,29 @@ const AdminProducts: React.FC = () => {
       setLoading(false);
     }
   }, [currentPage, searchTerm, selectedCategory, sortBy, sortOrder]);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await categoriesAPI.getAllCategories();
+      if (response.data.success) {
+        const categoryOptions = [
+          { value: 'all', label: 'All Categories' },
+          ...response.data.data.map((cat: any) => ({
+            value: cat._id,
+            label: cat.name[language] || cat.name.en
+          }))
+        ];
+        setCategories(categoryOptions);
+      }
+    } catch (error) {
+      console.error('Fetch categories error:', error);
+    }
+  }, [language]);
+
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    fetchCategories();
+  }, [fetchProducts, fetchCategories]);
   const handleDelete = async (productId: string) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     
@@ -144,12 +165,6 @@ const AdminProducts: React.FC = () => {
     return words.slice(0, maxWords).join(' ') + '…';
   };
 
-  const categories = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'samosa', label: 'Samosa' },
-    { value: 'appetizer', label: 'Appetizer' },
-    { value: 'snack', label: 'Snack' }
-  ];
 
   const sortOptions = [
     { value: 'createdAt', label: 'Date Created' },

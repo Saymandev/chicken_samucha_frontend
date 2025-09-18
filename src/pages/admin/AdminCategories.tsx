@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Edit2,
-    Eye,
-    EyeOff,
-    Plus,
-    Save,
-    Trash2,
-    X
+  Edit2,
+  Eye,
+  EyeOff,
+  Plus,
+  Save,
+  Trash2,
+  X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -95,7 +95,8 @@ const AdminCategories: React.FC = () => {
       setShowModal(false);
       setEditingCategory(null);
       resetForm();
-      fetchCategories();
+      // Refresh the categories list
+      await fetchCategories();
     } catch (error: any) {
       console.error('Submit category error:', error);
       toast.error(error.response?.data?.message || 'Failed to save category');
@@ -122,7 +123,7 @@ const AdminCategories: React.FC = () => {
     try {
       await categoriesAPI.deleteCategory(id);
       toast.success('Category deleted successfully');
-      fetchCategories();
+      await fetchCategories();
     } catch (error: any) {
       console.error('Delete category error:', error);
       toast.error(error.response?.data?.message || 'Failed to delete category');
@@ -133,7 +134,7 @@ const AdminCategories: React.FC = () => {
     try {
       await categoriesAPI.toggleCategoryStatus(id);
       toast.success('Category status updated');
-      fetchCategories();
+      await fetchCategories();
     } catch (error: any) {
       console.error('Toggle status error:', error);
       toast.error('Failed to update category status');
