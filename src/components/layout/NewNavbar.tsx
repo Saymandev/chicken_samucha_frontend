@@ -364,11 +364,11 @@ const NewNavbar: React.FC = () => {
                     <img
                       src={user?.avatar?.url}
                       alt={user?.name}
-                      className="w-6 h-6 rounded-full object-cover"
+                      className="w-7 h-7 rounded-full object-cover"
                     />
                   ) : (
                     
-                      <User className="w-4 h-4 text-primary-600" />
+                      <User className="w-6 h-6 text-white" />
                     
                   )}
                   </div>
