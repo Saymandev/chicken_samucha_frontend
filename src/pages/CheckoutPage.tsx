@@ -76,7 +76,7 @@ const CheckoutPage: React.FC = () => {
   const [couponError, setCouponError] = useState('');
 
   // Free delivery uses threshold from settings (fallback 500)
-  const baseDeliveryCharge = paymentSettings?.cashOnDelivery?.deliveryCharge || 60;
+  const baseDeliveryCharge = paymentSettings?.deliveryCharge ?? paymentSettings?.cashOnDelivery?.deliveryCharge ?? 60;
   const freeThreshold = paymentSettings?.freeDeliveryThreshold ?? 500;
   const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold ? 0 : baseDeliveryCharge);
   const couponDiscount = appliedCoupon?.discount || 0;
