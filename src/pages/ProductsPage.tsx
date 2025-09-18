@@ -10,9 +10,9 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
-    GridSkeleton,
-    ListSkeleton,
-    ProductCardSkeleton
+  GridSkeleton,
+  ListSkeleton,
+  ProductCardSkeleton
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
@@ -64,6 +64,22 @@ const ProductsPage: React.FC = () => {
     fetchProducts(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, priceRange, sortBy, filter]);
+
+  // Sync component state when URL query params change (e.g., via navbar links)
+  useEffect(() => {
+    const nextSearch = searchParams.get('search') || '';
+    const nextCategory = searchParams.get('category') || '';
+    const nextMin = parseInt(searchParams.get('minPrice') || '0');
+    const nextMax = parseInt(searchParams.get('maxPrice') || '10000');
+    const nextSort = searchParams.get('sortBy') || 'featured';
+    const nextFilter = searchParams.get('filter') || '';
+
+    setSearchTerm(nextSearch);
+    setSelectedCategory(nextCategory);
+    setPriceRange({ min: isNaN(nextMin) ? 0 : nextMin, max: isNaN(nextMax) ? 10000 : nextMax });
+    setSortBy(nextSort);
+    setFilter(nextFilter);
+  }, [searchParams]);
 
   // Load recently viewed and best sellers on mount
   useEffect(() => {
