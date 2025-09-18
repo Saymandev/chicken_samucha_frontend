@@ -192,12 +192,15 @@ const NewNavbar: React.FC = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex flex-1 min-w-0 items-center justify-center md:space-x-6 lg:space-x-8 overflow-x-auto flex-nowrap pr-2">
             {navItems.map((item) => (
-              <div key={item.path} className="relative">
+              <div
+                key={item.path}
+                className="relative"
+                onMouseEnter={() => item.hasDropdown && setIsProductsMenuOpen(true)}
+                onMouseLeave={() => item.hasDropdown && setIsProductsMenuOpen(false)}
+              >
                 {item.hasDropdown ? (
                   <div
                     className="flex items-center space-x-1 cursor-pointer text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                    onMouseEnter={() => setIsProductsMenuOpen(true)}
-                    onMouseLeave={() => setIsProductsMenuOpen(false)}
                   >
                     {item.icon}
                     <span className="font-medium whitespace-nowrap">{item.label}</span>
@@ -225,9 +228,7 @@ const NewNavbar: React.FC = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2"
-                        onMouseEnter={() => setIsProductsMenuOpen(true)}
-                        onMouseLeave={() => setIsProductsMenuOpen(false)}
+                        className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
                       >
                         {/* Categories */}
                         <div className="px-4 py-2">
