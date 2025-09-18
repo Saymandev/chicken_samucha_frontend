@@ -43,8 +43,12 @@ export interface Product {
     public_id: string;
   }>;
   category: {
-    en: string;
-    bn: string;
+    _id: string;
+    name: {
+      en: string;
+      bn: string;
+    };
+    slug: string;
   };
   ingredients: {
     en: string[];

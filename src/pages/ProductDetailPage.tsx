@@ -15,7 +15,11 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: { en: string; bn: string };
+  category: { 
+    _id: string;
+    name: { en: string; bn: string };
+    slug: string;
+  };
   ingredients: { en: string[]; bn: string[] };
   preparationTime: string;
   servingSize: string;
@@ -405,7 +409,7 @@ const ProductDetailPage: React.FC = () => {
                 <div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">Category</span>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {language === 'bn' ? product.category.bn : product.category.en}
+                    {language === 'bn' ? product.category.name.bn : product.category.name.en}
                   </p>
                 </div>
                 <div>

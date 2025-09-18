@@ -102,10 +102,10 @@ const NewNavbar: React.FC = () => {
 
   const productMenuItems = [
     {
-      path: '/products',
-      label: 'All Products',
-      icon: <Package className="w-4 h-4" />,
-      description: 'Browse all our products'
+      path: '/products?filter=offers',
+      label: 'Offer Zone',
+      icon: <Tag className="w-4 h-4" />,
+      description: 'Special discounts and offers'
     },
     {
       path: '/products?filter=best-seller',
@@ -114,10 +114,10 @@ const NewNavbar: React.FC = () => {
       description: 'Our most popular items'
     },
     {
-      path: '/products?filter=offers',
-      label: 'Offer Zone',
-      icon: <Tag className="w-4 h-4" />,
-      description: 'Special discounts and offers'
+      path: '/products',
+      label: 'All Products',
+      icon: <Package className="w-4 h-4" />,
+      description: 'Browse all our products'
     }
   ];
 
