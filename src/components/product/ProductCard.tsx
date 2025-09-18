@@ -198,7 +198,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-2 mb-1 ${
                   language === 'bn' ? 'font-bengali text-sm' : 'text-sm'
                 }`} title={product.name[language]}>
-                  {product.name[language]}
+                  {truncateWords(
+                    product.name[language],
+                    viewportWidth < 380 ? 4 : viewportWidth < 640 ? 6 : viewportWidth < 1024 ? 10 : 12
+                  )}
                 </h3>
 
                 {/* Category Tag (hide raw IDs) */}
@@ -227,7 +230,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   }`}>
                     {truncateWords(
                       product.description[language],
-                      viewportWidth < 380 ? 10 : viewportWidth < 640 ? 14 : viewportWidth < 1024 ? 24 : 32
+                      viewportWidth < 380 ? 8 : viewportWidth < 640 ? 12 : viewportWidth < 1024 ? 24 : 32
                     )}
                   </p>
                 )}
@@ -356,7 +359,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
               ? (language === 'bn' ? 'font-bengali text-sm' : 'text-sm')
               : (language === 'bn' ? 'font-bengali text-sm' : 'text-xs md:text-sm')
           }`} title={product.name[language]}>
-            {truncateWords(product.name[language], compact ? 4 : 5)}
+            {truncateWords(
+              product.name[language],
+              compact
+                ? (viewportWidth < 640 ? 4 : 5)
+                : (viewportWidth < 380 ? 4 : viewportWidth < 640 ? 6 : 8)
+            )}
           </h3>
 
           {/* Rating */}
