@@ -62,22 +62,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Resolve a safe category label without exposing raw IDs
   const getCategoryLabel = (): string => {
     const category: any = (product as any).category;
-    console.log('Category data for product:', product.name[language], category);
     if (!category) return '';
     // If populated object with name
     if (typeof category === 'object' && category.name) {
       const nameObj = category.name as { en?: string; bn?: string };
-      const result = (language === 'bn' ? nameObj.bn : nameObj.en) || '';
-      console.log('Category name found:', result);
-      return result;
+      return (language === 'bn' ? nameObj.bn : nameObj.en) || '';
     }
     if (typeof category === 'string') {
       // Hide MongoDB ObjectId-like strings
       if (/^[a-f\d]{24}$/i.test(category)) return '';
       // Otherwise show the string (likely a slug); prettify
-      const result = category.replace(/[-_]/g, ' ');
-      console.log('Category string found:', result);
-      return result;
+      return category.replace(/[-_]/g, ' ');
     }
     return '';
   };
@@ -85,10 +80,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    console.log('Quick add button clicked for product:', product.name[language]);
-    console.log('Product stock:', product.stock);
-    console.log('In stock:', inStock);
     
     if (product.stock < 1) {
       toast.error(t('products.outOfStock'));

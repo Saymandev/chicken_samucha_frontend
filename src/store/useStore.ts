@@ -194,7 +194,6 @@ export const useStore = create<AppStore>()(
       
       // Cart actions
       addToCart: (product, quantity) => {
-        console.log('Store addToCart called with:', { product: product.name, quantity });
         const state = get();
         const productId = product.id || (product as any)._id;
         const existingItem = state.cart.find(item => {
