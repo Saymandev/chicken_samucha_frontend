@@ -32,6 +32,7 @@ interface Category {
   icon: string;
   color: string;
   productCount: number;
+  parentCategory?: { _id: string } | null;
   children?: Category[];
 }
 
@@ -74,7 +75,31 @@ const NewNavbar: React.FC = () => {
       setLoadingCategories(true);
       const response = await categoriesAPI.getNavbarCategories();
       if (response.data.success) {
-        setCategories(response.data.data);
+        const flat: Category[] = response.data.data;
+        // If API already sends children, keep as is
+        if (flat.length && (flat as any)[0]?.children) {
+          setCategories(flat);
+        } else {
+          // Build tree from flat list using parentCategory
+          const idToNode = new Map<string, Category>();
+          flat.forEach((c: any) => {
+            idToNode.set(c._id, { ...c, children: [] });
+          });
+          const roots: Category[] = [];
+          flat.forEach((c: any) => {
+            if (c.parentCategory && c.parentCategory._id) {
+              const parent = idToNode.get(c.parentCategory._id);
+              if (parent) {
+                (parent.children as Category[]).push(idToNode.get(c._id)!);
+              } else {
+                roots.push(idToNode.get(c._id)!);
+              }
+            } else {
+              roots.push(idToNode.get(c._id)!);
+            }
+          });
+          setCategories(roots);
+        }
       }
     } catch (error) {
       console.error('Fetch categories error:', error);
