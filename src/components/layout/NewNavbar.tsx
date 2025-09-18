@@ -360,7 +360,11 @@ const NewNavbar: React.FC = () => {
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
+                  <img
+                      src={user?.avatar?.url}
+                      alt={user?.name}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
                   </div>
                   <span className="hidden xl:block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {user?.name || 'User'}

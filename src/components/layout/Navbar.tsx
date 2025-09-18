@@ -237,7 +237,7 @@ const Navbar: React.FC = () => {
                 >
                   {user.avatar?.url ? (
                     <img
-                      src={user.avatar.url}
+                      src={user?.avatar?.url}
                       alt={user.name}
                       className="w-6 h-6 rounded-full object-cover"
                     />
