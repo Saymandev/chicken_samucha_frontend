@@ -7,7 +7,7 @@ import { useStore } from './store/useStore';
 // Layout Components
 import AdminLayout from './components/layout/AdminLayout';
 import Footer from './components/layout/Footer';
-import Navbar from './components/layout/Navbar';
+import Navbar from './components/layout/NewNavbar';
 
 // Main Pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -38,6 +38,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import ProfilePage from './pages/ProfilePage';
 
 // Admin Pages
+import AdminCategories from './pages/admin/AdminCategories';
 import AdminChat from './pages/admin/AdminChat';
 import AdminContent from './pages/admin/AdminContent';
 import AdminCoupons from './pages/admin/AdminCoupons';
@@ -48,6 +49,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminUsers from './pages/admin/AdminUsers';
 
 // Components
+import FloatingChatButton from './components/common/FloatingChatButton';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import ShoppingCartSidebar from './components/common/ShoppingCartSidebar';
@@ -193,6 +195,16 @@ function AppContent() {
             }
           />
           <Route
+            path="/admin/categories"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminCategories />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/chat"
             element={
               <ProtectedRoute adminOnly>
@@ -231,6 +243,9 @@ function AppContent() {
           onClose={closeCart}
         />
       )}
+
+      {/* Floating Chat Button - Only show for non-admin routes */}
+      {!isAdminRoute && <FloatingChatButton />}
       
       {/* Global Loading Spinner */}
       <LoadingSpinner />

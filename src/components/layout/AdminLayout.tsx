@@ -56,6 +56,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       path: '/admin/products'
     },
     {
+      id: 'categories',
+      label: 'Categories',
+      icon: <Package className="w-5 h-5" />,
+      path: '/admin/categories'
+    },
+    {
       id: 'orders',
       label: 'Orders',
       icon: <ShoppingBag className="w-5 h-5" />,

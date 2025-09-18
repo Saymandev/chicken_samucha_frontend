@@ -456,4 +456,16 @@ export const reportsAPI = {
   testEmailService: () => api.post('/admin/email/test'),
 };
 
+// Categories API
+export const categoriesAPI = {
+  getAllCategories: (params?: any) => api.get('/categories', { params }),
+  getNavbarCategories: () => api.get('/categories/navbar'),
+  getCategoryById: (id: string) => api.get(`/categories/${id}`),
+  createCategory: (data: any) => api.post('/categories', data),
+  updateCategory: (id: string, data: any) => api.put(`/categories/${id}`, data),
+  deleteCategory: (id: string) => api.delete(`/categories/${id}`),
+  toggleCategoryStatus: (id: string) => api.patch(`/categories/${id}/toggle`),
+  updateCategoryOrder: (categories: any[]) => api.patch('/categories/order', { categories }),
+};
+
 export default api;

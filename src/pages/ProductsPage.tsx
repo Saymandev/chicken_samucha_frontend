@@ -10,9 +10,9 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
-  GridSkeleton,
-  ListSkeleton,
-  ProductCardSkeleton
+    GridSkeleton,
+    ListSkeleton,
+    ProductCardSkeleton
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
@@ -35,6 +35,7 @@ const ProductsPage: React.FC = () => {
     max: parseInt(searchParams.get('maxPrice') || '10000')
   });
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'featured');
+  const [filter, setFilter] = useState(searchParams.get('filter') || '');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
@@ -62,7 +63,7 @@ const ProductsPage: React.FC = () => {
     setProducts([]);
     fetchProducts(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, selectedCategory, priceRange, sortBy]);
+  }, [searchTerm, selectedCategory, priceRange, sortBy, filter]);
 
   // Load recently viewed and best sellers on mount
   useEffect(() => {
@@ -90,6 +91,7 @@ const ProductsPage: React.FC = () => {
         minPrice: priceRange.min,
         maxPrice: priceRange.max,
         sortBy,
+        filter,
         page,
         limit: 12
       };
@@ -134,6 +136,7 @@ const ProductsPage: React.FC = () => {
     if (priceRange.min > 0) params.set('minPrice', priceRange.min.toString());
     if (priceRange.max < 10000) params.set('maxPrice', priceRange.max.toString());
     if (sortBy !== 'featured') params.set('sortBy', sortBy);
+    if (filter) params.set('filter', filter);
     
     setSearchParams(params);
   };
@@ -143,6 +146,7 @@ const ProductsPage: React.FC = () => {
     setSelectedCategory('');
     setPriceRange({ min: 0, max: 10000 });
     setSortBy('featured');
+    setFilter('');
     setSearchParams(new URLSearchParams());
   };
 
@@ -315,6 +319,36 @@ const ProductsPage: React.FC = () => {
             </motion.div>
           )}
         </div>
+
+        {/* Active Filter Display */}
+        {filter && (
+          <div className="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
+                  {language === 'bn' ? 'সক্রিয় ফিল্টার:' : 'Active Filter:'}
+                </span>
+                <span className="px-3 py-1 bg-primary-100 dark:bg-primary-800 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">
+                  {filter === 'best-seller' 
+                    ? (language === 'bn' ? 'বেস্ট সেলার' : 'Best Sellers')
+                    : filter === 'offers'
+                    ? (language === 'bn' ? 'অফার জোন' : 'Offer Zone')
+                    : filter
+                  }
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  setFilter('');
+                  updateURLParams();
+                }}
+                className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 text-sm font-medium"
+              >
+                {language === 'bn' ? 'সাফ করুন' : 'Clear'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Products Grid/List */}
         {loading ? (

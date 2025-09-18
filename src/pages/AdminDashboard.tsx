@@ -1,23 +1,23 @@
 import { motion } from 'framer-motion';
 import {
-  AlertTriangle,
-  DollarSign,
-  MessageCircle,
-  Package,
-  Plus,
-  Settings,
-  ShoppingBag,
-  Star,
-  TrendingUp,
-  Users
+    AlertTriangle,
+    DollarSign,
+    MessageCircle,
+    Package,
+    Plus,
+    Settings,
+    ShoppingBag,
+    Star,
+    TrendingUp,
+    Users
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  DashboardCardSkeleton,
-  GridSkeleton,
-  TableRowSkeleton
+    DashboardCardSkeleton,
+    GridSkeleton,
+    TableRowSkeleton
 } from '../components/common/Skeleton';
 import { useStore } from '../store/useStore';
 import { adminAPI } from '../utils/api';
@@ -207,6 +207,13 @@ const AdminDashboard: React.FC = () => {
       icon: <MessageCircle className="w-6 h-6" />,
       color: 'bg-indigo-500 hover:bg-indigo-600',
       path: '/admin/chat'
+    },
+    {
+      title: 'Categories',
+      description: 'Manage product categories',
+      icon: <Package className="w-6 h-6" />,
+      color: 'bg-orange-500 hover:bg-orange-600',
+      path: '/admin/categories'
     }
   ];
 
