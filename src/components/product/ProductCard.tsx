@@ -24,7 +24,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { t } = useTranslation();
   const { language, addToCart, cart } = useStore();
   const { openCart } = useCart();
-  const [quantity, setQuantity] = useState(product.minOrderQuantity || 1);
+  // Safe defaults for min/max to ensure quick actions always work
+  const minOrderQty = product.minOrderQuantity || 1;
+  const maxOrderQty = product.maxOrderQuantity || 9999;
+  const [quantity, setQuantity] = useState(minOrderQty);
   const [isAdding, setIsAdding] = useState(false);
 
   // Truncate a title to a specific number of words
@@ -62,20 +65,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
 
-    if (quantity < product.minOrderQuantity) {
+    if (quantity < minOrderQty) {
       toast.error(
         language === 'bn' 
-          ? `ন্যূনতম ${product.minOrderQuantity}টি অর্ডার করুন`
-          : `Minimum order quantity is ${product.minOrderQuantity}`
+          ? `ন্যূনতম ${minOrderQty}টি অর্ডার করুন`
+          : `Minimum order quantity is ${minOrderQty}`
       );
       return;
     }
 
-    if (quantity > product.maxOrderQuantity) {
+    if (quantity > maxOrderQty) {
       toast.error(
         language === 'bn' 
-          ? `সর্বোচ্চ ${product.maxOrderQuantity}টি অর্ডার করতে পারেন`
-          : `Maximum order quantity is ${product.maxOrderQuantity}`
+          ? `সর্বোচ্চ ${maxOrderQty}টি অর্ডার করতে পারেন`
+          : `Maximum order quantity is ${maxOrderQty}`
       );
       return;
     }
@@ -111,7 +114,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity >= product.minOrderQuantity && newQuantity <= product.maxOrderQuantity) {
+    if (newQuantity >= minOrderQty && newQuantity <= maxOrderQty) {
       setQuantity(newQuantity);
     }
   };
@@ -299,7 +302,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Add to wishlist logic
+                  // Quick action: add to cart immediately
+                  handleAddToCart(e);
                 }}
                 className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
               >
@@ -388,7 +392,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   e.stopPropagation();
                   handleQuantityChange(quantity - 1);
                 }}
-                disabled={quantity <= product.minOrderQuantity}
+                disabled={quantity <= minOrderQty}
                 className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Minus className="w-4 h-4 text-gray-600" />
@@ -404,7 +408,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   e.stopPropagation();
                   handleQuantityChange(quantity + 1);
                 }}
-                disabled={quantity >= product.maxOrderQuantity}
+                disabled={quantity >= maxOrderQty}
                 className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Plus className="w-4 h-4 text-gray-600" />
