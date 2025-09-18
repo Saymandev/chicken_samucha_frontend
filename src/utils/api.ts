@@ -350,6 +350,10 @@ export const adminAPI = {
   // Bangladesh payment settings
   getPaymentSettings: () => api.get('/admin/settings/payments'),
   updatePaymentSettings: (settings: any) => api.put('/admin/settings/payments', settings),
+
+  // System settings (general, delivery, etc.)
+  getSystemSettings: () => api.get('/admin/settings'),
+  updateSystemSettings: (settings: any) => api.put('/admin/settings', settings),
   
   // Chat management  
   getChatSessions: (params?: any) => api.get('/chat/sessions', { params }),

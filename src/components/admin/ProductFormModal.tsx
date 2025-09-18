@@ -16,7 +16,6 @@ interface Product {
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
-  ingredients?: { en: string; bn: string };
 }
 
 interface ProductFormModalProps {
@@ -46,8 +45,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     category: '',
     stock: 0,
     isAvailable: true,
-    isFeatured: false,
-    ingredients: { en: '', bn: '' }
+    isFeatured: false
   });
   
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
@@ -67,8 +65,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         category: product.category || '',
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
-        isFeatured: product.isFeatured ?? false,
-        ingredients: product.ingredients || { en: '', bn: '' }
+        isFeatured: product.isFeatured ?? false
       });
       setImages(product.images || []);
     } else {
@@ -81,8 +78,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         category: '',
         stock: 0,
         isAvailable: true,
-        isFeatured: false,
-        ingredients: { en: '', bn: '' }
+        isFeatured: false
       });
       setImages([]);
     }
@@ -244,7 +240,6 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('stock', formData.stock.toString());
       submitData.append('isAvailable', formData.isAvailable.toString());
       submitData.append('isFeatured', formData.isFeatured.toString());
-      submitData.append('ingredients', JSON.stringify(formData.ingredients));
       
       // Add new image files from state
       
@@ -385,33 +380,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
             </div>
           </div>
 
-          {/* Ingredients */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Ingredients (English)
-              </label>
-              <textarea
-                value={formData.ingredients.en}
-                onChange={(e) => handleInputChange('ingredients', e.target.value, 'en')}
-                rows={3}
-                placeholder="e.g., Chicken, Flour, Onions, Spices"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Ingredients (Bengali)
-              </label>
-              <textarea
-                value={formData.ingredients.bn}
-                onChange={(e) => handleInputChange('ingredients', e.target.value, 'bn')}
-                rows={3}
-                placeholder="যেমন: মুরগির মাংস, ময়দা, পেঁয়াজ, মসলা"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
-            </div>
-          </div>
+          {/* Ingredients removed */}
 
           {/* Price and Category */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -35,8 +35,9 @@ const AdminContent: React.FC = () => {
   const [heroContent, setHeroContent] = useState<HeroContent | null>(null);
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'payments'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'payments' | 'delivery'>('hero');
   const [newSliderItem, setNewSliderItem] = useState<SliderItem | null>(null);
   const [editingSlider, setEditingSlider] = useState<SliderItem | null>(null);
   const [showSliderModal, setShowSliderModal] = useState(false);
@@ -68,6 +69,18 @@ const AdminContent: React.FC = () => {
       if (paymentResponse.data.success) {
         setPaymentSettings(paymentResponse.data.settings);
       }
+
+      // Fetch system settings (delivery)
+      try {
+        const systemResponse = await adminAPI.getSystemSettings();
+        if (systemResponse.data.success) {
+          const s = systemResponse.data.settings;
+          setDeliverySettings({
+            deliveryCharge: s?.general?.deliveryCharge ?? 60,
+            freeDeliveryThreshold: s?.delivery?.freeDeliveryThreshold ?? 500
+          });
+        }
+      } catch {}
       
     } catch (error) {
       console.error('Error fetching content:', error);
@@ -342,7 +355,7 @@ const AdminContent: React.FC = () => {
               Content Management
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage website content and Bangladesh payment settings
+              Manage website content, delivery, and Bangladesh payment settings
             </p>
           </div>
         </div>
@@ -353,7 +366,8 @@ const AdminContent: React.FC = () => {
             {[
               { id: 'hero', label: 'Hero Section', icon: <Image className="w-4 h-4" /> },
               { id: 'slider', label: 'Slider Items', icon: <FileText className="w-4 h-4" /> },
-              { id: 'payments', label: 'BD Payments', icon: <Settings className="w-4 h-4" /> }
+              { id: 'payments', label: 'BD Payments', icon: <Settings className="w-4 h-4" /> },
+              { id: 'delivery', label: 'Delivery', icon: <Settings className="w-4 h-4" /> }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -462,6 +476,60 @@ const AdminContent: React.FC = () => {
                 ) : (
                   'Update Hero Content'
                 )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Delivery Settings Tab */}
+        {activeTab === 'delivery' && deliverySettings && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Delivery Settings</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Delivery Charge (৳)</label>
+                <input
+                  type="number"
+                  value={deliverySettings.deliveryCharge}
+                  onChange={(e) => setDeliverySettings(ds => ds ? { ...ds, deliveryCharge: parseInt(e.target.value) || 0 } : ds)}
+                  min={0}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Free Delivery Threshold (৳)</label>
+                <input
+                  type="number"
+                  value={deliverySettings.freeDeliveryThreshold}
+                  onChange={(e) => setDeliverySettings(ds => ds ? { ...ds, freeDeliveryThreshold: parseInt(e.target.value) || 0 } : ds)}
+                  min={0}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+            </div>
+            <div className="mt-6">
+              <button
+                onClick={async () => {
+                  if (!deliverySettings) return;
+                  try {
+                    setSavingSettings(true);
+                    await adminAPI.updateSystemSettings({
+                      general: { deliveryCharge: deliverySettings.deliveryCharge },
+                      delivery: { freeDeliveryThreshold: deliverySettings.freeDeliveryThreshold }
+                    });
+                    toast.success('Delivery settings updated successfully');
+                  } catch (e) {
+                    toast.error('Failed to update delivery settings');
+                  } finally {
+                    setSavingSettings(false);
+                  }
+                }}
+                disabled={savingSettings}
+                className={`px-6 py-3 rounded-lg transition-colors ${
+                  savingSettings ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'
+                } text-white`}
+              >
+                {savingSettings ? 'Saving...' : 'Save Delivery Settings'}
               </button>
             </div>
           </div>
