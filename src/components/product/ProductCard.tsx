@@ -371,8 +371,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Quick action: add to cart immediately
-                  handleAddToCart(e);
+                  // Quick action: add to wishlist (not cart)
+                  // TODO: Implement wishlist functionality
+                  console.log('Add to wishlist:', product.name[language]);
                 }}
                 className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
               >

@@ -310,16 +310,28 @@ const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Product Images */}
             <div className="space-y-4">
-              {/* Main Image */}
+              {/* Main Image/Video */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                 <div className="aspect-square">
-                  {product.images && product.images.length > 0 ? (
+                  {selectedImage === -1 && product.youtubeVideoUrl && getYouTubeVideoId(product.youtubeVideoUrl) ? (
+                    // Show YouTube video
+                    <iframe
+                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(product.youtubeVideoUrl)}`}
+                      title={`${language === 'bn' ? product.name.bn : product.name.en} Video`}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : product.images && product.images.length > 0 ? (
+                    // Show selected image
                     <img
                       src={product.images[selectedImage]?.url}
                       alt={language === 'bn' ? product.name.bn : product.name.en}
                       className="w-full h-full object-cover"
                     />
                   ) : (
+                    // Show placeholder
                     <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                       <ShoppingCart className="w-20 h-20 text-gray-400" />
                     </div>
@@ -327,49 +339,46 @@ const ProductDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Thumbnail Images */}
-              {product.images && product.images.length > 1 && (
-                <div className="flex space-x-2 overflow-x-auto">
-                  {product.images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImage(index)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                        selectedImage === index
-                          ? 'border-orange-500'
-                          : 'border-gray-200 dark:border-gray-700'
-                      }`}
-                    >
-                      <img
-                        src={image.url}
-                        alt={`${language === 'bn' ? product.name.bn : product.name.en} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* YouTube Video */}
-              {product.youtubeVideoUrl && getYouTubeVideoId(product.youtubeVideoUrl) && (
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                    Product Video
-                  </h3>
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                    <div className="aspect-video">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(product.youtubeVideoUrl)}`}
-                        title={`${language === 'bn' ? product.name.bn : product.name.en} Video`}
-                        className="w-full h-full"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+              {/* Thumbnail Images + Video */}
+              <div className="flex space-x-2 overflow-x-auto">
+                {/* Product Images */}
+                {product.images && product.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                      selectedImage === index
+                        ? 'border-orange-500'
+                        : 'border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`${language === 'bn' ? product.name.bn : product.name.en} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+                
+                {/* YouTube Video Thumbnail */}
+                {product.youtubeVideoUrl && getYouTubeVideoId(product.youtubeVideoUrl) && (
+                  <button
+                    onClick={() => setSelectedImage(-1)} // Use -1 to indicate video selection
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                      selectedImage === -1
+                        ? 'border-orange-500'
+                        : 'border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    <div className="w-full h-full bg-red-600 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
                     </div>
-                  </div>
-                </div>
-              )}
+                  </button>
+                )}
+              </div>
+
             </div>
 
             {/* Product Info */}
