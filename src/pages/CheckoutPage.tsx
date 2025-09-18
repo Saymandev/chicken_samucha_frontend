@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import {
-    CreditCard,
-    MapPin,
-    Phone,
-    ShoppingCart,
-    Upload,
-    User
+  CreditCard,
+  MapPin,
+  Phone,
+  ShoppingCart,
+  Upload,
+  User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -75,9 +75,10 @@ const CheckoutPage: React.FC = () => {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  // Free delivery for orders ≥ ৳500
+  // Free delivery uses threshold from settings (fallback 500)
   const baseDeliveryCharge = paymentSettings?.cashOnDelivery?.deliveryCharge || 60;
-  const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= 500 ? 0 : baseDeliveryCharge);
+  const freeThreshold = paymentSettings?.freeDeliveryThreshold ?? 500;
+  const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold ? 0 : baseDeliveryCharge);
   const couponDiscount = appliedCoupon?.discount || 0;
   const finalTotal = Math.max(0, cartTotal + deliveryCharge - couponDiscount);
 
@@ -567,9 +568,9 @@ const CheckoutPage: React.FC = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           We'll deliver to your address
                         </p>
-                        {cartTotal >= 500 ? (
+                        {cartTotal >= freeThreshold ? (
                           <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                            🎉 FREE Delivery (Order ≥ ৳500)
+                            🎉 FREE Delivery (Order ≥ ৳{freeThreshold})
                           </p>
                         ) : (
                           <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
