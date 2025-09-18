@@ -141,7 +141,7 @@ const CartPage: React.FC = () => {
                             {truncateWords(language === 'bn' ? item.product.name.bn : item.product.name.en, 5)}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                            {language === 'bn' ? item.product.category.bn : item.product.category.en}
+                            {language === 'bn' ? item.product.category.name.bn : item.product.category.name.en}
                           </p>
                           
                           {/* Price */}
