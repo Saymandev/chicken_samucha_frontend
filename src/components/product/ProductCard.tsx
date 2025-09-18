@@ -52,6 +52,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
   });
   const isInCart = !!cartItem;
 
+  // Resolve a safe category label without exposing raw IDs
+  const getCategoryLabel = (): string => {
+    const category: any = (product as any).category;
+    if (!category) return '';
+    // If populated object with name
+    if (typeof category === 'object' && category.name) {
+      const nameObj = category.name as { en?: string; bn?: string };
+      return (language === 'bn' ? nameObj.bn : nameObj.en) || '';
+    }
+    if (typeof category === 'string') {
+      // Hide MongoDB ObjectId-like strings
+      if (/^[a-f\d]{24}$/i.test(category)) return '';
+      // Otherwise show the string (likely a slug); prettify
+      return category.replace(/[-_]/g, ' ');
+    }
+    return '';
+  };
+
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -176,10 +194,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   {product.name[language]}
                 </h3>
 
-                {/* Category Tag */}
-                <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded-full mb-2">
-                  {typeof product.category === 'string' ? product.category : 'food'}
-                </span>
+                {/* Category Tag (hide raw IDs) */}
+                {getCategoryLabel() && (
+                  <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded-full mb-2">
+                    {getCategoryLabel()}
+                  </span>
+                )}
 
                 {/* Price */}
                 <div className="flex items-center gap-2 mb-2">
