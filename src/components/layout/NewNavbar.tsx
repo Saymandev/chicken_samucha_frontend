@@ -73,7 +73,8 @@ const NewNavbar: React.FC = () => {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      const response = await categoriesAPI.getNavbarCategories();
+      // Use full categories list and build tree robustly
+      const response = await categoriesAPI.getAllCategories({ withProductCount: true });
       if (response.data.success) {
         const flat: Category[] = response.data.data;
         // If API already sends children, keep as is
