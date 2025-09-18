@@ -178,9 +178,9 @@ const NewNavbar: React.FC = () => {
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex items-center justify-between h-16 gap-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 shrink-0">
             <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
               <Package className="w-5 h-5 text-white" />
             </div>
@@ -190,7 +190,7 @@ const NewNavbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center md:space-x-6 lg:space-x-8 overflow-x-auto">
+          <div className="hidden md:flex flex-1 min-w-0 items-center md:space-x-6 lg:space-x-8 overflow-x-auto flex-nowrap pr-2">
             {navItems.map((item) => (
               <div key={item.path} className="relative">
                 {item.hasDropdown ? (
@@ -283,7 +283,7 @@ const NewNavbar: React.FC = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 shrink-0">
             {/* Cart */}
             <button
               onClick={openCart}
