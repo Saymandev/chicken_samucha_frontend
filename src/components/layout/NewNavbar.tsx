@@ -503,16 +503,31 @@ const NewNavbar: React.FC = () => {
                     <Package className="w-4 h-4" />
                     <span>Categories</span>
                   </div>
-                  <div className="ml-6 space-y-2">
+                  <div className="ml-6 space-y-3">
                     {categories.map((category) => (
-                      <Link
-                        key={category.id}
-                        to={`/products?category=${category.slug}`}
-                        className="block text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {category.name[language]} ({category.productCount})
-                      </Link>
+                      <div key={category.id}>
+                        <Link
+                          to={`/products?category=${category.slug}`}
+                          className="block text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {category.name[language]} ({category.productCount})
+                        </Link>
+                        {category.children && category.children.length > 0 && (
+                          <div className="mt-1 ml-4 space-y-1">
+                            {category.children.map((child) => (
+                              <Link
+                                key={child.id}
+                                to={`/products?category=${child.slug}`}
+                                className="block text-xs text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                {child.name[language]} ({child.productCount})
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
