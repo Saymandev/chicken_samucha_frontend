@@ -73,10 +73,39 @@ const NewNavbar: React.FC = () => {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      // Use backend-provided tree for navbar
-      const response = await categoriesAPI.getNavbarCategories();
+      // Fetch full list and build a reliable tree
+      const response = await categoriesAPI.getAllCategories({ withProductCount: true });
       if (response.data.success) {
-        setCategories(response.data.data);
+        const flat: any[] = response.data.data || [];
+        const idToNode = new Map<string, Category>();
+        flat.forEach((raw: any) => {
+          const id = raw.id || raw._id;
+          idToNode.set(id, {
+            id,
+            name: raw.name,
+            slug: raw.slug,
+            icon: raw.icon,
+            color: raw.color,
+            productCount: raw.productCount || 0,
+            parentCategory: raw.parentCategory ? { id: raw.parentCategory.id || raw.parentCategory._id } : null,
+            children: []
+          });
+        });
+
+        const roots: Category[] = [];
+        flat.forEach((raw: any) => {
+          const id = raw.id || raw._id;
+          const parentId = raw.parentCategory ? (raw.parentCategory.id || raw.parentCategory._id) : undefined;
+          const node = idToNode.get(id)!;
+          // Guard against self-parented records
+          if (parentId && parentId !== id && idToNode.has(parentId)) {
+            idToNode.get(parentId)!.children!.push(node);
+          } else {
+            roots.push(node);
+          }
+        });
+
+        setCategories(roots);
       }
     } catch (error) {
       console.error('Fetch categories error:', error);
