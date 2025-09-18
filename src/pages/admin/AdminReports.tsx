@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
 import {
-  BarChart3,
-  Calendar,
-  Clock,
-  DollarSign,
-  Download,
-  Mail,
-  Package,
-  Play,
-  ShoppingCart,
-  Square,
-  TrendingUp,
-  Users
+    BarChart3,
+    Calendar,
+    Clock,
+    DollarSign,
+    Download,
+    Mail,
+    Package,
+    Play,
+    ShoppingCart,
+    Square,
+    TrendingUp,
+    Users
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -256,10 +256,13 @@ const AdminReports: React.FC = () => {
       if (response.data.success) {
         toast.success(`Scheduler ${action}ed successfully`);
         fetchSchedulerStatus();
+      } else {
+        toast.error(response.data.message || `Failed to ${action} scheduler`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Scheduler control error:', error);
-      toast.error(`Failed to ${action} scheduler`);
+      const errorMessage = error.response?.data?.message || error.message || `Failed to ${action} scheduler`;
+      toast.error(errorMessage);
     }
   };
 
