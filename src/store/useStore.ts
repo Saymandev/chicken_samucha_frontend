@@ -50,12 +50,7 @@ export interface Product {
     };
     slug: string;
   };
-  ingredients: {
-    en: string[];
-    bn: string[];
-  };
-  preparationTime: string;
-  servingSize: string;
+  // removed: ingredients, preparationTime, servingSize
   isFeatured: boolean;
   isAvailable: boolean;
   stock: number;

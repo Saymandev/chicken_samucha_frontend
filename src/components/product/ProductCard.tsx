@@ -206,7 +206,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               {/* Bottom Section - Quick Add Button */}
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {product.preparationTime}
+                  &nbsp;
                 </span>
                 <button
                   onClick={(e) => {
@@ -357,9 +357,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
 
-          {/* Additional Info */}
+          {/* Additional Info: show Sold count if available */}
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>{product.preparationTime}</span>
             <span className="flex items-center gap-1">
               {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
                 <>
@@ -369,9 +368,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </span>
                 </>
               ) : (
-                <span>{product.servingSize}</span>
+                <span>&nbsp;</span>
               )}
             </span>
+            <span>&nbsp;</span>
           </div>
 
          

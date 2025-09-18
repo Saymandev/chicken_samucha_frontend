@@ -7,7 +7,7 @@ import ProductCard from '../components/product/ProductCard';
 import { useStore } from '../store/useStore';
 import { productsAPI, reviewsAPI } from '../utils/api';
 
-interface Product {
+  interface Product {
   id: string;
   name: { en: string; bn: string };
   description: { en: string; bn: string };
@@ -20,9 +20,7 @@ interface Product {
     name: { en: string; bn: string };
     slug: string;
   };
-  ingredients: { en: string[]; bn: string[] };
-  preparationTime: string;
-  servingSize: string;
+    // removed: ingredients, preparationTime, servingSize
   isFeatured: boolean;
   isAvailable: boolean;
   stock: number;
@@ -413,18 +411,6 @@ const ProductDetailPage: React.FC = () => {
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Preparation Time</span>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {product.preparationTime}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Serving Size</span>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {product.servingSize}
-                  </p>
-                </div>
-                <div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">Stock</span>
                   <p className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
@@ -487,24 +473,7 @@ const ProductDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Ingredients Section */}
-          {product.ingredients && (
-            <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Ingredients
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {(language === 'bn' ? product.ingredients.bn : product.ingredients.en).map((ingredient, index) => (
-                  <span
-                    key={index}
-                    className="bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200 px-3 py-1 rounded-full text-sm"
-                  >
-                    {ingredient}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Ingredients section removed */}
           {/* Related Products Section */}
           {relatedProducts.length > 0 && (
             <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
