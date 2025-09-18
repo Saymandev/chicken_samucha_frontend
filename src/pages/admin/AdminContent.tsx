@@ -514,8 +514,10 @@ const AdminContent: React.FC = () => {
                   try {
                     setSavingSettings(true);
                     await adminAPI.updateSystemSettings({
-                      general: { deliveryCharge: deliverySettings.deliveryCharge },
-                      delivery: { freeDeliveryThreshold: deliverySettings.freeDeliveryThreshold }
+                      settings: {
+                        general: { deliveryCharge: deliverySettings.deliveryCharge },
+                        delivery: { freeDeliveryThreshold: deliverySettings.freeDeliveryThreshold }
+                      }
                     });
                     toast.success('Delivery settings updated successfully');
                   } catch (e) {
