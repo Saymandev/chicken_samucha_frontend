@@ -73,33 +73,10 @@ const NewNavbar: React.FC = () => {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      // Use full categories list and build tree robustly
-      const response = await categoriesAPI.getAllCategories({ withProductCount: true });
+      // Use backend-provided tree for navbar
+      const response = await categoriesAPI.getNavbarCategories();
       if (response.data.success) {
-        const flat: Category[] = response.data.data;
-        // If API already sends children, keep as is
-        if (flat.length && (flat as any)[0]?.children) {
-          setCategories(flat);
-        } else {
-          // Build tree from flat list using parentCategory
-          const idToNode = new Map<string, Category>();
-          flat.forEach((c: any) => {
-            idToNode.set(c.id, { ...c, children: [] });
-          });
-          const roots: Category[] = [];
-          flat.forEach((c: any) => {
-            const parentId = c.parentCategory?.id;
-            if (parentId) {
-              const parent = idToNode.get(parentId);
-              if (parent) {
-                (parent.children as Category[]).push(idToNode.get(c.id)!);
-                return;
-              }
-            }
-            roots.push(idToNode.get(c.id)!);
-          });
-          setCategories(roots);
-        }
+        setCategories(response.data.data);
       }
     } catch (error) {
       console.error('Fetch categories error:', error);
