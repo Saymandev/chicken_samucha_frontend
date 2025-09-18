@@ -160,17 +160,25 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        {/* X Icon - Always visible */}
-        <X className="w-8 h-8 font-bold" />
+        {/* Toggle icon: Message when closed, X when open */}
+        {isOpen ? (
+          <X className="w-8 h-8 font-bold" />
+        ) : (
+          <MessageCircle className="w-8 h-8 font-bold" />
+        )}
 
-        {/* Notification Badge - Always visible */}
-        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-          <div className="w-2 h-2 bg-white rounded-full" />
-        </div>
+        {/* Notification Badge - show only when closed */}
+        {!isOpen && (
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full" />
+          </div>
+        )}
 
         {/* Tooltip */}
         <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-          {language === 'bn' ? 'সহায়তা পান' : 'Get Help'}
+          {isOpen
+            ? (language === 'bn' ? 'বন্ধ করুন' : 'Close')
+            : (language === 'bn' ? 'সহায়তা পান' : 'Get Help')}
           <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
         </div>
       </motion.button>
