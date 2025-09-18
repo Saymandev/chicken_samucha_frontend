@@ -29,6 +29,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const maxOrderQty = product.maxOrderQuantity || 9999;
   const [quantity, setQuantity] = useState(minOrderQty);
   const [isAdding, setIsAdding] = useState(false);
+  // Track viewport width to adapt description length responsively
+  const [viewportWidth, setViewportWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  React.useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Truncate a title to a specific number of words
   const truncateWords = (text: string | undefined, maxWords: number): string => {
@@ -213,12 +220,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   )}
                 </div>
 
-                {/* Description (fixed-length preview) */}
+                {/* Description (responsive-length preview) */}
                 {product.description && (
                   <p className={`text-gray-600 dark:text-gray-400 text-xs mb-2 ${
                     language === 'bn' ? 'font-bengali' : ''
                   }`}>
-                    {truncateWords(product.description[language], 20)}
+                    {truncateWords(
+                      product.description[language],
+                      viewportWidth < 380 ? 10 : viewportWidth < 640 ? 14 : viewportWidth < 1024 ? 24 : 32
+                    )}
                   </p>
                 )}
               </div>
