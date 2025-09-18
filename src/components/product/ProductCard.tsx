@@ -128,7 +128,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <motion.div
         whileHover={{ y: -2, scale: 1.01 }}
         transition={{ duration: 0.3 }}
-        className="group card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
+        className="group card overflow-hidden hover:shadow-xl transition-all duration-300 h-full min-w-0"
       >
         <Link to={`/products/${product.id || (product as any)._id}`} className="block">
           <div className="flex h-32">
@@ -245,7 +245,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
       transition={{ duration: 0.3 }}
-      className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full"
+      className="card overflow-hidden hover:shadow-xl transition-all duration-300 h-full min-w-0"
       
     >
       <Link to={`/products/${product.id || (product as any)._id}`} className="block">
@@ -390,7 +390,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="p-3 pt-0 space-y-3">
           {/* Quantity Selector */}
           {inStock && (
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-2 sm:gap-3">
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -403,7 +403,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <Minus className="w-4 h-4 text-gray-600" />
               </button>
               
-              <span className="min-w-[2rem] text-center font-medium text-gray-900 dark:text-white">
+              <span className="min-w-[1.75rem] text-center font-medium text-gray-900 dark:text-white text-sm sm:text-base">
                 {quantity}
               </span>
               
@@ -427,7 +427,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             disabled={!inStock || isAdding}
             whileHover={inStock && !isAdding ? { scale: 1.02 } : {}}
             whileTap={inStock && !isAdding ? { scale: 0.98 } : {}}
-            className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+            className={`w-full flex items-center justify-center gap-2 py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
               inStock && !isAdding
                 ? isInCart
                   ? 'bg-green-500 hover:bg-green-600 text-white'
