@@ -1,19 +1,19 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    ChevronDown,
-    Globe,
-    Home,
-    LogOut,
-    Menu,
-    Moon,
-    Package,
-    Settings,
-    ShoppingCart,
-    Star,
-    Sun,
-    Tag,
-    User,
-    X
+  ChevronDown,
+  Globe,
+  Home,
+  LogOut,
+  Menu,
+  Moon,
+  Package,
+  Settings,
+  ShoppingCart,
+  Star,
+  Sun,
+  Tag,
+  User,
+  X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -92,34 +92,33 @@ const NewNavbar: React.FC = () => {
       active: location.pathname === '/'
     },
     {
-      path: '/products',
-      label: t('nav.products'),
-      icon: <Package className="w-4 h-4" />,
-      active: location.pathname.startsWith('/products'),
-      hasDropdown: true
-    }
-  ];
-
-  const productMenuItems = [
-    {
       path: '/products?filter=offers',
       label: 'Offer Zone',
       icon: <Tag className="w-4 h-4" />,
-      description: 'Special discounts and offers'
+      active: location.search.includes('filter=offers')
     },
     {
       path: '/products?filter=best-seller',
       label: 'Best Sellers',
       icon: <Star className="w-4 h-4" />,
-      description: 'Our most popular items'
+      active: location.search.includes('filter=best-seller')
     },
     {
       path: '/products',
       label: 'All Products',
       icon: <Package className="w-4 h-4" />,
-      description: 'Browse all our products'
+      active: location.pathname === '/products'
+    },
+    {
+      path: '#',
+      label: 'Categories',
+      icon: <Package className="w-4 h-4" />,
+      active: false,
+      hasDropdown: true
     }
   ];
+
+  // Product quick links are now top-level nav items; no dropdown items needed
 
   const userMenuItems = [
     ...(user?.role === 'admin' ? [
@@ -232,34 +231,6 @@ const NewNavbar: React.FC = () => {
                         onMouseEnter={() => setIsProductsMenuOpen(true)}
                         onMouseLeave={() => setIsProductsMenuOpen(false)}
                       >
-                        {/* Main Product Sections */}
-                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                            Browse Products
-                          </h3>
-                          <div className="space-y-1">
-                            {productMenuItems.map((menuItem) => (
-                              <Link
-                                key={menuItem.path}
-                                to={menuItem.path}
-                                className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                              >
-                                <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center">
-                                  {menuItem.icon}
-                                </div>
-                                <div>
-                                  <div className="font-medium text-gray-900 dark:text-white">
-                                    {menuItem.label}
-                                  </div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                                    {menuItem.description}
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-
                         {/* Categories */}
                         <div className="px-4 py-2">
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
@@ -447,53 +418,42 @@ const NewNavbar: React.FC = () => {
               className="md:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <div className="px-4 py-4 space-y-4">
-                {navItems.map((item) => (
-                  <div key={item.path}>
-                    {item.hasDropdown ? (
-                      <div>
-                        <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 font-medium mb-2">
-                          {item.icon}
-                          <span>{item.label}</span>
-                        </div>
-                        <div className="ml-6 space-y-2">
-                          {productMenuItems.map((menuItem) => (
-                            <Link
-                              key={menuItem.path}
-                              to={menuItem.path}
-                              className="block text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              {menuItem.label}
-                            </Link>
-                          ))}
-                          {categories.map((category) => (
-                            <Link
-                              key={category._id}
-                              to={`/products?category=${category.slug}`}
-                              className="block text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              {category.name[language]} ({category.productCount})
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
+                {/* Top-level links: Home, Offer Zone, Best Sellers, All Products */}
+                {navItems.filter(i => !i.hasDropdown).map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-2 transition-colors ${
+                      item.active
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.icon}
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                ))}
+
+                {/* Categories list */}
+                <div>
+                  <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 font-medium mb-2">
+                    <Package className="w-4 h-4" />
+                    <span>Categories</span>
+                  </div>
+                  <div className="ml-6 space-y-2">
+                    {categories.map((category) => (
                       <Link
-                        to={item.path}
-                        className={`flex items-center space-x-2 transition-colors ${
-                          item.active
-                            ? 'text-primary-600 dark:text-primary-400'
-                            : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                        }`}
+                        key={category._id}
+                        to={`/products?category=${category.slug}`}
+                        className="block text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        {item.icon}
-                        <span className="font-medium">{item.label}</span>
+                        {category.name[language]} ({category.productCount})
                       </Link>
-                    )}
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </motion.div>
           )}
