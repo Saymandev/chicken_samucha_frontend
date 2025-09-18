@@ -15,6 +15,15 @@ const CartPage: React.FC = () => {
   
   const finalTotal = cartTotal; // Remove delivery charge from cart page total
 
+  // Safely resolve localized strings with sensible fallbacks
+  const getLocalized = (value: any): string => {
+    if (!value) return '';
+    const preferred = language === 'bn' ? value?.bn ?? value?.en : value?.en ?? value?.bn;
+    if (typeof preferred === 'string') return preferred;
+    if (typeof value === 'string') return value;
+    return '';
+  };
+
   const handleQuantityUpdate = (productId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     updateCartItem(productId, newQuantity);
@@ -124,8 +133,8 @@ const CartPage: React.FC = () => {
                         <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
                           {item.product.images && item.product.images.length > 0 ? (
                             <img
-                              src={item.product.images[0].url}
-                              alt={language === 'bn' ? item.product.name.bn : item.product.name.en}
+                              src={item.product.images[0]?.url}
+                              alt={getLocalized(item.product?.name) || 'Product image'}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -137,11 +146,11 @@ const CartPage: React.FC = () => {
 
                         {/* Product Details */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate" title={language === 'bn' ? item.product.name.bn : item.product.name.en}>
-                            {truncateWords(language === 'bn' ? item.product.name.bn : item.product.name.en, 5)}
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate" title={getLocalized(item.product?.name) || 'Product'}>
+                            {truncateWords(getLocalized(item.product?.name) || 'Product', 5)}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                            {language === 'bn' ? item.product.category.name.bn : item.product.category.name.en}
+                            {getLocalized(item.product?.category?.name) || '—'}
                           </p>
                           
                           {/* Price */}
@@ -190,7 +199,7 @@ const CartPage: React.FC = () => {
                           <button
                             onClick={() => handleRemoveItem(
                               item.product.id,
-                              language === 'bn' ? item.product.name.bn : item.product.name.en
+                              getLocalized(item.product?.name) || 'Product'
                             )}
                             className="p-2 text-red-500 hover:text-red-700 transition-colors"
                           >
