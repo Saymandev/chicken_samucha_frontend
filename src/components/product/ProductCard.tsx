@@ -62,17 +62,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Resolve a safe category label without exposing raw IDs
   const getCategoryLabel = (): string => {
     const category: any = (product as any).category;
+    console.log('Category data for product:', product.name[language], category);
     if (!category) return '';
     // If populated object with name
     if (typeof category === 'object' && category.name) {
       const nameObj = category.name as { en?: string; bn?: string };
-      return (language === 'bn' ? nameObj.bn : nameObj.en) || '';
+      const result = (language === 'bn' ? nameObj.bn : nameObj.en) || '';
+      console.log('Category name found:', result);
+      return result;
     }
     if (typeof category === 'string') {
       // Hide MongoDB ObjectId-like strings
       if (/^[a-f\d]{24}$/i.test(category)) return '';
       // Otherwise show the string (likely a slug); prettify
-      return category.replace(/[-_]/g, ' ');
+      const result = category.replace(/[-_]/g, ' ');
+      console.log('Category string found:', result);
+      return result;
     }
     return '';
   };
