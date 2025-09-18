@@ -224,8 +224,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </div>
 
               {/* Bottom Section - Quick Add Button */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400 order-2 sm:order-1">
                   &nbsp;
                 </span>
                 <button
@@ -235,7 +235,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     handleAddToCart(e);
                   }}
                   disabled={!inStock || isAdding}
-                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 border ${
+                  className={`w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded text-xs font-medium transition-all duration-200 border ${
                     isInCart
                       ? 'bg-green-500 border-green-500 text-white'
                       : inStock
