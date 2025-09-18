@@ -190,7 +190,7 @@ const NewNavbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex flex-1 min-w-0 items-center justify-center md:space-x-6 lg:space-x-8 overflow-x-auto flex-nowrap pr-2">
+          <div className="hidden md:flex flex-1 min-w-0 items-center justify-center md:space-x-6 lg:space-x-8 overflow-x-auto lg:overflow-visible flex-nowrap pr-2">
             {navItems.map((item) => (
               <div
                 key={item.path}
@@ -201,6 +201,7 @@ const NewNavbar: React.FC = () => {
                 {item.hasDropdown ? (
                   <div
                     className="flex items-center space-x-1 cursor-pointer text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                    onClick={() => setIsProductsMenuOpen((prev) => !prev)}
                   >
                     {item.icon}
                     <span className="font-medium whitespace-nowrap">{item.label}</span>
