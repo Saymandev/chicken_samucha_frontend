@@ -9,9 +9,7 @@ import {
   Package,
   Settings,
   ShoppingCart,
-  Star,
   Sun,
-  Tag,
   User,
   X
 } from 'lucide-react';
@@ -94,20 +92,20 @@ const NewNavbar: React.FC = () => {
     {
       path: '/products?filter=offers',
       label: 'Offer Zone',
-      icon: <Tag className="w-4 h-4" />,
+      icon: null,
       active: location.search.includes('filter=offers')
     },
     {
       path: '/products?filter=best-seller',
       label: 'Best Sellers',
-      icon: <Star className="w-4 h-4" />,
+      icon: null,
       active: location.search.includes('filter=best-seller')
     },
     {
       path: '/products',
       label: 'All Products',
-      icon: <Package className="w-4 h-4" />,
-      active: location.pathname === '/products'
+      icon: null,
+      active: location.pathname.startsWith('/products') && !location.search.includes('filter=')
     },
     {
       path: '#',
@@ -202,7 +200,7 @@ const NewNavbar: React.FC = () => {
                     onMouseLeave={() => setIsProductsMenuOpen(false)}
                   >
                     {item.icon}
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium whitespace-nowrap">{item.label}</span>
                     <ChevronDown className="w-4 h-4" />
                   </div>
                 ) : (
@@ -215,7 +213,7 @@ const NewNavbar: React.FC = () => {
                     }`}
                   >
                     {item.icon}
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium whitespace-nowrap">{item.label}</span>
                   </Link>
                 )}
 
