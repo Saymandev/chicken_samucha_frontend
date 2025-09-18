@@ -5,7 +5,6 @@ import {
     Home,
     LogOut,
     Menu,
-    MessageCircle,
     Moon,
     Package,
     Settings,
@@ -98,12 +97,6 @@ const NewNavbar: React.FC = () => {
       icon: <Package className="w-4 h-4" />,
       active: location.pathname.startsWith('/products'),
       hasDropdown: true
-    },
-    {
-      path: '/chat',
-      label: t('nav.chat'),
-      icon: <MessageCircle className="w-4 h-4" />,
-      active: location.pathname === '/chat'
     }
   ];
 

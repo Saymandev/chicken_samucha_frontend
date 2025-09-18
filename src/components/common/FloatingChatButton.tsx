@@ -52,7 +52,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
   };
 
   return (
-    <div className={`fixed bottom-6 left-6 z-50 ${className}`} ref={chatRef}>
+    <div className={`fixed bottom-6 right-6 z-50 ${className}`} ref={chatRef}>
       {/* Chat Options Panel */}
       <AnimatePresence>
         {isOpen && (
@@ -61,7 +61,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             className="mb-4 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
-            style={{ width: '280px' }}
+            style={{ width: '280px', position: 'absolute', right: '0', bottom: '100%' }}
           >
             {/* Header */}
             <div className="bg-primary-500 text-white p-4">
@@ -194,9 +194,9 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
         )}
 
         {/* Tooltip */}
-        <div className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+        <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
           {language === 'bn' ? 'সহায়তা পান' : 'Get Help'}
-          <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900 dark:border-l-gray-700" />
+          <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
         </div>
       </motion.button>
     </div>
