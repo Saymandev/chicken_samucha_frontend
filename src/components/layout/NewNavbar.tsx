@@ -190,7 +190,7 @@ const NewNavbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex flex-1 min-w-0 items-center md:space-x-6 lg:space-x-8 overflow-x-auto flex-nowrap pr-2">
+          <div className="hidden md:flex flex-1 min-w-0 items-center justify-center md:space-x-6 lg:space-x-8 overflow-x-auto flex-nowrap pr-2">
             {navItems.map((item) => (
               <div key={item.path} className="relative">
                 {item.hasDropdown ? (
