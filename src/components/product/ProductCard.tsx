@@ -193,12 +193,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   )}
                 </div>
 
-                {/* Short Description */}
-                {product.shortDescription && (
-                  <p className={`text-gray-600 dark:text-gray-400 text-xs line-clamp-2 mb-2 ${
+                {/* Description (fixed-length preview) */}
+                {product.description && (
+                  <p className={`text-gray-600 dark:text-gray-400 text-xs mb-2 ${
                     language === 'bn' ? 'font-bengali' : ''
                   }`}>
-                    {product.shortDescription[language]}
+                    {truncateWords(product.description[language], 20)}
                   </p>
                 )}
               </div>
@@ -319,7 +319,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Product Info */}
-        <div className={`${compact ? 'p-3 space-y-2 min-h-[140px]' : 'p-2 space-y-1 min-h-[70px]'}`}>
+        <div className={`${compact ? 'p-2 space-y-2 min-h-[80px]' : 'p-2 space-y-1 min-h-[70px]'}`}>
           {/* Title */}
           <h3 className={`font-semibold text-gray-900 dark:text-white line-clamp-1 ${
             compact 
