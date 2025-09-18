@@ -148,9 +148,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
                   </span>
                 )}
-                {product.isFeatured && (
-                  <span className="bg-orange-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px]">
-                    {language === 'bn' ? 'বৈশিষ্ট্য' : 'FEATURED'}
+                {typeof totalSold === 'number' && totalSold >= 50 && (
+                  <span className="bg-yellow-500 text-black font-extrabold px-2 py-0.5 rounded text-[10px] uppercase tracking-wide shadow">
+                    Best Seller
                   </span>
                 )}
               </div>
@@ -266,15 +266,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </span>
             )}
             {typeof totalSold === 'number' && totalSold >= 50 && (
-              <span className={`bg-yellow-500 text-white font-bold px-2 py-1 rounded-full uppercase tracking-wide ${compact ? 'text-[8px]' : 'text-[10px]'}`}>
+              <span className={`bg-yellow-400 text-black font-extrabold px-2 py-1 rounded-full uppercase tracking-wide shadow ${compact ? 'text-[8px]' : 'text-[10px]'}`}>
                 Best Seller
               </span>
             )}
-            {product.isFeatured && (
-              <span className={`bg-primary-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
-                {language === 'bn' ? 'বৈশিষ্ট্য' : 'FEATURED'}
-              </span>
-            )}
+            {/* Featured badge intentionally hidden as requested */}
           </div>
 
           {/* Right side discount amount badge */}
@@ -282,6 +278,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className={`absolute top-2 right-2`}>
               <span className={`bg-red-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
                 ৳{Math.round(product.price - currentPrice)} DISCOUNT
+              </span>
+            </div>
+          )}
+
+          {/* Sold count badge - emphasize for users */}
+          {typeof totalSold === 'number' && totalSold > 0 && (
+            <div className="absolute bottom-2 left-2">
+              <span className={`bg-black/70 text-white font-semibold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
+                Sold {totalSold}
               </span>
             </div>
           )}
