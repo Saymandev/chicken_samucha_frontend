@@ -43,10 +43,36 @@ const AdminContent: React.FC = () => {
   const [showSliderModal, setShowSliderModal] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchContent();
   }, []);
+
+  // Refetch slider items when page or search changes
+  useEffect(() => {
+    if (activeTab === 'slider') {
+      fetchSliderItems();
+    }
+  }, [currentPage, searchTerm, activeTab]);
+
+  const fetchSliderItems = async () => {
+    try {
+      const sliderResponse = await contentAPI.getSliderItems({
+        page: currentPage,
+        limit: 10,
+        search: searchTerm || undefined
+      });
+      if (sliderResponse.data.success) {
+        setSliderItems(sliderResponse.data.items || []);
+        setTotalPages(sliderResponse.data.pagination?.pages || 1);
+      }
+    } catch (error) {
+      console.error('Error fetching slider items:', error);
+    }
+  };
 
   const fetchContent = async () => {
     try {
@@ -59,9 +85,14 @@ const AdminContent: React.FC = () => {
       }
 
       // Fetch slider items
-      const sliderResponse = await contentAPI.getSliderItems();
+      const sliderResponse = await contentAPI.getSliderItems({
+        page: currentPage,
+        limit: 10,
+        search: searchTerm || undefined
+      });
       if (sliderResponse.data.success) {
-        setSliderItems(sliderResponse.data.sliderItems || []);
+        setSliderItems(sliderResponse.data.items || []);
+        setTotalPages(sliderResponse.data.pagination?.pages || 1);
       }
 
       // Fetch payment settings
@@ -553,6 +584,24 @@ const AdminContent: React.FC = () => {
               </button>
             </div>
 
+            {/* Search */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search slider items..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1); // Reset to first page when searching
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
             {sliderItems.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sliderItems.map((item) => (
@@ -650,6 +699,25 @@ const AdminContent: React.FC = () => {
                 >
                   Add First Slider Item
                 </button>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      currentPage === i + 1
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
               </div>
             )}
           </div>

@@ -5,7 +5,7 @@ import { useStore } from '../store/useStore';
 
 const NotificationsPage: React.FC = () => {
   const { user } = useStore();
-  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useUserNotifications(user?.id);
+  const { notifications, unreadCount, loading, markAsRead, markAllAsRead, currentPage, totalPages, goToPage } = useUserNotifications(user?.id);
 
   if (loading) {
     return (
@@ -96,6 +96,25 @@ const NotificationsPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-8 p-4">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goToPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === i + 1
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {i + 1}
+                </button>
               ))}
             </div>
           )}

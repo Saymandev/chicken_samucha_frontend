@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-  Calendar,
-  Clock,
-  MapPin,
-  Package,
-  Phone,
-  Star,
-  Truck,
-  XCircle
+    Calendar,
+    Clock,
+    MapPin,
+    Package,
+    Phone,
+    Star,
+    Truck,
+    XCircle
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -56,6 +56,8 @@ const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewOrder, setReviewOrder] = useState<Order | null>(null);
   const [rating, setRating] = useState(5);
@@ -66,6 +68,13 @@ const OrdersPage: React.FC = () => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Refetch orders when page or filter changes
+  useEffect(() => {
+    if (user) {
+      fetchOrders();
+    }
+  }, [currentPage, filter]);
 
   const fetchOrders = async () => {
     try {
@@ -80,11 +89,16 @@ const OrdersPage: React.FC = () => {
         return;
       }
 
-      const response = await ordersAPI.getMyOrders();
+      const response = await ordersAPI.getMyOrders({ 
+        status: filter !== 'all' ? filter : undefined,
+        page: currentPage,
+        limit: 10
+      });
       console.log('📦 Orders response:', response.data);
       
       if (response.data.success) {
         setOrders(response.data.orders || []);
+        setTotalPages(response.data.totalPages || 1);
         console.log(`✅ Loaded ${response.data.orders?.length || 0} orders`);
       } else {
         console.error('❌ API returned unsuccessful response:', response.data);
@@ -275,7 +289,10 @@ const OrdersPage: React.FC = () => {
             {['all', 'pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'].map((status) => (
               <button
                 key={status}
-                onClick={() => setFilter(status)}
+                onClick={() => {
+                  setFilter(status);
+                  setCurrentPage(1); // Reset to first page when filtering
+                }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === status
                     ? 'bg-orange-500 text-white'
@@ -458,6 +475,25 @@ const OrdersPage: React.FC = () => {
               <p className="text-gray-600 dark:text-gray-400">
                 You don't have any orders with status "{filter.replace('_', ' ')}"
               </p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === i + 1
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
             </div>
           )}
         </motion.div>

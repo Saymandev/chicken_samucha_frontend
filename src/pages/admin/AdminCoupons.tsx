@@ -40,6 +40,8 @@ const AdminCoupons: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all'|'active'|'expired'|'inactive'>('all');
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [users, setUsers] = useState<CouponUser[]>([]);
@@ -70,16 +72,22 @@ const AdminCoupons: React.FC = () => {
   const fetchCoupons = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await couponAPI.getAllCoupons({ status: statusFilter, search });
+      const res = await couponAPI.getAllCoupons({ 
+        status: statusFilter, 
+        search,
+        page: currentPage,
+        limit: 10
+      });
       if (res.data.success) {
         setCoupons(res.data.coupons || []);
+        setTotalPages(res.data.totalPages || 1);
       }
     } catch (e) {
       toast.error('Failed to fetch coupons');
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, search]);
+  }, [statusFilter, search, currentPage]);
 
   const fetchUsers = useCallback(async (searchTerm: string = '') => {
     try {
@@ -279,7 +287,10 @@ const AdminCoupons: React.FC = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1); // Reset to first page when searching
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && fetchCoupons()}
                 placeholder="Search code or name..."
                 className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -287,7 +298,10 @@ const AdminCoupons: React.FC = () => {
             </div>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as any);
+                setCurrentPage(1); // Reset to first page when filtering
+              }}
               className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All</option>
@@ -333,6 +347,25 @@ const AdminCoupons: React.FC = () => {
               </motion.div>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-8">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  currentPage === i + 1
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
           </div>
         )}
 

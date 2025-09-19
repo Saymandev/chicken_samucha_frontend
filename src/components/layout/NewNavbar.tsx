@@ -1,22 +1,24 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ChevronDown,
-  Globe,
-  Home,
-  LogOut,
-  Menu,
-  Moon,
-  Package,
-  Settings,
-  ShoppingCart,
-  Sun,
-  User,
-  X
+    ChevronDown,
+    Globe,
+    Heart,
+    Home,
+    LogOut,
+    Menu,
+    Moon,
+    Package,
+    Settings,
+    ShoppingCart,
+    Sun,
+    User,
+    X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
+import { useWishlist } from '../../contexts/WishlistContext';
 import { useStore } from '../../store/useStore';
 import { categoriesAPI } from '../../utils/api';
 import { Skeleton } from '../common/Skeleton';
@@ -48,10 +50,11 @@ const NewNavbar: React.FC = () => {
     theme, 
     language,
     toggleTheme, 
-    setLanguage, 
-    logout 
+    setLanguage,
+    logout
   } = useStore();
   const { openCart } = useCart();
+  const { wishlistCount } = useWishlist();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -336,6 +339,19 @@ const NewNavbar: React.FC = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 shrink-0">
+            {/* Wishlist */}
+            <Link
+              to="/wishlist"
+              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             {/* Cart */}
             <button
               onClick={openCart}

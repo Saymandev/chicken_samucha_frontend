@@ -16,22 +16,25 @@ export const useUserNotifications = (userId?: string) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = useCallback(async (page: number = currentPage) => {
     if (!userId) return;
     
     try {
-      const response = await authAPI.getUserNotifications();
+      const response = await authAPI.getUserNotifications({ page, limit: 20 });
       if (response?.data?.success) {
         setNotifications(response.data.notifications);
         setUnreadCount(response.data.unreadCount);
+        setTotalPages(response.data.totalPages || 1);
       }
     } catch (error) {
       console.error('Error fetching user notifications:', error);
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentPage]);
 
   const markAsRead = async (notificationId: string) => {
     try {
@@ -107,12 +110,20 @@ export const useUserNotifications = (userId?: string) => {
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    fetchNotifications(page);
+  };
+
   return {
     notifications,
     unreadCount,
     loading,
     markAsRead,
     markAllAsRead,
-    refreshNotifications: fetchNotifications
+    refreshNotifications: fetchNotifications,
+    currentPage,
+    totalPages,
+    goToPage
   };
 }; 

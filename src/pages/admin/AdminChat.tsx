@@ -1,5 +1,5 @@
 import { ArrowLeft, Clock, FileText, MessageCircle, Send, User, Users } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import io, { Socket } from 'socket.io-client';
 import { adminAPI } from '../../utils/api';
@@ -56,9 +56,32 @@ const AdminChat: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
+
+  const fetchChatSessions = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await adminAPI.getChatSessions({
+        page: currentPage,
+        limit: 20,
+        sortBy: 'updatedAt',
+        status: statusFilter !== 'all' ? statusFilter : undefined
+      });
+      
+      setChatSessions(response.data.sessions || []);
+      setTotalPages(Math.ceil((response.data.total || 0) / 20));
+    } catch (error: any) {
+      console.error('Error fetching chat sessions:', error);
+      toast.error('Failed to fetch chat sessions');
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, statusFilter]);
 
     useEffect(() => {
     const initializeSocket = () => {
@@ -174,7 +197,12 @@ const AdminChat: React.FC = () => {
         socketRef.current.disconnect();
       }
     };
-  }, [selectedChat]);
+  }, [selectedChat, fetchChatSessions]);
+
+  // Refetch chat sessions when page or status filter changes
+  useEffect(() => {
+    fetchChatSessions();
+  }, [fetchChatSessions]);
 
   useEffect(() => {
     if (selectedChat) {
@@ -191,25 +219,6 @@ const AdminChat: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const fetchChatSessions = async () => {
-    try {
-      setLoading(true);
-      const response = await adminAPI.getChatSessions({
-        page: 1,
-        limit: 50,
-        sortBy: 'updatedAt'
-      });
-      
-      
-      setChatSessions(response.data.sessions || []);
-    } catch (error: any) {
-      console.error('Error fetching chat sessions:', error);
-      toast.error('Failed to fetch chat sessions');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchMessages = async (chatId: string) => {
     try {
@@ -361,13 +370,29 @@ const AdminChat: React.FC = () => {
                     Refresh
                   </button>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-3">
                   <span className="text-sm bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 px-2 py-1 rounded-full">
                     {chatSessions.filter(c => c.status === 'active').length} Active
                   </span>
                   <span className="text-sm bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 px-2 py-1 rounded-full">
                     {chatSessions.filter(c => c.status === 'waiting').length} Waiting
                   </span>
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => {
+                      setStatusFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="all">All Sessions</option>
+                    <option value="active">Active</option>
+                    <option value="waiting">Waiting</option>
+                    <option value="closed">Closed</option>
+                    <option value="archived">Archived</option>
+                  </select>
                 </div>
               </div>
 
@@ -427,6 +452,27 @@ const AdminChat: React.FC = () => {
                   ))
                 )}
               </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex justify-center gap-1">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`px-3 py-1 text-sm rounded transition-colors ${
+                          currentPage === i + 1
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Chat Messages */}

@@ -472,4 +472,24 @@ export const categoriesAPI = {
   updateCategoryOrder: (categories: any[]) => api.patch('/categories/order', { categories }),
 };
 
+export const wishlistAPI = {
+  // Add product to wishlist
+  addToWishlist: (productId: string) => api.post(`/wishlist/add/${productId}`),
+  
+  // Remove product from wishlist
+  removeFromWishlist: (productId: string) => api.delete(`/wishlist/remove/${productId}`),
+  
+  // Get user's wishlist
+  getWishlist: (params?: any) => api.get('/wishlist', { params }),
+  
+  // Check if product is in wishlist
+  checkWishlistStatus: (productId: string) => api.get(`/wishlist/check/${productId}`),
+  
+  // Get wishlist count
+  getWishlistCount: () => api.get('/wishlist/count'),
+  
+  // Clear entire wishlist
+  clearWishlist: () => api.delete('/wishlist/clear')
+};
+
 export default api;

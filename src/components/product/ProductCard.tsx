@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
+import { useWishlist } from '../../contexts/WishlistContext';
 import { Product, useStore } from '../../store/useStore';
 import { productsAPI } from '../../utils/api';
 
@@ -24,11 +25,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { t } = useTranslation();
   const { language, addToCart, cart } = useStore();
   const { openCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   // Safe defaults for min/max to ensure quick actions always work
   const minOrderQty = product.minOrderQuantity || 1;
   const maxOrderQty = product.maxOrderQuantity || 9999;
   const [quantity, setQuantity] = useState(minOrderQty);
   const [isAdding, setIsAdding] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   // Track viewport width to adapt description length responsively
   const [viewportWidth, setViewportWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
   React.useEffect(() => {
@@ -137,6 +140,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity >= minOrderQty && newQuantity <= maxOrderQty) {
       setQuantity(newQuantity);
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (isWishlistLoading) return;
+    
+    setIsWishlistLoading(true);
+    try {
+      if (isInWishlist(product.id)) {
+        await removeFromWishlist(product.id);
+      } else {
+        await addToWishlist(product.id);
+      }
+    } finally {
+      setIsWishlistLoading(false);
     }
   };
 
@@ -371,13 +389,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Quick action: add to wishlist (not cart)
-                  // TODO: Implement wishlist functionality
-                  console.log('Add to wishlist:', product.name[language]);
+                  handleWishlistToggle();
                 }}
-                className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+                disabled={isWishlistLoading}
+                className={`p-2 rounded-full shadow-md transition-colors ${
+                  isInWishlist(product.id)
+                    ? 'bg-red-500 text-white hover:bg-red-600'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                } ${isWishlistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <Heart className="w-4 h-4 text-gray-600" />
+                <Heart 
+                  className={`w-4 h-4 ${
+                    isInWishlist(product.id) ? 'fill-current' : ''
+                  }`} 
+                />
               </button>
             </div>
           )}
@@ -457,7 +482,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* Sold count */}
-            {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) && (
+            {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
+              <div className="flex items-center gap-1 text-xs">
+                <span className="text-gray-500 dark:text-gray-400">Sold:</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                </span>
+              </div>
+            ) : (
               <div className="flex items-center gap-1 text-xs">
                 <span className="text-gray-500 dark:text-gray-400">Sold:</span>
                 <span className="font-medium text-gray-700 dark:text-gray-300">

@@ -36,6 +36,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import OrdersPage from './pages/OrdersPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProfilePage from './pages/ProfilePage';
+import WishlistPage from './pages/WishlistPage';
 
 // Admin Pages
 import AdminCategories from './pages/admin/AdminCategories';
@@ -56,6 +57,7 @@ import ShoppingCartSidebar from './components/common/ShoppingCartSidebar';
 
 // Contexts
 import { CartProvider, useCart } from './contexts/CartContext';
+import { WishlistProvider } from './contexts/WishlistContext';
 
 // Component to handle layout based on route
 function AppContent() {
@@ -78,6 +80,7 @@ function AppContent() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />
           <Route path="/chat" element={<ChatPage />} />
@@ -286,7 +289,9 @@ function App() {
   return (
     <Router>
       <CartProvider>
-        <AppContent />
+        <WishlistProvider>
+          <AppContent />
+        </WishlistProvider>
       </CartProvider>
     </Router>
   );

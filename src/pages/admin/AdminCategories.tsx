@@ -8,7 +8,7 @@ import {
   Trash2,
   X
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { categoriesAPI } from '../../utils/api';
 
@@ -43,6 +43,9 @@ const AdminCategories: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: { en: '', bn: '' },
     description: { en: '', bn: '' },
@@ -67,16 +70,19 @@ const AdminCategories: React.FC = () => {
     '🥐', '🍞', '🥨', '🧀', '🥓', '🍳', '🥞', '🧇', '🥯', '🍯'
   ];
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await categoriesAPI.getAllCategories({ withProductCount: true });
+      const params = {
+        page: currentPage,
+        limit: 10,
+        search: searchTerm || undefined,
+        withProductCount: true
+      };
+      const response = await categoriesAPI.getAllCategories(params);
       if (response.data.success) {
-        setCategories(response.data.data);
+        setCategories(response.data.data || []);
+        setTotalPages(response.data.pagination?.pages || 1);
       }
     } catch (error) {
       console.error('Fetch categories error:', error);
@@ -84,7 +90,11 @@ const AdminCategories: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,7 +197,7 @@ const AdminCategories: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
           <p className="text-gray-600 dark:text-gray-400">Manage product categories</p>
@@ -203,6 +213,24 @@ const AdminCategories: React.FC = () => {
           <Plus className="w-4 h-4" />
           Add Category
         </button>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search categories..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page when searching
+              }}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Categories Grid */}
@@ -303,8 +331,27 @@ const AdminCategories: React.FC = () => {
         ))}
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-8">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                currentPage === i + 1
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Empty State */}
-      {categories.length === 0 && (
+      {categories.length === 0 && !loading && (
         <div className="text-center py-12">
           <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
             <Plus className="w-8 h-8 text-gray-400" />
