@@ -90,7 +90,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setLoading(false);
       console.log('🏁 Loading finished');
     }
-  }, [user]);
+  }, []); // Remove user dependency
 
 
   // Add product to wishlist
@@ -101,7 +101,11 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
 
     try {
+      setLoading(true);
+      console.log('Adding product to wishlist:', productId);
       const response = await wishlistAPI.addToWishlist(productId);
+      console.log('Add to wishlist response:', response.data);
+      
       if (response.data.success) {
         // Refresh wishlist
         await fetchWishlist();
@@ -111,6 +115,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       console.error('Error adding to wishlist:', error);
       const message = error.response?.data?.message || 'Failed to add to wishlist';
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -170,7 +176,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setWishlistCount(0);
       setLoading(false); // Ensure loading is false when no user
     }
-  }, [user, fetchWishlist]);
+  }, [user]); // Remove fetchWishlist from dependencies
 
   const value: WishlistContextType = {
     wishlistItems,
