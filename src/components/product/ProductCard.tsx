@@ -146,12 +146,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleWishlistToggle = async () => {
     if (isWishlistLoading) return;
     
+    const productId = product.id || (product as any)._id;
+    if (!productId) {
+      console.error('Product ID is undefined');
+      return;
+    }
+    
     setIsWishlistLoading(true);
     try {
-      if (isInWishlist(product.id)) {
-        await removeFromWishlist(product.id);
+      if (isInWishlist(productId)) {
+        await removeFromWishlist(productId);
       } else {
-        await addToWishlist(product.id);
+        await addToWishlist(productId);
       }
     } finally {
       setIsWishlistLoading(false);

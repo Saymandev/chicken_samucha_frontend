@@ -16,7 +16,7 @@ import {
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
-import { categoriesAPI, productsAPI, reportsAPI } from '../utils/api';
+import { categoriesAPI, productsAPI } from '../utils/api';
 
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -201,13 +201,12 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
   // Fetch best sellers
   const fetchBestSellers = async () => {
     try {
-      const res = await reportsAPI.getSalesAnalytics({ period: '90d' });
-      if (res.data.success && res.data.data?.productPerformance) {
-        const byQuantity = res.data.data.productPerformance
-          .sort((a: any, b: any) => b.totalQuantity - a.totalQuantity)
-          .slice(0, 10)
-          .map((row: any) => ({ ...row.product, salesQuantity: row.totalQuantity }));
-        setBestSellers(byQuantity);
+      const res = await productsAPI.getProducts({ 
+        filter: 'best-seller', 
+        limit: 8 
+      });
+      if (res.data.success) {
+        setBestSellers(res.data.data || []);
       }
     } catch (error) {
       console.error('Error fetching best sellers:', error);
