@@ -90,7 +90,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setLoading(false);
       console.log('🏁 Loading finished');
     }
-  }, []); // Remove user dependency
+  }, [user]); // Keep user dependency but fix the useEffect
 
 
   // Add product to wishlist
@@ -176,7 +176,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setWishlistCount(0);
       setLoading(false); // Ensure loading is false when no user
     }
-  }, [user]); // Remove fetchWishlist from dependencies
+  }, [user?.id]); // Only depend on user.id to prevent infinite loops
 
   const value: WishlistContextType = {
     wishlistItems,
