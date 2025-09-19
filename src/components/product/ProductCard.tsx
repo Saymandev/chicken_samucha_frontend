@@ -162,6 +162,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
     
+    console.log('🔄 Toggling wishlist for product:', productId, 'Current state:', isInWishlist(productId));
+    
     setIsWishlistLoading(true);
     try {
       if (isInWishlist(productId)) {
@@ -407,14 +409,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 }}
                 disabled={isWishlistLoading}
                 className={`p-2 rounded-full shadow-md transition-colors ${
-                  isInWishlist(product.id)
+                  isInWishlist(product.id || (product as any)._id)
                     ? 'bg-red-500 text-white hover:bg-red-600'
                     : 'bg-white text-gray-600 hover:bg-gray-50'
                 } ${isWishlistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <Heart 
                   className={`w-4 h-4 ${
-                    isInWishlist(product.id) ? 'fill-current' : ''
+                    isInWishlist(product.id || (product as any)._id) ? 'fill-current' : ''
                   }`} 
                 />
               </button>
