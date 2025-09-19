@@ -11,7 +11,7 @@ import {
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
-import { contentAPI, productsAPI, reportsAPI, reviewsAPI } from '../utils/api';
+import { contentAPI, productsAPI, reviewsAPI } from '../utils/api';
 
 interface SliderItem {
   id: string;
@@ -106,14 +106,12 @@ const HomePage: React.FC = () => {
 
   const fetchBestSellers = async () => {
     try {
-      const response = await reportsAPI.getSalesAnalytics({ period: '90d' });
-      if (response.data.success && response.data.data?.productPerformance) {
-        const perf = response.data.data.productPerformance as any[];
-        const byQuantity = perf
-          .sort((a, b) => (b.totalQuantity || 0) - (a.totalQuantity || 0))
-          .slice(0, 10)
-          .map((row) => ({ ...row.product, salesQuantity: row.totalQuantity }));
-        setBestSellers(byQuantity as unknown as Product[]);
+      const response = await productsAPI.getProducts({ 
+        filter: 'best-seller', 
+        limit: 8 
+      });
+      if (response.data.success) {
+        setBestSellers(response.data.data || []);
       } else {
         setBestSellers([]);
       }

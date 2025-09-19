@@ -53,6 +53,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
     (product as any).stock == null ? true : (product as any).stock > 0
   );
   const totalSold: number | undefined = (product as any).analytics?.purchaseCount;
+  
+  // Debug logging for sold count
+  if (product.name?.en?.includes('Chicken Samosa')) {
+    console.log('Chicken Samosa sold count debug:', {
+      productId: product.id || (product as any)._id,
+      analytics: (product as any).analytics,
+      purchaseCount: (product as any).analytics?.purchaseCount,
+      totalSold
+    });
+  }
 
   // Check if product is already in cart
   const productId = product.id || (product as any)._id;
@@ -280,11 +290,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   )}
 
                   {/* Rating */}
-                  {product.ratings.count > 0 && (
+                  {product.ratings?.count > 0 && (
                     <div className="flex items-center gap-1">
                       <Star className="w-3 h-3 text-yellow-400 fill-current" />
                       <span className="font-medium">
-                        {product.ratings.average.toFixed(1)} ({product.ratings.count})
+                        {product.ratings?.average?.toFixed(1)} ({product.ratings?.count})
                       </span>
                     </div>
                   )}
@@ -431,14 +441,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </h3>
 
           {/* Rating */}
-          {product.ratings.count > 0 && (
+          {product.ratings?.count > 0 && (
             <div className="flex items-center gap-1">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     className={`w-3 h-3 ${
-                      i < Math.round(product.ratings.average)
+                      i < Math.round(product.ratings?.average || 0)
                         ? 'text-yellow-400 fill-current'
                         : 'text-gray-300 dark:text-gray-600'
                     }`}
@@ -446,7 +456,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 ))}
               </div>
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                {product.ratings.average.toFixed(1)} ({product.ratings.count})
+                {product.ratings?.average?.toFixed(1)} ({product.ratings?.count})
               </span>
             </div>
           )}
