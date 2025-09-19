@@ -104,11 +104,7 @@ const ProductDetailPage: React.FC = () => {
           const existing: string[] = existingRaw ? JSON.parse(existingRaw) : [];
           const currentId = (prod as any).id || (prod as any)._id;
           
-          console.log('🔍 ProductDetailPage - Storing product in recently viewed:', {
-            currentId,
-            productName: (prod as any).name?.en,
-            existingIds: existing
-          });
+          
           
           // Remove if already exists, then add to front
           const filtered = existing.filter(id => id !== currentId);
@@ -117,7 +113,7 @@ const ProductDetailPage: React.FC = () => {
           const updated = [currentId, ...filtered].slice(0, 12);
           localStorage.setItem(key, JSON.stringify(updated));
           
-          console.log('✅ ProductDetailPage - Updated recently viewed IDs:', updated);
+          
         } catch (error) {
           console.error('❌ Error storing recently viewed product:', error);
         }

@@ -42,10 +42,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   // Fetch wishlist items
   const fetchWishlist = useCallback(async () => {
-    console.log('🔄 Fetching wishlist, user:', user?.id);
+    
     
     if (!user) {
-      console.log('❌ No user, clearing wishlist');
+      
       setWishlistItems([]);
       setWishlistCount(0);
       setLoading(false);
@@ -54,7 +54,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
     try {
       setLoading(true);
-      console.log('📡 Making API call to get wishlist');
+      
       
       // Add timeout to prevent infinite loading
       const timeoutPromise = new Promise((_, reject) => 
@@ -66,12 +66,12 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         timeoutPromise
       ]) as any;
       
-      console.log('📡 Wishlist API response:', response.data);
+     
       
       if (response.data.success) {
         setWishlistItems(response.data.data || []);
         setWishlistCount(response.data.data?.length || 0);
-        console.log('✅ Wishlist fetched successfully:', response.data.data?.length || 0, 'items');
+       
       } else {
         console.error('❌ API returned success: false', response.data);
         toast.error('Failed to fetch wishlist data');
@@ -88,7 +88,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setWishlistCount(0);
     } finally {
       setLoading(false);
-      console.log('🏁 Loading finished');
+      
     }
   }, [user]); // Keep user dependency but fix the useEffect
 
@@ -102,9 +102,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
     try {
       setLoading(true);
-      console.log('Adding product to wishlist:', productId);
+      
       const response = await wishlistAPI.addToWishlist(productId);
-      console.log('Add to wishlist response:', response.data);
+      
       
       if (response.data.success) {
         // Refresh wishlist
@@ -148,15 +148,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       return itemId === productId;
     });
     
-    // Debug logging for wishlist check
-    if (productId && wishlistItems.length > 0) {
-      console.log('🔍 Checking wishlist for product:', productId, 'Result:', result);
-      console.log('🔍 Wishlist items:', wishlistItems.map(item => ({
-        id: (item.product as any).id,
-        _id: (item.product as any)._id,
-        name: (item.product as any).name?.en
-      })));
-    }
+    
     
     return result;
   }, [wishlistItems]);

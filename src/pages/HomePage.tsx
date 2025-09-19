@@ -106,19 +106,18 @@ const HomePage: React.FC = () => {
 
   const fetchBestSellers = async () => {
     try {
-      console.log('🔄 Fetching best sellers...');
+      
       const response = await productsAPI.getProducts({ 
         filter: 'best-seller', 
         limit: 8 
       });
-      console.log('📊 Best sellers response:', response.data);
+      
       if (response.data.success) {
         const items = response.data.products || response.data.data || [];
         setBestSellers(items);
-        console.log('✅ Best sellers set:', items.length || 0, 'products');
+        
       } else {
-        console.log('❌ Best sellers API failed');
-        setBestSellers([]);
+        
       }
     } catch (error) {
       console.error('❌ Best sellers error:', error);

@@ -72,7 +72,7 @@ export const useUserNotifications = (userId?: string) => {
     });
 
     newSocket.on('connect', () => {
-      console.log('Connected to notification socket');
+      
       // Join user-specific room for notifications
       newSocket.emit('join-user-room', userId);
     });

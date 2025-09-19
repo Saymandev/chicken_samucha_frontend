@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import io, { Socket } from 'socket.io-client';
 import './index.css';
 import { useStore } from './store/useStore';
 
@@ -61,12 +62,47 @@ import { WishlistProvider } from './contexts/WishlistContext';
 
 // Component to handle layout based on route
 function AppContent() {
-  const { theme } = useStore();
+  const { theme, user } = useStore();
   const { isCartOpen, closeCart } = useCart();
   const location = useLocation();
   
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Socket connection for real-time notifications
+  useEffect(() => {
+    let socket: Socket | null = null;
+
+    if (user?.id) {
+      const API_BASE_URL = process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api';
+      const socketURL = API_BASE_URL.replace('/api', '');
+      
+      socket = io(socketURL, {
+        transports: ['websocket', 'polling']
+      });
+
+      socket.on('connect', () => {
+        console.log('🔌 Connected to server for notifications');
+        // Join user-specific room for notifications
+        socket?.emit('join-user-room', user.id);
+      });
+
+      socket.on('new-user-notification', (notification) => {
+        console.log('🔔 New notification received:', notification);
+        // You can add toast notification here if needed
+      });
+
+      socket.on('disconnect', () => {
+        console.log('🔌 Disconnected from server');
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">

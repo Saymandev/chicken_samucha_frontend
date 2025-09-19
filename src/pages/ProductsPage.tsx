@@ -81,25 +81,24 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
       const raw = localStorage.getItem('recentlyViewedProductIds');
       const productIds = raw ? JSON.parse(raw) : [];
       
-      console.log('🔍 ProductsPage - Recently viewed product IDs from localStorage:', productIds);
+     
       
       if (productIds.length === 0) {
-        console.log('❌ ProductsPage - No recently viewed products found');
+        
         setRecentlyViewed([]);
         return;
       }
 
       // Fetch all products in a single API call using MongoDB $in operator
-      console.log('📡 ProductsPage - Fetching recently viewed products...');
+      
       const response = await productsAPI.getProductsByIds(productIds);
-      console.log('📡 ProductsPage - Recently viewed API response:', response.data);
+      
       
       if (response.data.success) {
         setRecentlyViewed(response.data.products || []);
-        console.log('✅ ProductsPage - Recently viewed products set:', (response.data.products || []).length, 'products');
+        
       } else {
-        console.log('❌ ProductsPage - Recently viewed API failed');
-        setRecentlyViewed([]);
+       
       }
     } catch (error) {
       console.error('❌ ProductsPage - Error fetching recently viewed products:', error);

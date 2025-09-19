@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-    Calendar,
-    Clock,
-    MapPin,
-    Package,
-    Phone,
-    Star,
-    Truck,
-    XCircle
+  Calendar,
+  Clock,
+  MapPin,
+  Package,
+  Phone,
+  Star,
+  Truck,
+  XCircle
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -79,7 +79,7 @@ const OrdersPage: React.FC = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching orders for user:', user?.name);
+      
       
       // Check if user is logged in
       if (!user) {
@@ -94,12 +94,12 @@ const OrdersPage: React.FC = () => {
         page: currentPage,
         limit: 10
       });
-      console.log('📦 Orders response:', response.data);
+      
       
       if (response.data.success) {
         setOrders(response.data.orders || []);
         setTotalPages(response.data.totalPages || 1);
-        console.log(`✅ Loaded ${response.data.orders?.length || 0} orders`);
+        
       } else {
         console.error('❌ API returned unsuccessful response:', response.data);
         toast.error('Failed to load orders');
@@ -115,8 +115,7 @@ const OrdersPage: React.FC = () => {
         localStorage.removeItem('token');
         window.location.href = '/login';
       } else if (error.response?.status === 404) {
-        console.log('ℹ️ No orders found for user');
-        setOrders([]);
+        
       } else {
         toast.error(error.response?.data?.message || 'Failed to load orders');
       }

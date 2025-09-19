@@ -54,15 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
   const totalSold: number | undefined = (product as any).analytics?.purchaseCount;
   
-  // Debug logging for sold count
-  if (product.name?.en?.includes('Chicken Samosa')) {
-    console.log('Chicken Samosa sold count debug:', {
-      productId: product.id || (product as any)._id,
-      analytics: (product as any).analytics,
-      purchaseCount: (product as any).analytics?.purchaseCount,
-      totalSold
-    });
-  }
+  
 
   // Check if product is already in cart
   const productId = product.id || (product as any)._id;
@@ -162,7 +154,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
     
-    console.log('🔄 Toggling wishlist for product:', productId, 'Current state:', isInWishlist(productId));
+    
     
     setIsWishlistLoading(true);
     try {
