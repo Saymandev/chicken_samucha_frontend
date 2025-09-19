@@ -52,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const inStock = (product as any).isAvailable !== false && (
     (product as any).stock == null ? true : (product as any).stock > 0
   );
-  const totalSold: number | undefined = (product as any).analytics?.purchaseCount ?? (product as any).salesQuantity;
+  const totalSold: number | undefined = (product as any).analytics?.purchaseCount;
 
   // Check if product is already in cart
   const productId = product.id || (product as any)._id;
@@ -264,11 +264,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </div>
 
                   {/* Sold count */}
-                  {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) && (
+                  {(product as any).analytics?.purchaseCount && (
                     <div className="flex items-center gap-1">
                       <span>Sold:</span>
                       <span className="font-medium text-gray-700 dark:text-gray-300">
-                        {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                        {(product as any).analytics?.purchaseCount}
                       </span>
                     </div>
                   )}
@@ -482,19 +482,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* Sold count */}
-            {((product as any).analytics?.purchaseCount ?? (product as any).salesQuantity) ? (
+            {(product as any).analytics?.purchaseCount ? (
               <div className="flex items-center gap-1 text-xs">
                 <span className="text-gray-500 dark:text-gray-400">Sold:</span>
                 <span className="font-medium text-gray-700 dark:text-gray-300">
-                  {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
+                  {(product as any).analytics?.purchaseCount}
                 </span>
               </div>
             ) : (
               <div className="flex items-center gap-1 text-xs">
                 <span className="text-gray-500 dark:text-gray-400">Sold:</span>
-                <span className="font-medium text-gray-700 dark:text-gray-300">
-                  {(product as any).analytics?.purchaseCount ?? (product as any).salesQuantity}
-                </span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">0</span>
               </div>
             )}
           </div>
