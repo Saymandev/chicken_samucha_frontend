@@ -82,18 +82,18 @@ function AppContent() {
       });
 
       socket.on('connect', () => {
-        console.log('🔌 Connected to server for notifications');
+        
         // Join user-specific room for notifications
         socket?.emit('join-user-room', user.id);
       });
 
       socket.on('new-user-notification', (notification) => {
-        console.log('🔔 New notification received:', notification);
+        
         // You can add toast notification here if needed
       });
 
       socket.on('disconnect', () => {
-        console.log('🔌 Disconnected from server');
+        
       });
     }
 

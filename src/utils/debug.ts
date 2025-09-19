@@ -5,7 +5,7 @@ export const debugAPI = {
   // Test if authentication is working
   testAuth: async () => {
     try {
-      console.log('🔍 Testing authentication...');
+      
       const token = localStorage.getItem('token');
       
       if (!token) {
@@ -13,7 +13,7 @@ export const debugAPI = {
         return { success: false, error: 'No token found' };
       }
       
-      console.log('✅ Token found:', token.substring(0, 20) + '...');
+      
       
       // Test the auth endpoint
       const response = await fetch('/api/orders/auth-test', {
@@ -26,7 +26,7 @@ export const debugAPI = {
       const data = await response.json();
       
       if (response.ok) {
-        console.log('✅ Authentication test successful:', data);
+        
         return { success: true, data };
       } else {
         console.error('❌ Authentication test failed:', data);
@@ -41,9 +41,9 @@ export const debugAPI = {
   // Test orders API
   testOrdersAPI: async () => {
     try {
-      console.log('🔍 Testing orders API...');
+   
       const response = await ordersAPI.getMyOrders();
-      console.log('✅ Orders API response:', response.data);
+      
       return { success: true, data: response.data };
     } catch (error: any) {
       console.error('❌ Orders API error:', error);
@@ -57,12 +57,12 @@ export const debugAPI = {
 
   // Full diagnostic
   runDiagnostic: async () => {
-    console.log('🔍 Starting API diagnostic...');
+    
     
     // Check localStorage
     const token = localStorage.getItem('token');
     const hasToken = !!token;
-    console.log('📋 Token in localStorage:', hasToken ? '✅ Yes' : '❌ No');
+    
     
     if (hasToken) {
       try {
@@ -71,9 +71,9 @@ export const debugAPI = {
         const expiry = new Date(payload.exp * 1000);
         const isExpired = expiry < new Date();
         
-        console.log('📋 Token expiry:', expiry.toLocaleString());
-        console.log('📋 Token expired:', isExpired ? '❌ Yes' : '✅ No');
-        console.log('📋 User ID in token:', payload.id);
+       
+       
+        
       } catch (error) {
         console.error('❌ Invalid token format');
       }
@@ -87,13 +87,12 @@ export const debugAPI = {
       await debugAPI.testOrdersAPI();
     }
     
-    console.log('🔍 Diagnostic complete');
+   
   }
 };
 
 // Global debug function for development
 if (process.env.NODE_ENV === 'development') {
   (window as any).debugAPI = debugAPI;
-  console.log('🛠️ Debug utilities available: window.debugAPI');
-  console.log('💡 Run window.debugAPI.runDiagnostic() to test API connectivity');
+  
 } 
