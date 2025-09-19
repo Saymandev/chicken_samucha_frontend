@@ -75,15 +75,40 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
     setFilter(nextFilter);
   }, [searchParams]);
 
-  // Load recently viewed and best sellers on mount
-  useEffect(() => {
+  // Fetch recently viewed products by IDs
+  const fetchRecentlyViewed = async () => {
     try {
-      const raw = localStorage.getItem('recentlyViewedProducts');
-      const list = raw ? JSON.parse(raw) : [];
-      setRecentlyViewed(Array.isArray(list) ? list.slice(0, 12) : []);
-    } catch {
+      const raw = localStorage.getItem('recentlyViewedProductIds');
+      const productIds = raw ? JSON.parse(raw) : [];
+      
+      if (productIds.length === 0) {
+        setRecentlyViewed([]);
+        return;
+      }
+
+      // Fetch fresh product data for each ID
+      const productPromises = productIds.map(async (id: string) => {
+        try {
+          const response = await productsAPI.getProduct(id);
+          return response.data.success ? response.data.product : null;
+        } catch (error) {
+          console.error(`Error fetching product ${id}:`, error);
+          return null;
+        }
+      });
+
+      const products = await Promise.all(productPromises);
+      const validProducts = products.filter(product => product !== null);
+      setRecentlyViewed(validProducts);
+    } catch (error) {
+      console.error('Error fetching recently viewed products:', error);
       setRecentlyViewed([]);
     }
+  };
+
+  // Load recently viewed and best sellers on mount
+  useEffect(() => {
+    fetchRecentlyViewed();
     fetchBestSellers();
     (async () => {
       try {
@@ -213,6 +238,11 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
       console.error('Error fetching best sellers:', error);
       toast.error('Failed to load best sellers');
     }
+  };
+
+  // Refresh recently viewed products (can be called when needed)
+  const refreshRecentlyViewed = () => {
+    fetchRecentlyViewed();
   };
 
 
