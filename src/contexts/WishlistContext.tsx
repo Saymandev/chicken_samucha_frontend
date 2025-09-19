@@ -140,9 +140,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   };
 
   // Check if product is in wishlist
-  const isInWishlist = (productId: string): boolean => {
-    return wishlistItems.some(item => item.product.id === productId);
-  };
+  const isInWishlist = useCallback((productId: string): boolean => {
+    return wishlistItems.some(item => (item.product as any).id === productId || (item.product as any)._id === productId);
+  }, [wishlistItems]);
 
   // Clear entire wishlist
   const clearWishlist = async () => {
@@ -162,10 +162,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
   };
 
-  // Refresh wishlist
-  const refreshWishlist = async () => {
+  // Refresh wishlist (stable reference to avoid re-renders/useEffect loops)
+  const refreshWishlist = useCallback(async () => {
     await fetchWishlist();
-  };
+  }, [fetchWishlist]);
 
   // Load wishlist when user changes
   useEffect(() => {
@@ -176,7 +176,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setWishlistCount(0);
       setLoading(false); // Ensure loading is false when no user
     }
-  }, [user?.id]); // Only depend on user.id to prevent infinite loops
+  }, [user, user?.id, fetchWishlist]);
 
   const value: WishlistContextType = {
     wishlistItems,
