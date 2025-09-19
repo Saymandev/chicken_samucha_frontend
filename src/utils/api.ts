@@ -199,7 +199,8 @@ export const reviewsAPI = {
 
 export const contentAPI = {
   getHeroContent: () => api.get('/content/hero'),
-  getSliderItems: () => api.get('/content/slider'),
+  getSliderItems: (params?: { page?: number; limit?: number; search?: string }) => 
+    api.get('/content/slider', { params }),
   getPaymentSettings: () => api.get('/content/payment-settings'),
   createSliderItem: (itemData: FormData) => api.post('/content/slider', itemData, {
     headers: { 'Content-Type': 'multipart/form-data' }
@@ -339,7 +340,8 @@ export const adminAPI = {
   getHeroContent: () => api.get('/admin/content/hero'),
   updateHeroContent: (content: any) => api.put('/admin/content/hero', content),
   
-  getSliderItems: () => api.get('/admin/content/slider'),
+  getSliderItems: (params?: { page?: number; limit?: number; search?: string }) => 
+    api.get('/admin/content/slider', { params }),
   createSliderItem: (itemData: FormData) => api.post('/content/slider', itemData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
