@@ -206,7 +206,8 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
         limit: 8 
       });
       if (res.data.success) {
-        setBestSellers(res.data.data || []);
+        const items = res.data.products || res.data.data || [];
+        setBestSellers(items);
       }
     } catch (error) {
       console.error('Error fetching best sellers:', error);

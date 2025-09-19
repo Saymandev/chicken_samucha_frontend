@@ -113,8 +113,9 @@ const HomePage: React.FC = () => {
       });
       console.log('📊 Best sellers response:', response.data);
       if (response.data.success) {
-        setBestSellers(response.data.data || []);
-        console.log('✅ Best sellers set:', response.data.data?.length || 0, 'products');
+        const items = response.data.products || response.data.data || [];
+        setBestSellers(items);
+        console.log('✅ Best sellers set:', items.length || 0, 'products');
       } else {
         console.log('❌ Best sellers API failed');
         setBestSellers([]);

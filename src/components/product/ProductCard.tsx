@@ -280,14 +280,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </div>
 
                   {/* Sold count */}
-                  {(product as any).analytics?.purchaseCount && (
-                    <div className="flex items-center gap-1">
-                      <span>Sold:</span>
-                      <span className="font-medium text-gray-700 dark:text-gray-300">
-                        {(product as any).analytics?.purchaseCount}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <span>Sold:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      {(product as any).analytics?.purchaseCount || 0}
+                    </span>
+                  </div>
 
                   {/* Rating */}
                   {product.ratings?.count > 0 && (
@@ -381,7 +379,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
 
           {/* Sold count badge - emphasize for users */}
-          {typeof totalSold === 'number' && totalSold > 0 && (
+          {typeof totalSold === 'number' && (
             <div className="absolute bottom-2 left-2">
               <span className={`bg-black/70 text-white font-semibold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
                 Sold {totalSold}
@@ -498,19 +496,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* Sold count */}
-            {(product as any).analytics?.purchaseCount ? (
-              <div className="flex items-center gap-1 text-xs">
-                <span className="text-gray-500 dark:text-gray-400">Sold:</span>
-                <span className="font-medium text-gray-700 dark:text-gray-300">
-                  {(product as any).analytics?.purchaseCount}
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 text-xs">
-                <span className="text-gray-500 dark:text-gray-400">Sold:</span>
-                <span className="font-medium text-gray-700 dark:text-gray-300">0</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-gray-500 dark:text-gray-400">Sold:</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                {(product as any).analytics?.purchaseCount || 0}
+              </span>
+            </div>
           </div>
 
          
