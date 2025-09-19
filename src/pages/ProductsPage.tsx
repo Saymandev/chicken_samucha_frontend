@@ -75,7 +75,7 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
     setFilter(nextFilter);
   }, [searchParams]);
 
-  // Fetch recently viewed products by IDs
+  // Fetch recently viewed products by IDs (optimized with single API call)
   const fetchRecentlyViewed = async () => {
     try {
       const raw = localStorage.getItem('recentlyViewedProductIds');
@@ -86,20 +86,13 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
         return;
       }
 
-      // Fetch fresh product data for each ID
-      const productPromises = productIds.map(async (id: string) => {
-        try {
-          const response = await productsAPI.getProduct(id);
-          return response.data.success ? response.data.product : null;
-        } catch (error) {
-          console.error(`Error fetching product ${id}:`, error);
-          return null;
-        }
-      });
-
-      const products = await Promise.all(productPromises);
-      const validProducts = products.filter(product => product !== null);
-      setRecentlyViewed(validProducts);
+      // Fetch all products in a single API call using MongoDB $in operator
+      const response = await productsAPI.getProductsByIds(productIds);
+      if (response.data.success) {
+        setRecentlyViewed(response.data.products || []);
+      } else {
+        setRecentlyViewed([]);
+      }
     } catch (error) {
       console.error('Error fetching recently viewed products:', error);
       setRecentlyViewed([]);
@@ -240,10 +233,7 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
     }
   };
 
-  // Refresh recently viewed products (can be called when needed)
-  const refreshRecentlyViewed = () => {
-    fetchRecentlyViewed();
-  };
+  
 
 
   return (

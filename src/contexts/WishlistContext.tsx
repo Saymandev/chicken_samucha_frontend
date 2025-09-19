@@ -127,8 +127,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     try {
       const response = await wishlistAPI.removeFromWishlist(productId);
       if (response.data.success) {
-        // Update local state
-        setWishlistItems(prev => prev.filter(item => item.product.id !== productId));
+        // Update local state immediately for instant UI update
+        setWishlistItems(prev => prev.filter(item => 
+          (item.product as any).id !== productId && (item.product as any)._id !== productId
+        ));
         setWishlistCount(prev => Math.max(0, prev - 1));
         toast.success('Removed from wishlist');
       }
@@ -141,7 +143,22 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   // Check if product is in wishlist
   const isInWishlist = useCallback((productId: string): boolean => {
-    return wishlistItems.some(item => (item.product as any).id === productId || (item.product as any)._id === productId);
+    const result = wishlistItems.some(item => {
+      const itemId = (item.product as any).id || (item.product as any)._id;
+      return itemId === productId;
+    });
+    
+    // Debug logging for wishlist check
+    if (productId && wishlistItems.length > 0) {
+      console.log('🔍 Checking wishlist for product:', productId, 'Result:', result);
+      console.log('🔍 Wishlist items:', wishlistItems.map(item => ({
+        id: (item.product as any).id,
+        _id: (item.product as any)._id,
+        name: (item.product as any).name?.en
+      })));
+    }
+    
+    return result;
   }, [wishlistItems]);
 
   // Clear entire wishlist

@@ -156,6 +156,7 @@ export const productsAPI = {
   getFeaturedProducts: (limit?: number) =>
     api.get('/products/featured', { params: { limit } }),
   getProduct: (id: string) => api.get(`/products/${id}`),
+  getProductsByIds: (ids: string[]) => api.get('/products/by-ids', { params: { ids } }),
   getRelatedProducts: (id: string, limit?: number) =>
     api.get(`/products/${id}/related`, { params: { limit } }),
   trackAddToCart: (productId: string) =>
