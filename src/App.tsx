@@ -23,6 +23,7 @@ import FAQPage from './pages/FAQPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import LoginPage from './pages/LoginPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import RefundHistoryPage from './pages/RefundHistoryPage';
 import RefundPolicyPage from './pages/RefundPolicyPage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -47,6 +48,7 @@ import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminPromotions from './pages/admin/AdminPromotions';
+import AdminRefunds from './pages/admin/AdminRefunds';
 import AdminReports from './pages/admin/AdminReports';
 import AdminReviews from './pages/admin/AdminReviews';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -170,6 +172,14 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/refunds"
+            element={
+              <ProtectedRoute>
+                <RefundHistoryPage />
+              </ProtectedRoute>
+            }
+          />
           
           {/* Admin Routes */}
           <Route
@@ -248,6 +258,16 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <AdminPromotions />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/refunds"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminRefunds />
                 </AdminLayout>
               </ProtectedRoute>
             }

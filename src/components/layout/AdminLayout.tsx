@@ -9,6 +9,7 @@ import {
     MessageCircle,
     Moon,
     Package,
+    RefreshCw,
     Settings,
     ShoppingBag,
     Star,
@@ -66,6 +67,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: 'Orders',
       icon: <ShoppingBag className="w-5 h-5" />,
       path: '/admin/orders'
+    },
+    {
+      id: 'refunds',
+      label: 'Refunds',
+      icon: <RefreshCw className="w-5 h-5" />,
+      path: '/admin/refunds'
     },
     {
       id: 'users',

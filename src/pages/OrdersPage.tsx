@@ -1,17 +1,19 @@
 import { motion } from 'framer-motion';
 import {
-  Calendar,
-  Clock,
-  MapPin,
-  Package,
-  Phone,
-  Star,
-  Truck,
-  XCircle
+    Calendar,
+    Clock,
+    MapPin,
+    Package,
+    Phone,
+    RefreshCw,
+    Star,
+    Truck,
+    XCircle
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import RefundRequestModal from '../components/refund/RefundRequestModal';
 import { useStore } from '../store/useStore';
 import { ordersAPI, reviewsAPI } from '../utils/api';
 import '../utils/debug'; // Import debug utilities for development
@@ -63,6 +65,8 @@ const OrdersPage: React.FC = () => {
   const [rating, setRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
+  const [refundOrder, setRefundOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -169,6 +173,15 @@ const OrdersPage: React.FC = () => {
     setReviewModalOpen(true);
     setRating(5);
     setReviewComment('');
+  };
+
+  const openRefundModal = (order: Order) => {
+    setRefundOrder(order);
+    setRefundModalOpen(true);
+  };
+
+  const handleRefundSuccess = () => {
+    fetchOrders(); // Refresh orders after successful refund request
   };
 
   const submitReview = async () => {
@@ -454,6 +467,15 @@ const OrdersPage: React.FC = () => {
                         Rate & Review
                       </button>
                     )}
+                    {(order.orderStatus === 'delivered' || order.orderStatus === 'cancelled') && (
+                      <button 
+                        onClick={() => openRefundModal(order)}
+                        className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium flex items-center gap-2"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Request Refund
+                      </button>
+                    )}
                     {order.orderStatus === 'pending' && (
                       <button className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
                         Cancel Order
@@ -496,6 +518,16 @@ const OrdersPage: React.FC = () => {
             </div>
           )}
         </motion.div>
+
+        {/* Refund Request Modal */}
+        {refundModalOpen && refundOrder && (
+          <RefundRequestModal
+            isOpen={refundModalOpen}
+            onClose={() => setRefundModalOpen(false)}
+            order={refundOrder}
+            onSuccess={handleRefundSuccess}
+          />
+        )}
 
         {/* Review Modal */}
         {reviewModalOpen && reviewOrder && (

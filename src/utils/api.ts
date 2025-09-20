@@ -389,6 +389,11 @@ export const adminAPI = {
   togglePromotionStatus: (id: string) => api.put(`/admin/promotions/${id}/toggle`),
   getPromotionAnalytics: (id: string) => api.get(`/admin/promotions/${id}/analytics`),
   
+  // Refunds (Admin)
+  getAllRefunds: (params?: any) => api.get('/admin/refunds', { params }),
+  updateRefundStatus: (id: string, data: any) => api.put(`/admin/refunds/${id}`, data),
+  getRefundStats: () => api.get('/admin/refunds/stats'),
+  
   // Promotions (Public) - moved to publicAPI below
 };
 
@@ -397,7 +402,11 @@ export const publicAPI = {
   // Promotions
   getActivePromotions: (params?: any) => api.get('/promotions', { params }),
   trackPromotionView: (id: string) => api.post(`/promotions/${id}/view`),
-  trackPromotionClick: (id: string) => api.post(`/promotions/${id}/click`)
+  trackPromotionClick: (id: string) => api.post(`/promotions/${id}/click`),
+  
+  // Refunds (Customer)
+  createRefundRequest: (data: any) => api.post('/refunds', data),
+  getMyRefunds: (params?: any) => api.get('/refunds', { params })
 };
 
 // Coupon API
