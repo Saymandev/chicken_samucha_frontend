@@ -1,20 +1,19 @@
 import { motion } from 'framer-motion';
 import {
-    AlertCircle,
-    Banknote,
-    CheckCircle,
-    Clock,
-    CreditCard,
-    Eye,
-    Gift,
-    RefreshCw,
-    Search,
-    Smartphone,
-    XCircle
+  AlertCircle,
+  Banknote,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Eye,
+  Gift,
+  RefreshCw,
+  Search,
+  Smartphone,
+  XCircle
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { adminAPI } from '../../utils/api';
 
 interface Refund {
@@ -53,7 +52,6 @@ interface Refund {
 }
 
 const AdminRefunds: React.FC = () => {
-  const { t } = useTranslation();
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,7 +62,7 @@ const AdminRefunds: React.FC = () => {
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchRefunds = async () => {
+  const fetchRefunds = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getAllRefunds({
@@ -84,11 +82,11 @@ const AdminRefunds: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, statusFilter, searchTerm]);
 
   useEffect(() => {
     fetchRefunds();
-  }, [currentPage, statusFilter, searchTerm]);
+  }, [fetchRefunds]);
 
   const handleStatusUpdate = async (refundId: string, status: string, notes?: string, rejectionReason?: string) => {
     try {
@@ -403,6 +401,19 @@ const RefundDetailModal: React.FC<RefundDetailModalProps> = ({
 }) => {
   const [adminNotes, setAdminNotes] = useState(refund.adminNotes || '');
   const [rejectionReason, setRejectionReason] = useState('');
+
+  const getReasonLabel = (reason: string) => {
+    const reasonMap: { [key: string]: string } = {
+      order_cancelled: 'Order Cancelled',
+      product_defective: 'Product Defective',
+      wrong_item: 'Wrong Item Received',
+      not_as_described: 'Not as Described',
+      late_delivery: 'Late Delivery',
+      customer_request: 'Customer Request',
+      other: 'Other'
+    };
+    return reasonMap[reason] || reason;
+  };
 
   const handleApprove = () => {
     onStatusUpdate(refund._id, 'approved', adminNotes);
