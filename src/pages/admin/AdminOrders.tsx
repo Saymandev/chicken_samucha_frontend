@@ -542,14 +542,17 @@ const AdminOrders: React.FC = () => {
                   </button>
                 )}
 
-                <button 
-                  onClick={() => cancelOrder(getOrderId(order))}
-                  className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
-                >
-                  <XCircle className="w-4 h-4" />
-                  <span className="hidden sm:inline">Cancel Order</span>
-                  <span className="sm:hidden">Cancel</span>
-                </button>
+                {/* Only show Cancel button for pending and confirmed orders */}
+                {(order.orderStatus === 'pending' || order.orderStatus === 'confirmed') && (
+                  <button 
+                    onClick={() => cancelOrder(getOrderId(order))}
+                    className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">Cancel Order</span>
+                    <span className="sm:hidden">Cancel</span>
+                  </button>
+                )}
               </div>
             </motion.div>
           ))}
