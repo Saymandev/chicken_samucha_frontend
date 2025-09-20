@@ -200,42 +200,6 @@ const AdminProducts: React.FC = () => {
     { value: 'ratings.average', label: 'Rating' }
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="space-y-8">
-            {/* Header skeleton */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="space-y-2">
-                <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-              <div className="h-12 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            </div>
-
-            {/* Filters skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Products grid skeleton */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <AdminProductCardSkeleton key={i} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="container mx-auto px-4">
@@ -257,6 +221,7 @@ const AdminProducts: React.FC = () => {
           </button>
         </div>
 
+        {/* Search and Filter - Always visible */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
@@ -310,30 +275,56 @@ const AdminProducts: React.FC = () => {
           </div>
         </div>
 
-        {/* Search Results Info */}
-        {debouncedSearchTerm && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-blue-800 dark:text-blue-200 font-medium">
-                  Search results for "{debouncedSearchTerm}"
-                </span>
-                <span className="text-blue-600 dark:text-blue-300 text-sm">
-                  ({products.length} product{products.length !== 1 ? 's' : ''} found)
-                </span>
-              </div>
-              <button
-                onClick={() => setSearchTerm('')}
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
-              >
-                Clear search
-              </button>
-            </div>
+        {/* Content Area - Changes based on state */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <AdminProductCardSkeleton key={i} />
+            ))}
           </div>
-        )}
+        ) : products.length === 0 ? (
+          <div className="text-center py-12">
+            <Package className="w-24 h-24 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              {searchTerm ? 'No products found' : 'No products yet'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {searchTerm ? 'Try adjusting your search criteria' : 'Get started by adding your first product'}
+            </p>
+            <button 
+              onClick={handleAddProduct}
+              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Add Your First Product
+            </button>
+          </div>
+        ) : (
+          <>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Search Results Info */}
+            {debouncedSearchTerm && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-blue-800 dark:text-blue-200 font-medium">
+                      Search results for "{debouncedSearchTerm}"
+                    </span>
+                    <span className="text-blue-600 dark:text-blue-300 text-sm">
+                      ({products.length} product{products.length !== 1 ? 's' : ''} found)
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+                  >
+                    Clear search
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {products.map((product) => (
             <motion.div
               key={product._id}
@@ -486,40 +477,24 @@ const AdminProducts: React.FC = () => {
           ))}
         </div>
 
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentPage === i + 1
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {products.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <Package className="w-24 h-24 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No products found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {searchTerm ? 'Try adjusting your search criteria' : 'Get started by adding your first product'}
-            </p>
-            <button 
-              onClick={handleAddProduct}
-              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              Add Your First Product
-            </button>
-          </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      currentPage === i + 1
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Product Form Modal */}

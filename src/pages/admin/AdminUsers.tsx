@@ -108,36 +108,6 @@ const AdminUsers: React.FC = () => {
     setCurrentPage(1); // Reset to first page when filter changes
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="space-y-8">
-            {/* Header skeleton */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="space-y-2">
-                <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Filters skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Table skeleton */}
-            <AdminTableSkeleton rows={5} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="container mx-auto px-4">
@@ -152,7 +122,7 @@ const AdminUsers: React.FC = () => {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Filters - Always visible */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
@@ -192,6 +162,24 @@ const AdminUsers: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Content Area - Changes based on state */}
+        {loading ? (
+          <AdminTableSkeleton rows={5} />
+        ) : users.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
+            <div className="text-center py-12">
+              <User className="w-24 h-24 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                {searchTerm ? 'No users found' : 'No users yet'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {searchTerm ? 'Try adjusting your search criteria' : 'Users will appear here when they register'}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
 
         {/* Search Results Info */}
         {debouncedSearchTerm && (
@@ -361,36 +349,25 @@ const AdminUsers: React.FC = () => {
           </div>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mb-8">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentPage === i + 1
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {users.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <User className="w-24 h-24 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No users found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              {searchTerm ? 'Try adjusting your search criteria' : 'Users will appear here when they register'}
-            </p>
-          </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mb-8">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      currentPage === i + 1
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

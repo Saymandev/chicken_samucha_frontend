@@ -217,36 +217,6 @@ const AdminRefunds: React.FC = () => {
     return reasonMap[reason] || reason;
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="space-y-8">
-            {/* Header skeleton */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="space-y-2">
-                <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Filters skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Table skeleton */}
-            <AdminTableSkeleton rows={5} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -261,7 +231,7 @@ const AdminRefunds: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters - Always visible */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -314,6 +284,27 @@ const AdminRefunds: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Content Area - Changes based on state */}
+      {loading ? (
+        <AdminTableSkeleton rows={5} />
+      ) : refunds.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="text-center py-12">
+            <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No refund requests found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {searchTerm || statusFilter !== 'all' 
+                ? "No refunds match your current filters"
+                : "No refund requests have been submitted yet"
+              }
+            </p>
+          </div>
+        </div>
+      ) : (
+        <>
 
       {/* Search Results Info */}
       {debouncedSearchTerm && (
@@ -473,23 +464,25 @@ const AdminRefunds: React.FC = () => {
         )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                currentPage === i + 1
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === i + 1
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Refund Detail Modal */}

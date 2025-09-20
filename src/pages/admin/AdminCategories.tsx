@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Edit2,
-    Eye,
-    EyeOff,
-    Plus,
-    Save,
-    Trash2,
-    X
+  Edit2,
+  Eye,
+  EyeOff,
+  Plus,
+  Save,
+  Trash2,
+  X
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -198,32 +198,6 @@ const AdminCategories: React.FC = () => {
     }));
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {/* Header skeleton */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="space-y-2">
-            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-          </div>
-          <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-        </div>
-
-        {/* Search skeleton */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-        </div>
-
-        {/* Categories grid skeleton */}
-        <AdminCardGridSkeleton 
-          items={6} 
-          columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -245,7 +219,7 @@ const AdminCategories: React.FC = () => {
         </button>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and Filters - Always visible */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
@@ -264,6 +238,37 @@ const AdminCategories: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Content Area - Changes based on state */}
+      {loading ? (
+        <AdminCardGridSkeleton 
+          items={6} 
+          columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        />
+      ) : categories.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+            <Plus className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            {searchTerm ? 'No categories found' : 'No categories yet'}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {searchTerm ? 'Try adjusting your search criteria' : 'Create your first category to organize your products'}
+          </p>
+          <button
+            onClick={() => {
+              setEditingCategory(null);
+              resetForm();
+              setShowModal(true);
+            }}
+            className="btn-primary"
+          >
+            Add Category
+          </button>
+        </div>
+      ) : (
+        <>
 
       {/* Search Results Info */}
       {debouncedSearchTerm && (
@@ -386,48 +391,25 @@ const AdminCategories: React.FC = () => {
         ))}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                currentPage === i + 1
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {categories.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-            <Plus className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No categories yet
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Create your first category to organize your products
-          </p>
-          <button
-            onClick={() => {
-              setEditingCategory(null);
-              resetForm();
-              setShowModal(true);
-            }}
-            className="btn-primary"
-          >
-            Add Category
-          </button>
-        </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === i + 1
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Modal */}

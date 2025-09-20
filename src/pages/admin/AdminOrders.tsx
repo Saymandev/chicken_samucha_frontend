@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-    CheckCircle,
-    Clock,
-    Eye,
-    Package,
-    Search,
-    Truck,
-    X,
-    XCircle
+  CheckCircle,
+  Clock,
+  Eye,
+  Package,
+  Search,
+  Truck,
+  X,
+  XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -324,50 +324,6 @@ const AdminOrders: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="space-y-8">
-            {/* Header skeleton */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="space-y-2">
-                <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Quick Actions skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-6">
-              <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-3"></div>
-              <div className="flex flex-wrap gap-3">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                ))}
-              </div>
-            </div>
-
-            {/* Filters skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Orders skeleton */}
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <AdminOrderCardSkeleton key={i} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="container mx-auto px-4">
@@ -382,7 +338,7 @@ const AdminOrders: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Actions for Delivery Management */}
+        {/* Quick Actions for Delivery Management - Always visible */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Delivery Management</h3>
           <div className="flex flex-wrap gap-3">
@@ -433,7 +389,7 @@ const AdminOrders: React.FC = () => {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Filters - Always visible */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
@@ -489,6 +445,26 @@ const AdminOrders: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Content Area - Changes based on state */}
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <AdminOrderCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-12">
+            <Package className="w-24 h-24 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              {searchTerm ? 'No orders found' : 'No orders yet'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {searchTerm ? 'Try adjusting your search criteria' : 'Orders will appear here when customers start placing them'}
+            </p>
+          </div>
+        ) : (
+          <>
 
         {/* Search Results Info */}
         {debouncedSearchTerm && (
@@ -737,35 +713,25 @@ const AdminOrders: React.FC = () => {
           ))}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mb-8">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentPage === i + 1
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {orders.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <Package className="w-24 h-24 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No orders found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              {searchTerm ? 'Try adjusting your search criteria' : 'Orders will appear here when customers start placing them'}
-            </p>
-          </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mb-8">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      currentPage === i + 1
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Order Details Modal */}
