@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
+import PromotionFormModal from '../../components/promotion/PromotionFormModal';
 import { adminAPI } from '../../utils/api';
 
 interface Promotion {
@@ -43,7 +43,6 @@ interface Promotion {
 }
 
 const AdminPromotions: React.FC = () => {
-  const { t } = useTranslation();
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -157,7 +156,10 @@ const AdminPromotions: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={() => setShowPromotionModal(true)}
+          onClick={() => {
+            setSelectedPromotion(null);
+            setShowPromotionModal(true);
+          }}
           className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -220,7 +222,10 @@ const AdminPromotions: React.FC = () => {
               Create your first promotion to get started
             </p>
             <button
-              onClick={() => setShowPromotionModal(true)}
+              onClick={() => {
+                setSelectedPromotion(null);
+                setShowPromotionModal(true);
+              }}
               className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               Create Promotion
@@ -299,13 +304,19 @@ const AdminPromotions: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => setSelectedPromotion(promotion)}
+                          onClick={() => {
+                            setSelectedPromotion(promotion);
+                            setShowPromotionModal(true);
+                          }}
                           className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => setSelectedPromotion(promotion)}
+                          onClick={() => {
+                            setSelectedPromotion(promotion);
+                            setShowPromotionModal(true);
+                          }}
                           className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                           <Edit className="w-4 h-4" />
@@ -360,6 +371,14 @@ const AdminPromotions: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Promotion Form Modal */}
+      <PromotionFormModal
+        isOpen={showPromotionModal}
+        onClose={() => setShowPromotionModal(false)}
+        promotion={selectedPromotion}
+        onSuccess={fetchPromotions}
+      />
     </div>
   );
 };
