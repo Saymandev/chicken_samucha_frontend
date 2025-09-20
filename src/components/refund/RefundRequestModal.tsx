@@ -114,7 +114,27 @@ const RefundRequestModal: React.FC<RefundRequestModalProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Refund request error:', error);
-      toast.error(error.response?.data?.message || 'Failed to submit refund request');
+      
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.existingRefund) {
+        const existingRefund = error.response.data.existingRefund;
+        toast.error(
+          `Refund request already exists for this order (Status: ${existingRefund.status})`,
+          {
+            duration: 5000,
+            style: {
+              background: '#fef2f2',
+              color: '#dc2626',
+              border: '1px solid #fecaca'
+            }
+          }
+        );
+        
+        // Show existing refund details
+        console.log('Existing refund details:', existingRefund);
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to submit refund request');
+      }
     } finally {
       setLoading(false);
     }

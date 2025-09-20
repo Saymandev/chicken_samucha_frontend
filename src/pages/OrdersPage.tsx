@@ -10,9 +10,10 @@ import {
   Truck,
   XCircle
 } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import RefundRequestModal from '../components/refund/RefundRequestModal';
 import { useStore } from '../store/useStore';
 import { ordersAPI, reviewsAPI } from '../utils/api';
@@ -68,6 +69,17 @@ const OrdersPage: React.FC = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [refundOrder, setRefundOrder] = useState<Order | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -85,7 +97,8 @@ const OrdersPage: React.FC = () => {
       const response = await ordersAPI.getMyOrders({ 
         status: filter !== 'all' ? filter : undefined,
         page: currentPage,
-        limit: 10
+        limit: 10,
+        search: debouncedSearchTerm || undefined
       });
       
       
@@ -115,7 +128,7 @@ const OrdersPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, filter, currentPage]);
+  }, [user, filter, currentPage, debouncedSearchTerm]);
 
   useEffect(() => {
     fetchOrders();
@@ -128,6 +141,45 @@ const OrdersPage: React.FC = () => {
       fetchOrders();
     }
   }, [currentPage, filter, fetchOrders, user]);
+
+  // Socket.IO integration for real-time updates
+  useEffect(() => {
+    if (!user) return;
+
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const socket = io(API_BASE_URL, {
+      transports: ['websocket', 'polling']
+    });
+
+    socket.on('connect', () => {
+      console.log('🔌 Connected to server for order updates');
+      socket.emit('join-user-room', { userId: user.id });
+    });
+
+    socket.on('order-status-updated', (data) => {
+      console.log('📢 Order status updated:', data);
+      // Refresh orders when status changes
+      fetchOrders();
+      toast.success(`Order ${data.orderNumber} status updated to ${data.newStatus}`);
+    });
+
+    socket.on('refund-request-created', (data) => {
+      console.log('📢 Refund request created:', data);
+      // Refresh orders when refund is created
+      fetchOrders();
+    });
+
+    socket.on('refund-status-updated', (data) => {
+      console.log('📢 Refund status updated:', data);
+      // Refresh orders when refund status changes
+      fetchOrders();
+    });
+
+    return () => {
+      socket.emit('leave-user-room', { userId: user.id });
+      socket.disconnect();
+    };
+  }, [user, fetchOrders]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -177,6 +229,19 @@ const OrdersPage: React.FC = () => {
   };
 
   const openRefundModal = (order: Order) => {
+    // Check if refund already exists
+    if (order.hasRefundRequest) {
+      toast.error('Refund request already exists for this order. Please check your refund history.', {
+        duration: 5000,
+        style: {
+          background: '#fef2f2',
+          color: '#dc2626',
+          border: '1px solid #fecaca'
+        }
+      });
+      return;
+    }
+    
     setRefundOrder(order);
     setRefundModalOpen(true);
   };
@@ -221,10 +286,13 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => {
-    if (filter === 'all') return true;
-    return order.orderStatus === filter;
-  });
+  // Memoized filtered orders to prevent unnecessary re-renders
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      if (filter === 'all') return true;
+      return order.orderStatus === filter;
+    });
+  }, [orders, filter]);
 
   if (loading) {
     return (
@@ -298,24 +366,38 @@ const OrdersPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="mb-8 flex flex-wrap gap-2">
-            {['all', 'pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'].map((status) => (
-              <button
-                key={status}
-                onClick={() => {
-                  setFilter(status);
-                  setCurrentPage(1); // Reset to first page when filtering
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  filter === status
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {status === 'all' ? 'All Orders' : status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-              </button>
-            ))}
+          {/* Search and Filter */}
+          <div className="mb-8 space-y-4">
+            {/* Search Input */}
+            <div className="max-w-md">
+              <input
+                type="text"
+                placeholder="Search orders by order number..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white"
+              />
+            </div>
+            
+            {/* Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              {['all', 'pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => {
+                    setFilter(status);
+                    setCurrentPage(1); // Reset to first page when filtering
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    filter === status
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {status === 'all' ? 'All Orders' : status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Orders List */}
