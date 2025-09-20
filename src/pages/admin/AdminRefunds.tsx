@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 import { adminAPI } from '../../utils/api';
 
 interface Refund {
@@ -86,6 +87,34 @@ const AdminRefunds: React.FC = () => {
 
   useEffect(() => {
     fetchRefunds();
+  }, [fetchRefunds]);
+
+  // Real-time updates for refund status changes
+  useEffect(() => {
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const socket = io(API_BASE_URL, {
+      transports: ['websocket', 'polling']
+    });
+
+    socket.on('connect', () => {
+      console.log('🔌 Connected to server for refund updates');
+    });
+
+    socket.on('refund-status-updated', (data) => {
+      console.log('📢 Refund status updated:', data);
+      // Refresh refunds when status changes
+      fetchRefunds();
+    });
+
+    socket.on('new-refund-request', (data) => {
+      console.log('📢 New refund request:', data);
+      // Refresh refunds when new request is created
+      fetchRefunds();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [fetchRefunds]);
 
   const handleStatusUpdate = async (refundId: string, status: string, notes?: string, rejectionReason?: string) => {

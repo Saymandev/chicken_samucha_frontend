@@ -1,16 +1,16 @@
 import { motion } from 'framer-motion';
 import {
-    Calendar,
-    Clock,
-    MapPin,
-    Package,
-    Phone,
-    RefreshCw,
-    Star,
-    Truck,
-    XCircle
+  Calendar,
+  Clock,
+  MapPin,
+  Package,
+  Phone,
+  RefreshCw,
+  Star,
+  Truck,
+  XCircle
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import RefundRequestModal from '../components/refund/RefundRequestModal';
@@ -40,6 +40,7 @@ interface Order {
   };
   createdAt: string;
   estimatedDeliveryTime?: string;
+  hasRefundRequest?: boolean;
   customer: {
     name: string;
     phone: string;
@@ -68,19 +69,7 @@ const OrdersPage: React.FC = () => {
   const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [refundOrder, setRefundOrder] = useState<Order | null>(null);
 
-  useEffect(() => {
-    fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Refetch orders when page or filter changes
-  useEffect(() => {
-    if (user) {
-      fetchOrders();
-    }
-  }, [currentPage, filter]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -126,7 +115,19 @@ const OrdersPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, filter, currentPage]);
+
+  useEffect(() => {
+    fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Refetch orders when page or filter changes
+  useEffect(() => {
+    if (user) {
+      fetchOrders();
+    }
+  }, [currentPage, filter, fetchOrders, user]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -182,6 +183,7 @@ const OrdersPage: React.FC = () => {
 
   const handleRefundSuccess = () => {
     fetchOrders(); // Refresh orders after successful refund request
+    toast.success('Refund request submitted successfully! You can track the status in your refund history.');
   };
 
   const submitReview = async () => {
@@ -467,7 +469,7 @@ const OrdersPage: React.FC = () => {
                         Rate & Review
                       </button>
                     )}
-                    {(order.orderStatus === 'delivered' || order.orderStatus === 'cancelled') && (
+                    {(order.orderStatus === 'delivered' || order.orderStatus === 'cancelled') && !order.hasRefundRequest && (
                       <button 
                         onClick={() => openRefundModal(order)}
                         className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium flex items-center gap-2"
@@ -475,6 +477,19 @@ const OrdersPage: React.FC = () => {
                         <RefreshCw className="w-4 h-4" />
                         Request Refund
                       </button>
+                    )}
+                    {order.hasRefundRequest && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-orange-600 dark:text-orange-400 font-medium">
+                          Refund Requested
+                        </span>
+                        <Link 
+                          to="/refunds"
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          View Status
+                        </Link>
+                      </div>
                     )}
                     {order.orderStatus === 'pending' && (
                       <button className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">

@@ -51,6 +51,13 @@ interface Order {
     preferredTime?: string;
     deliveryInstructions?: string;
   };
+  refunds?: Array<{
+    _id: string;
+    status: 'pending' | 'approved' | 'rejected' | 'processed' | 'completed';
+    amount: number;
+    reason: string;
+    createdAt: string;
+  }>;
   createdAt: string;
 }
 
@@ -265,6 +272,34 @@ const AdminOrders: React.FC = () => {
     }
   };
 
+  const getRefundStatus = (order: Order) => {
+    if (!order.refunds || order.refunds.length === 0) return null;
+    
+    const latestRefund = order.refunds[order.refunds.length - 1];
+    return {
+      status: latestRefund.status,
+      amount: latestRefund.amount,
+      reason: latestRefund.reason
+    };
+  };
+
+  const getRefundBadgeColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300';
+      case 'approved':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300';
+      case 'processed':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
+      case 'completed':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -416,6 +451,11 @@ const AdminOrders: React.FC = () => {
                       {getPaymentMethodLogo(order.paymentInfo.method)}
                       {order.paymentInfo.method.toUpperCase()}
                     </span>
+                    {getRefundStatus(order) && (
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full ${getRefundBadgeColor(getRefundStatus(order)!.status)}`}>
+                        💰 REFUND {getRefundStatus(order)!.status.toUpperCase()}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

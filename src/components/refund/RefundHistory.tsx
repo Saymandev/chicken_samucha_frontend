@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 import api from '../../utils/api';
 
 interface Refund {
@@ -72,6 +73,34 @@ const RefundHistory: React.FC = () => {
 
   useEffect(() => {
     fetchRefunds();
+  }, [fetchRefunds]);
+
+  // Real-time updates for refund status changes
+  useEffect(() => {
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const socket = io(API_BASE_URL, {
+      transports: ['websocket', 'polling']
+    });
+
+    socket.on('connect', () => {
+      console.log('🔌 Connected to server for refund updates');
+    });
+
+    socket.on('refund-status-updated', (data) => {
+      console.log('📢 Refund status updated:', data);
+      // Refresh refunds when status changes
+      fetchRefunds();
+    });
+
+    socket.on('refund-request-created', (data) => {
+      console.log('📢 New refund request created:', data);
+      // Refresh refunds when new request is created
+      fetchRefunds();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [fetchRefunds]);
 
   const getStatusIcon = (status: string) => {
@@ -264,23 +293,51 @@ const RefundHistory: React.FC = () => {
                     </div>
                   )}
 
-                  {refund.adminNotes && (
-                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <span className="text-blue-700 dark:text-blue-300 text-sm font-medium">Admin Notes:</span>
-                      <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                        {refund.adminNotes}
-                      </p>
-                    </div>
-                  )}
+                   {refund.adminNotes && (
+                     <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                       <span className="text-blue-700 dark:text-blue-300 text-sm font-medium">Admin Notes:</span>
+                       <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                         {refund.adminNotes}
+                       </p>
+                     </div>
+                   )}
 
-                  {refund.rejectionReason && (
-                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                      <span className="text-red-700 dark:text-red-300 text-sm font-medium">Rejection Reason:</span>
-                      <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                        {refund.rejectionReason}
-                      </p>
-                    </div>
-                  )}
+                   {refund.rejectionReason && (
+                     <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                       <span className="text-red-700 dark:text-red-300 text-sm font-medium">Rejection Reason:</span>
+                       <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                         {refund.rejectionReason}
+                       </p>
+                     </div>
+                   )}
+
+                   {/* Status-specific messages */}
+                   {refund.status === 'approved' && (
+                     <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                       <span className="text-green-700 dark:text-green-300 text-sm font-medium">✅ Refund Approved</span>
+                       <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                         Your refund request has been approved and is being processed. You will receive your refund within 3-5 business days.
+                       </p>
+                     </div>
+                   )}
+
+                   {refund.status === 'processed' && (
+                     <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                       <span className="text-blue-700 dark:text-blue-300 text-sm font-medium">🔄 Refund Processing</span>
+                       <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                         Your refund is currently being processed. You should receive it soon.
+                       </p>
+                     </div>
+                   )}
+
+                   {refund.status === 'completed' && (
+                     <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                       <span className="text-green-700 dark:text-green-300 text-sm font-medium">✅ Refund Completed</span>
+                       <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                         Your refund has been successfully processed and completed.
+                       </p>
+                     </div>
+                   )}
                 </div>
 
                 {/* Right Side - Status */}
