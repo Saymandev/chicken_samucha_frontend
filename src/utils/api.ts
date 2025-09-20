@@ -378,7 +378,16 @@ export const adminAPI = {
   
   // Product Analytics
   getAllProductsAnalytics: (params?: any) => api.get('/products/analytics/all', { params }),
-  getProductAnalytics: (id: string) => api.get(`/products/${id}/analytics`)
+  getProductAnalytics: (id: string) => api.get(`/products/${id}/analytics`),
+  
+  // Promotions
+  getPromotions: (params?: any) => api.get('/admin/promotions', { params }),
+  getPromotion: (id: string) => api.get(`/admin/promotions/${id}`),
+  createPromotion: (data: any) => api.post('/admin/promotions', data),
+  updatePromotion: (id: string, data: any) => api.put(`/admin/promotions/${id}`, data),
+  deletePromotion: (id: string) => api.delete(`/admin/promotions/${id}`),
+  togglePromotionStatus: (id: string) => api.put(`/admin/promotions/${id}/toggle`),
+  getPromotionAnalytics: (id: string) => api.get(`/admin/promotions/${id}/analytics`)
 };
 
 // Coupon API

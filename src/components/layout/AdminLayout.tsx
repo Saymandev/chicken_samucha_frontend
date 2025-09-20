@@ -98,6 +98,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       path: '/admin/coupons'
     },
     {
+      id: 'promotions',
+      label: 'Promotions',
+      icon: <Star className="w-5 h-5" />,
+      path: '/admin/promotions'
+    },
+    {
       id: 'reports',
       label: 'Reports',
       icon: <BarChart3 className="w-5 h-5" />,

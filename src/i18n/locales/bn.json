@@ -465,5 +465,17 @@
     "phoneInvalid": "অবৈধ ফোন নম্বর",
     "tryAgain": "আবার চেষ্টা করুন",
     "contactSupport": "সাহায্যের জন্য সাপোর্টে যোগাযোগ করুন"
+  },
+  "promotion": {
+    "endsIn": "শেষ হচ্ছে",
+    "skip": "এড়িয়ে যান",
+    "shopNow": "এখনই কিনুন",
+    "learnMore": "আরো জানুন",
+    "getOffer": "অফার পান",
+    "limitedTime": "সীমিত সময়ের অফার",
+    "specialOffer": "বিশেষ অফার",
+    "flashSale": "ফ্ল্যাশ সেল",
+    "seasonal": "মৌসুমি অফার",
+    "announcement": "ঘোষণা"
   }
 } 

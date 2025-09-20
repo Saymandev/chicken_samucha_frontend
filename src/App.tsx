@@ -46,6 +46,7 @@ import AdminContent from './pages/admin/AdminContent';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminProducts from './pages/admin/AdminProducts';
+import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminReports from './pages/admin/AdminReports';
 import AdminReviews from './pages/admin/AdminReviews';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -55,10 +56,14 @@ import FloatingChatButton from './components/common/FloatingChatButton';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import ShoppingCartSidebar from './components/common/ShoppingCartSidebar';
+import PromotionModal from './components/promotion/PromotionModal';
 
 // Contexts
 import { CartProvider, useCart } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
+
+// Hooks
+import { usePromotions } from './hooks/usePromotions';
 
 // Component to handle layout based on route
 function AppContent() {
@@ -68,6 +73,9 @@ function AppContent() {
   
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  // Promotion modal logic (only for non-admin routes)
+  const { currentPromotion, closePromotion, handlePromotionClick } = usePromotions();
 
   // Socket connection for real-time notifications
   useEffect(() => {
@@ -234,6 +242,16 @@ function AppContent() {
             }
           />
           <Route
+            path="/admin/promotions"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminPromotions />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/categories"
             element={
               <ProtectedRoute adminOnly>
@@ -285,6 +303,15 @@ function AppContent() {
 
       {/* Floating Chat Button - Only show for non-admin routes */}
       {!isAdminRoute && <FloatingChatButton />}
+      
+      {/* Promotion Modal - Only show for non-admin routes */}
+      {!isAdminRoute && currentPromotion && (
+        <PromotionModal
+          promotion={currentPromotion}
+          onClose={closePromotion}
+          onTrackClick={handlePromotionClick}
+        />
+      )}
       
       {/* Global Loading Spinner */}
       <LoadingSpinner />

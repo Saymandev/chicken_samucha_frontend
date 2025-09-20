@@ -728,5 +728,17 @@
     "phoneInvalid": "Invalid phone number",
     "tryAgain": "Please try again",
     "contactSupport": "Contact support for assistance"
+  },
+  "promotion": {
+    "endsIn": "Ends in",
+    "skip": "Skip",
+    "shopNow": "Shop Now",
+    "learnMore": "Learn More",
+    "getOffer": "Get Offer",
+    "limitedTime": "Limited Time Offer",
+    "specialOffer": "Special Offer",
+    "flashSale": "Flash Sale",
+    "seasonal": "Seasonal Offer",
+    "announcement": "Announcement"
   }
 } 
