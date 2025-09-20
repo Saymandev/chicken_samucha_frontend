@@ -113,7 +113,7 @@ const Navbar: React.FC = () => {
   if (isLoading) {
     return (
       <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Skeleton className="h-8 w-32" />
             <div className="hidden md:flex space-x-8">
@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
