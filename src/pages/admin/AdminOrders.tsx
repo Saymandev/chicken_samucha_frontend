@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { io, Socket } from 'socket.io-client';
 import { adminAPI } from '../../utils/api';
 
 interface Order {
@@ -65,6 +66,7 @@ const AdminOrders: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -95,11 +97,58 @@ const AdminOrders: React.FC = () => {
     fetchOrders();
   }, [fetchOrders]);
 
+  // Socket.IO connection for real-time updates
+  useEffect(() => {
+    const API_BASE_URL = process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api';
+    const socketURL = API_BASE_URL.replace('/api', '');
+    
+    const newSocket = io(socketURL, {
+      transports: ['websocket', 'polling']
+    });
+
+    newSocket.on('connect', () => {
+      console.log('🔌 Admin connected to server for real-time order updates');
+      // Join admin dashboard room for notifications
+      newSocket.emit('join-admin-dashboard');
+    });
+
+    // Listen for new orders
+    newSocket.on('new-order', (orderData) => {
+      console.log('🆕 New order received:', orderData);
+      toast.success(`New order received: ${orderData.orderNumber}`);
+      // Refresh orders list to show the new order
+      fetchOrders();
+    });
+
+    // Listen for order status updates
+    newSocket.on('order-status-updated', (data) => {
+      console.log('📦 Order status updated:', data);
+      toast.success(`Order ${data.orderNumber} status updated to ${data.newStatus}`);
+      // Refresh orders list to show updated status
+      fetchOrders();
+    });
+
+    // Listen for new notifications (for admin dashboard)
+    newSocket.on('new-notification', (notification) => {
+      console.log('🔔 Admin notification received:', notification);
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('🔌 Admin disconnected from server');
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [fetchOrders]);
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       await adminAPI.updateOrderStatus(orderId, newStatus);
       toast.success(`Order status updated to ${newStatus}`);
-      fetchOrders();
+      // Socket.IO will automatically refresh the orders list
     } catch (error) {
       toast.error('Failed to update order status');
     }
@@ -109,7 +158,7 @@ const AdminOrders: React.FC = () => {
     try {
       await adminAPI.verifyPayment(orderId);
       toast.success('Payment verified successfully');
-      fetchOrders();
+      // Socket.IO will automatically refresh the orders list
     } catch (error) {
       toast.error('Failed to verify payment');
     }
