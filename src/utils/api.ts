@@ -380,14 +380,24 @@ export const adminAPI = {
   getAllProductsAnalytics: (params?: any) => api.get('/products/analytics/all', { params }),
   getProductAnalytics: (id: string) => api.get(`/products/${id}/analytics`),
   
-  // Promotions
+  // Promotions (Admin)
   getPromotions: (params?: any) => api.get('/admin/promotions', { params }),
   getPromotion: (id: string) => api.get(`/admin/promotions/${id}`),
   createPromotion: (data: any) => api.post('/admin/promotions', data),
   updatePromotion: (id: string, data: any) => api.put(`/admin/promotions/${id}`, data),
   deletePromotion: (id: string) => api.delete(`/admin/promotions/${id}`),
   togglePromotionStatus: (id: string) => api.put(`/admin/promotions/${id}/toggle`),
-  getPromotionAnalytics: (id: string) => api.get(`/admin/promotions/${id}/analytics`)
+  getPromotionAnalytics: (id: string) => api.get(`/admin/promotions/${id}/analytics`),
+  
+  // Promotions (Public) - moved to publicAPI below
+};
+
+// Public API (no authentication required)
+export const publicAPI = {
+  // Promotions
+  getActivePromotions: (params?: any) => api.get('/promotions', { params }),
+  trackPromotionView: (id: string) => api.post(`/promotions/${id}/view`),
+  trackPromotionClick: (id: string) => api.post(`/promotions/${id}/click`)
 };
 
 // Coupon API

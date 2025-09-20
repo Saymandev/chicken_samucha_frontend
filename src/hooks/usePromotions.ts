@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { publicAPI } from '../utils/api';
 
 interface Promotion {
   _id: string;
@@ -46,15 +47,6 @@ export const usePromotions = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
-  // Get current page type for filtering promotions
-  const getCurrentPageType = () => {
-    if (location.pathname === '/') return 'homepage';
-    if (location.pathname.startsWith('/products')) return 'product';
-    if (location.pathname === '/cart') return 'cart';
-    if (location.pathname === '/checkout') return 'checkout';
-    return 'homepage';
-  };
-
   // Check if promotion should be shown based on display frequency
   const shouldShowPromotion = (promotion: Promotion): boolean => {
     const sessionKey = `promotion_${promotion._id}_session`;
@@ -92,24 +84,33 @@ export const usePromotions = () => {
   };
 
   // Fetch active promotions
-  const fetchPromotions = async () => {
+  const fetchPromotions = useCallback(async () => {
     try {
       setLoading(true);
-      const pageType = getCurrentPageType();
-      const response = await fetch(
-        `/api/promotions?page=${pageType}&limit=5&targetAudience=all`
-      );
       
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setPromotions(data.promotions || []);
-          
-          // Find the first promotion that should be shown
-          const promotionToShow = data.promotions.find(shouldShowPromotion);
-          if (promotionToShow) {
-            setCurrentPromotion(promotionToShow);
-          }
+      // Get current page type for filtering promotions
+      const getCurrentPageType = () => {
+        if (location.pathname === '/') return 'homepage';
+        if (location.pathname.startsWith('/products')) return 'product';
+        if (location.pathname === '/cart') return 'cart';
+        if (location.pathname === '/checkout') return 'checkout';
+        return 'homepage';
+      };
+      
+      const pageType = getCurrentPageType();
+      const response = await publicAPI.getActivePromotions({
+        page: pageType,
+        limit: 5,
+        targetAudience: 'all'
+      });
+      
+      if (response.data.success) {
+        setPromotions(response.data.promotions || []);
+        
+        // Find the first promotion that should be shown
+        const promotionToShow = response.data.promotions.find(shouldShowPromotion);
+        if (promotionToShow) {
+          setCurrentPromotion(promotionToShow);
         }
       }
     } catch (error) {
@@ -117,14 +118,12 @@ export const usePromotions = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location.pathname]);
 
   // Track promotion view
   const trackPromotionView = async (promotionId: string) => {
     try {
-      await fetch(`/api/promotions/${promotionId}/view`, {
-        method: 'POST',
-      });
+      await publicAPI.trackPromotionView(promotionId);
     } catch (error) {
       console.error('Error tracking promotion view:', error);
     }
@@ -133,9 +132,7 @@ export const usePromotions = () => {
   // Track promotion click
   const trackPromotionClick = async (promotionId: string) => {
     try {
-      await fetch(`/api/promotions/${promotionId}/click`, {
-        method: 'POST',
-      });
+      await publicAPI.trackPromotionClick(promotionId);
     } catch (error) {
       console.error('Error tracking promotion click:', error);
     }
@@ -159,7 +156,7 @@ export const usePromotions = () => {
   // Load promotions on mount and when location changes
   useEffect(() => {
     fetchPromotions();
-  }, [location.pathname]);
+  }, [location.pathname, fetchPromotions]);
 
   // Track view when promotion is shown
   useEffect(() => {

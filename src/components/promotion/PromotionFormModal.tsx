@@ -419,6 +419,208 @@ const PromotionFormModal: React.FC<PromotionFormModalProps> = ({
                 </div>
               </div>
 
+              {/* Short Description */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Short Description
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Short Description (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.shortDescription.en}
+                      onChange={(e) => handleNestedInputChange('shortDescription', 'en', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Brief description for the promotion"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Short Description (Bengali)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.shortDescription.bn}
+                      onChange={(e) => handleNestedInputChange('shortDescription', 'bn', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="প্রচারের জন্য সংক্ষিপ্ত বিবরণ"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Priority & Target Audience */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Settings
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Priority (1-10)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.priority}
+                      onChange={(e) => handleInputChange('priority', parseInt(e.target.value) || 1)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      min="1"
+                      max="10"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Target Audience
+                    </label>
+                    <select
+                      value={formData.targetAudience}
+                      onChange={(e) => handleInputChange('targetAudience', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="all">All Users</option>
+                      <option value="new_users">New Users</option>
+                      <option value="returning_users">Returning Users</option>
+                      <option value="vip_users">VIP Users</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Display Frequency
+                    </label>
+                    <select
+                      value={formData.displayFrequency}
+                      onChange={(e) => handleInputChange('displayFrequency', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="once_per_session">Once Per Session</option>
+                      <option value="once_per_day">Once Per Day</option>
+                      <option value="always">Always</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Display Rules */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Display Rules
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.displayRules.showOnHomepage}
+                      onChange={(e) => handleNestedInputChange('displayRules', 'showOnHomepage', e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label className="text-sm text-gray-700 dark:text-gray-300">Homepage</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.displayRules.showOnProductPage}
+                      onChange={(e) => handleNestedInputChange('displayRules', 'showOnProductPage', e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label className="text-sm text-gray-700 dark:text-gray-300">Product Page</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.displayRules.showOnCartPage}
+                      onChange={(e) => handleNestedInputChange('displayRules', 'showOnCartPage', e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label className="text-sm text-gray-700 dark:text-gray-300">Cart Page</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.displayRules.showOnCheckout}
+                      onChange={(e) => handleNestedInputChange('displayRules', 'showOnCheckout', e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label className="text-sm text-gray-700 dark:text-gray-300">Checkout</label>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Minimum Order Amount (৳)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.displayRules.minimumOrderAmount}
+                    onChange={(e) => handleNestedInputChange('displayRules', 'minimumOrderAmount', parseFloat(e.target.value) || 0)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Call to Action Button
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Button Text (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.ctaButton.text.en}
+                      onChange={(e) => handleInputChange('ctaButton', {...formData.ctaButton, text: {...formData.ctaButton.text, en: e.target.value}})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Shop Now"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Button Text (Bengali)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.ctaButton.text.bn}
+                      onChange={(e) => handleInputChange('ctaButton', {...formData.ctaButton, text: {...formData.ctaButton.text, bn: e.target.value}})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="এখনই কিনুন"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Button Link
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.ctaButton.link}
+                      onChange={(e) => handleInputChange('ctaButton', {...formData.ctaButton, link: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="/products"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Button Action
+                    </label>
+                    <select
+                      value={formData.ctaButton.action}
+                      onChange={(e) => handleInputChange('ctaButton', {...formData.ctaButton, action: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="navigate">Navigate</option>
+                      <option value="apply_coupon">Apply Coupon</option>
+                      <option value="open_catalog">Open Catalog</option>
+                      <option value="contact_us">Contact Us</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               {/* Images */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
