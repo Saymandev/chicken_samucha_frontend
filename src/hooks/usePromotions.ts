@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import io, { Socket } from 'socket.io-client';
 import { publicAPI } from '../utils/api';
 
 interface Promotion {
@@ -128,6 +129,7 @@ export const usePromotions = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [currentPromotion, setCurrentPromotion] = useState<Promotion | null>(null);
   const [loading, setLoading] = useState(false);
+  const [, setSocket] = useState<Socket | null>(null);
   const location = useLocation();
 
   // Mark promotion as shown
@@ -183,19 +185,31 @@ export const usePromotions = () => {
     }
   }, [location.pathname]);
 
-  // Track promotion view
+  // Track promotion view (only once per session)
   const trackPromotionView = async (promotionId: string) => {
     try {
-      await publicAPI.trackPromotionView(promotionId);
+      const sessionKey = `promotion_view_${promotionId}_session`;
+      const hasViewed = sessionStorage.getItem(sessionKey);
+      
+      if (!hasViewed) {
+        await publicAPI.trackPromotionView(promotionId);
+        sessionStorage.setItem(sessionKey, 'true');
+      }
     } catch (error) {
       console.error('Error tracking promotion view:', error);
     }
   };
 
-  // Track promotion click
+  // Track promotion click (only once per session)
   const trackPromotionClick = async (promotionId: string) => {
     try {
-      await publicAPI.trackPromotionClick(promotionId);
+      const sessionKey = `promotion_click_${promotionId}_session`;
+      const hasClicked = sessionStorage.getItem(sessionKey);
+      
+      if (!hasClicked) {
+        await publicAPI.trackPromotionClick(promotionId);
+        sessionStorage.setItem(sessionKey, 'true');
+      }
     } catch (error) {
       console.error('Error tracking promotion click:', error);
     }
@@ -215,6 +229,69 @@ export const usePromotions = () => {
       await trackPromotionClick(currentPromotion._id);
     }
   };
+
+  // Handle promotion updates
+  const handlePromotionUpdate = useCallback((data: any) => {
+    console.log('📢 Promotion update received:', data);
+    const { promotion, action } = data;
+    
+    if (action === 'created' || action === 'activated') {
+      // Add new promotion to the list
+      setPromotions(prev => {
+        const exists = prev.find(p => p._id === promotion._id);
+        if (!exists) {
+          return [promotion, ...prev];
+        }
+        return prev;
+      });
+      
+      // Check if this promotion should be shown
+      const shouldShow = shouldShowPromotion(promotion, location.pathname);
+      if (shouldShow) {
+        setCurrentPromotion(promotion);
+      }
+    } else if (action === 'deactivated' || action === 'deleted') {
+      // Remove promotion from the list
+      setPromotions(prev => prev.filter(p => p._id !== promotion._id));
+      
+      // Close modal if this was the current promotion
+      setCurrentPromotion(prev => prev?._id === promotion._id ? null : prev);
+    } else if (action === 'updated') {
+      // Update existing promotion
+      setPromotions(prev => 
+        prev.map(p => p._id === promotion._id ? promotion : p)
+      );
+      
+      // Update current promotion if it's the same one
+      setCurrentPromotion(prev => prev?._id === promotion._id ? promotion : prev);
+    }
+  }, [location.pathname]);
+
+  // Socket.IO connection for real-time updates
+  useEffect(() => {
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const newSocket = io(API_BASE_URL, {
+      transports: ['websocket', 'polling']
+    });
+
+    newSocket.on('connect', () => {
+      console.log('🔌 Connected to server for promotion updates');
+      newSocket.emit('join-promotion-room');
+    });
+
+    newSocket.on('promotion-updated', handlePromotionUpdate);
+
+    newSocket.on('disconnect', () => {
+      console.log('🔌 Disconnected from server');
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.emit('leave-promotion-room');
+      newSocket.disconnect();
+    };
+  }, [handlePromotionUpdate]);
 
   // Load promotions on mount and when location changes
   useEffect(() => {
