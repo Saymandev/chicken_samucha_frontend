@@ -12,7 +12,11 @@ interface Order {
   totalAmount: number;
   finalAmount: number;
   items: Array<{
-    name: { en: string; bn: string } | string;
+    product: {
+      name: { en: string; bn: string };
+      images: Array<{ url: string }>;
+      price: number;
+    };
     quantity: number;
     price: number;
   }>;
