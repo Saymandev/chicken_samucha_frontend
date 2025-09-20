@@ -115,8 +115,14 @@ const AdminOrders: React.FC = () => {
     });
 
     newSocket.on('order-status-updated', (data) => {
-      toast.success(`Order ${data.orderNumber} status updated to ${data.newStatus}`);
-      fetchOrders();
+      // Only show toast if this is from another admin (not from our own action)
+      // The local state update already handled the immediate UI change
+      console.log(`Order ${data.orderNumber} status updated to ${data.newStatus}`);
+      
+      // Refresh orders list to ensure data consistency with server
+      setTimeout(() => {
+        fetchOrders();
+      }, 500); // Small delay to avoid race conditions
     });
 
     newSocket.on('new-notification', (notification) => {
@@ -131,18 +137,69 @@ const AdminOrders: React.FC = () => {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      await adminAPI.updateOrderStatus(orderId, newStatus);
+      // Update the order status immediately in the local state for instant UI update
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          (order.id || order._id) === orderId 
+            ? { ...order, orderStatus: newStatus as Order['orderStatus'] }
+            : order
+        )
+      );
+
+      // Show immediate feedback
       toast.success(`Order status updated to ${newStatus}`);
+
+      // Then make the API call
+      await adminAPI.updateOrderStatus(orderId, newStatus);
+      
+      // The Socket.IO event will handle the final refresh to ensure data consistency
     } catch (error) {
+      // If the API call fails, revert the local state
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          (order.id || order._id) === orderId 
+            ? { ...order } // Revert to original status
+            : order
+        )
+      );
       toast.error('Failed to update order status');
     }
   };
 
   const verifyPayment = async (orderId: string) => {
     try {
-      await adminAPI.verifyPayment(orderId);
+      // Update the payment status immediately in the local state for instant UI update
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          (order.id || order._id) === orderId 
+            ? { 
+                ...order, 
+                paymentInfo: { ...order.paymentInfo, status: 'verified' },
+                orderStatus: 'confirmed' // Auto-confirm order when payment is verified
+              }
+            : order
+        )
+      );
+
+      // Show immediate feedback
       toast.success('Payment verified successfully');
+
+      // Then make the API call
+      await adminAPI.verifyPayment(orderId);
+      
+      // The Socket.IO event will handle the final refresh to ensure data consistency
     } catch (error) {
+      // If the API call fails, revert the local state
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          (order.id || order._id) === orderId 
+            ? { 
+                ...order, 
+                paymentInfo: { ...order.paymentInfo, status: 'pending' } // Revert to pending
+              }
+            : order
+        )
+      );
       toast.error('Failed to verify payment');
     }
   };
