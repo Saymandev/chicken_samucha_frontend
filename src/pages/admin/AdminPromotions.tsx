@@ -1,16 +1,16 @@
 import { motion } from 'framer-motion';
 import {
-    Calendar,
-    Edit,
-    Eye,
-    Gift,
-    Plus,
-    Search,
-    Star,
-    ToggleLeft,
-    ToggleRight,
-    Trash2,
-    TrendingUp
+  Calendar,
+  Edit,
+  Eye,
+  Gift,
+  Plus,
+  Search,
+  Star,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  TrendingUp
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -94,7 +94,7 @@ const AdminPromotions: React.FC = () => {
   };
 
   const deletePromotion = async (promotionId: string) => {
-    if (!confirm('Are you sure you want to delete this promotion?')) return;
+    if (!window.confirm('Are you sure you want to delete this promotion?')) return;
     
     try {
       await adminAPI.deletePromotion(promotionId);
