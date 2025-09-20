@@ -1,19 +1,20 @@
 import { motion } from 'framer-motion';
 import {
-  Calendar,
-  Edit,
-  Eye,
-  Gift,
-  Plus,
-  Search,
-  Star,
-  ToggleLeft,
-  ToggleRight,
-  Trash2,
-  TrendingUp
+    Calendar,
+    Edit,
+    Eye,
+    Gift,
+    Plus,
+    Search,
+    Star,
+    ToggleLeft,
+    ToggleRight,
+    Trash2,
+    TrendingUp
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { AdminTableSkeleton } from '../../components/common/Skeleton';
 import PromotionFormModal from '../../components/promotion/PromotionFormModal';
 import { adminAPI } from '../../utils/api';
 
@@ -208,10 +209,7 @@ const AdminPromotions: React.FC = () => {
       {/* Promotions Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">Loading promotions...</p>
-          </div>
+          <AdminTableSkeleton rows={5} />
         ) : promotions.length === 0 ? (
           <div className="p-8 text-center">
             <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />

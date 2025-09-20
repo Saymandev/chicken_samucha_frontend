@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Edit, Plus, Search, TicketPercent, Trash2, User, X } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { AdminCardGridSkeleton } from '../../components/common/Skeleton';
 import { adminAPI, couponAPI } from '../../utils/api';
 
 interface CouponUser {
@@ -377,11 +378,10 @@ const AdminCoupons: React.FC = () => {
         )}
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-40 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
-            ))}
-          </div>
+          <AdminCardGridSkeleton 
+            items={6} 
+            columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {coupons.map((c) => {

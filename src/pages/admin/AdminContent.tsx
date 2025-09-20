@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Edit, FileText, Image, Settings, Trash2, Upload, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { AdminPageSkeleton } from '../../components/common/Skeleton';
 import { adminAPI, contentAPI } from '../../utils/api';
 
 interface HeroContent {
@@ -361,20 +362,7 @@ const AdminContent: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <AdminPageSkeleton />;
   }
 
   return (

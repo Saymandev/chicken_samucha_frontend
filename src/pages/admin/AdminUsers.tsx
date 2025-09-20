@@ -1,6 +1,7 @@
 import { Edit, Search, Shield, User, UserCheck, UserX } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { AdminTableSkeleton } from '../../components/common/Skeleton';
 import { adminAPI } from '../../utils/api';
 
 interface UserData {
@@ -111,9 +112,26 @@ const AdminUsers: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="container mx-auto px-4">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-            <div className="bg-gray-200 dark:bg-gray-700 rounded-xl h-64"></div>
+          <div className="space-y-8">
+            {/* Header skeleton */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="space-y-2">
+                <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Filters skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Table skeleton */}
+            <AdminTableSkeleton rows={5} />
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { ArrowLeft, Clock, FileText, MessageCircle, Send, User, Users } from 'lu
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import io, { Socket } from 'socket.io-client';
+import { AdminPageSkeleton } from '../../components/common/Skeleton';
 import { adminAPI } from '../../utils/api';
 
 interface ChatSession {
@@ -331,11 +332,7 @@ const AdminChat: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-      </div>
-    );
+    return <AdminPageSkeleton />;
   }
 
   return (

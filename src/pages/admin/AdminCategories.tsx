@@ -1,15 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Edit2,
-  Eye,
-  EyeOff,
-  Plus,
-  Save,
-  Trash2,
-  X
+    Edit2,
+    Eye,
+    EyeOff,
+    Plus,
+    Save,
+    Trash2,
+    X
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { AdminCardGridSkeleton } from '../../components/common/Skeleton';
 import { categoriesAPI } from '../../utils/api';
 
 interface Category {
@@ -199,8 +200,26 @@ const AdminCategories: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="space-y-2">
+            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+          <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+        </div>
+
+        {/* Search skeleton */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+        </div>
+
+        {/* Categories grid skeleton */}
+        <AdminCardGridSkeleton 
+          items={6} 
+          columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        />
       </div>
     );
   }

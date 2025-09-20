@@ -226,6 +226,250 @@ export const GridSkeleton: React.FC<{
   </div>
 );
 
+// Admin page skeleton
+export const AdminPageSkeleton: React.FC = () => (
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="container mx-auto px-4">
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-12 w-32" />
+        </div>
+        
+        {/* Filters skeleton */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+        
+        {/* Content skeleton */}
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-xl" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Admin table skeleton
+export const AdminTableSkeleton: React.FC<{ rows?: number }> = ({ rows = 5 }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="min-w-full">
+        <thead className="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            {[...Array(6)].map((_, i) => (
+              <th key={i} className="px-6 py-3">
+                <Skeleton className="h-4 w-20" />
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {[...Array(rows)].map((_, i) => (
+            <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+              {[...Array(6)].map((_, j) => (
+                <td key={j} className="px-6 py-4">
+                  <Skeleton className="h-4 w-full" />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+// Admin card grid skeleton
+export const AdminCardGridSkeleton: React.FC<{ 
+  items?: number; 
+  columns?: string;
+}> = ({ 
+  items = 6, 
+  columns = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+}) => (
+  <div className={`grid ${columns} gap-6`}>
+    {[...Array(items)].map((_, i) => (
+      <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-8 w-8 rounded-lg" />
+          </div>
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-8 w-16" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// Admin stats cards skeleton
+export const AdminStatsSkeleton: React.FC = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {[...Array(8)].map((_, i) => (
+      <DashboardCardSkeleton key={i} />
+    ))}
+  </div>
+);
+
+// Admin order card skeleton
+export const AdminOrderCardSkeleton: React.FC = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
+    <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-4">
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-6 w-32" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+      <div className="flex flex-col sm:text-right space-y-2">
+        <Skeleton className="h-8 w-20" />
+        <div className="flex gap-2">
+          <Skeleton className="h-6 w-16" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+      </div>
+    </div>
+    
+    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+      <Skeleton className="h-4 w-32 mb-2" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+      </div>
+    </div>
+    
+    <div className="space-y-2 mb-4">
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+    </div>
+    
+    <div className="flex gap-2 flex-wrap">
+      {[...Array(4)].map((_, i) => (
+        <Skeleton key={i} className="h-8 w-20" />
+      ))}
+    </div>
+  </div>
+);
+
+// Admin product card skeleton
+export const AdminProductCardSkeleton: React.FC = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+    <Skeleton className="w-full h-48" />
+    <div className="p-4 space-y-3">
+      <Skeleton className="h-6 w-3/4" />
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-12" />
+      </div>
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-2/3" />
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-16" />
+        <Skeleton className="h-8 w-16" />
+        <Skeleton className="h-8 w-8" />
+      </div>
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-20" />
+        <Skeleton className="h-8 w-20" />
+      </div>
+    </div>
+  </div>
+);
+
+// Admin user row skeleton
+export const AdminUserRowSkeleton: React.FC = () => (
+  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+    <td className="px-6 py-4 whitespace-nowrap">
+      <div className="flex items-center">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="ml-4 space-y-1">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+      </div>
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap">
+      <div className="space-y-1">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-3 w-28" />
+      </div>
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap">
+      <Skeleton className="h-6 w-16" />
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap">
+      <Skeleton className="h-6 w-16" />
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap">
+      <Skeleton className="h-4 w-20" />
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap">
+      <div className="flex gap-2">
+        <Skeleton className="h-6 w-6" />
+        <Skeleton className="h-6 w-6" />
+        <Skeleton className="h-6 w-6" />
+      </div>
+    </td>
+  </tr>
+);
+
+// Admin review card skeleton
+export const AdminReviewCardSkeleton: React.FC = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+    <div className="flex items-start justify-between mb-4">
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-6 w-16" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+        <Skeleton className="h-4 w-48" />
+        <div className="flex items-center gap-4">
+          <div className="flex gap-1">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="w-4 h-4" />
+            ))}
+          </div>
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+    </div>
+    
+    <div className="mb-4">
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+    </div>
+    
+    <div className="flex gap-3 flex-wrap">
+      {[...Array(5)].map((_, i) => (
+        <Skeleton key={i} className="h-8 w-24" />
+      ))}
+    </div>
+  </div>
+);
+
 // Page skeleton wrapper
 export const PageSkeleton: React.FC<{
   showNav?: boolean;
