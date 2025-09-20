@@ -31,7 +31,16 @@ interface Promotion {
   discountType: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_shipping';
   discountValue: number;
   validUntil: string;
-  displayFrequency: 'once_per_session' | 'once_per_day' | 'always' | 'custom';
+  displayFrequency?: 'once_per_session' | 'once_per_day' | 'always' | 'custom';
+  displayRules?: {
+    showOnHomepage: boolean;
+    showOnProductPage: boolean;
+    showOnCartPage: boolean;
+    showOnCheckout: boolean;
+    minimumOrderAmount: number;
+  };
+  priority?: number;
+  targetAudience?: string;
   ctaButton: {
     text: {
       en: string;
@@ -40,8 +49,8 @@ interface Promotion {
     link: string;
     action: 'navigate' | 'apply_coupon' | 'open_catalog' | 'contact_us';
   };
-  timeRemaining: number;
-  isValid: boolean;
+  timeRemaining?: number;
+  isValid?: boolean;
 }
 
 interface PromotionModalProps {
@@ -55,26 +64,27 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
   onClose, 
   onTrackClick 
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { language } = useStore();
-  const [timeRemaining, setTimeRemaining] = useState(promotion.timeRemaining);
+  const [timeRemaining, setTimeRemaining] = useState(promotion.timeRemaining ?? 0);
   const [isClosing, setIsClosing] = useState(false);
 
   // Update time remaining every second
   useEffect(() => {
-    if (!promotion.isValid || timeRemaining <= 0) {
+    if (promotion.isValid === false || timeRemaining <= 0) {
       onClose();
       return;
     }
 
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
-        if (prev <= 1000) {
+        const currentTime = prev ?? 0;
+        if (currentTime <= 1000) {
           onClose();
           return 0;
         }
-        return prev - 1000;
+        return currentTime - 1000;
       });
     }, 1000);
 
@@ -107,7 +117,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
   };
 
   const getDiscountText = () => {
-    const lang = language;
+    // const lang = language;
     switch (promotion.discountType) {
       case 'percentage':
         return `${promotion.discountValue}% OFF`;
@@ -209,11 +219,11 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
             </p>
 
             {/* Time Remaining */}
-            {promotion.timeRemaining > 0 && (
+            {(promotion.timeRemaining ?? 0) > 0 && (
               <div className="flex items-center gap-2 mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                 <Clock className="w-5 h-5 text-red-500" />
                 <span className="text-sm font-medium text-red-700 dark:text-red-300">
-                  {t('promotion.endsIn')}: {formatTimeRemaining(timeRemaining)}
+                  {t('promotion.endsIn')}: {formatTimeRemaining(timeRemaining ?? 0)}
                 </span>
               </div>
             )}

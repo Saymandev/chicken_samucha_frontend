@@ -76,6 +76,7 @@ function AppContent() {
   
   // Promotion modal logic (only for non-admin routes)
   const { currentPromotion, closePromotion, handlePromotionClick } = usePromotions();
+  
 
   // Socket connection for real-time notifications
   useEffect(() => {
