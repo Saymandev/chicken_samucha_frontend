@@ -41,6 +41,7 @@ const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
@@ -52,15 +53,23 @@ const AdminProducts: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 300);
 
-  const fetchProducts =useCallback( async () => {
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
         page: currentPage,
         limit: 10,
-        search: searchTerm,
+        search: debouncedSearchTerm || undefined,
         category: selectedCategory !== 'all' ? selectedCategory : undefined,
         sort: `${sortOrder === 'desc' ? '-' : ''}${sortBy}`
       };
@@ -78,7 +87,7 @@ const AdminProducts: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, selectedCategory, sortBy, sortOrder]);
+  }, [currentPage, debouncedSearchTerm, selectedCategory, sortBy, sortOrder]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -158,6 +167,22 @@ const AdminProducts: React.FC = () => {
     handleModalClose();
   };
 
+  // Handle filter changes
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    setCurrentPage(1); // Reset to first page when sort changes
+  };
+
+  const handleSortOrderChange = (order: string) => {
+    setSortOrder(order);
+    setCurrentPage(1); // Reset to first page when sort order changes
+  };
+
   const truncateWords = (text: string, maxWords: number): string => {
     if (!text) return '';
     const words = text.trim().split(/\s+/);
@@ -218,16 +243,21 @@ const AdminProducts: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search by name, description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
+              {searchTerm !== debouncedSearchTerm && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                </div>
+              )}
             </div>
 
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               {categories.map((category) => (
@@ -239,7 +269,7 @@ const AdminProducts: React.FC = () => {
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               {sortOptions.map((option) => (
@@ -251,7 +281,7 @@ const AdminProducts: React.FC = () => {
 
             <select
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
+              onChange={(e) => handleSortOrderChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="desc">Descending</option>
@@ -259,6 +289,29 @@ const AdminProducts: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Search Results Info */}
+        {debouncedSearchTerm && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Search results for "{debouncedSearchTerm}"
+                </span>
+                <span className="text-blue-600 dark:text-blue-300 text-sm">
+                  ({products.length} product{products.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => setSearchTerm('')}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+              >
+                Clear search
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {products.map((product) => (

@@ -40,6 +40,7 @@ const AdminCoupons: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all'|'active'|'expired'|'inactive'>('all');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -69,12 +70,22 @@ const AdminCoupons: React.FC = () => {
     }
   });
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const fetchCoupons = useCallback(async () => {
     try {
       setLoading(true);
       const res = await couponAPI.getAllCoupons({ 
         status: statusFilter, 
-        search,
+        search: debouncedSearch || undefined,
         page: currentPage,
         limit: 10
       });
@@ -87,7 +98,7 @@ const AdminCoupons: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, search, currentPage]);
+  }, [statusFilter, debouncedSearch, currentPage]);
 
   const fetchUsers = useCallback(async (searchTerm: string = '') => {
     try {
@@ -165,6 +176,12 @@ const AdminCoupons: React.FC = () => {
         specificUsers: formData.userRestrictions.specificUsers.filter(id => id !== userId)
       }
     });
+  };
+
+  // Handle filter changes
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status as any);
+    setCurrentPage(1); // Reset to first page when filter changes
   };
 
   const handleCreate = () => {
@@ -286,21 +303,19 @@ const AdminCoupons: React.FC = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1); // Reset to first page when searching
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && fetchCoupons()}
-                placeholder="Search code or name..."
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by code, name, or description..."
                 className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               />
+              {search !== debouncedSearch && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                </div>
+              )}
             </div>
             <select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value as any);
-                setCurrentPage(1); // Reset to first page when filtering
-              }}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
               className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All</option>
@@ -311,6 +326,55 @@ const AdminCoupons: React.FC = () => {
             <button onClick={fetchCoupons} className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">Refresh</button>
           </div>
         </div>
+
+        {/* Search Results Info */}
+        {debouncedSearch && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Search results for "{debouncedSearch}"
+                </span>
+                <span className="text-blue-600 dark:text-blue-300 text-sm">
+                  ({coupons.length} coupon{coupons.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => setSearch('')}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+              >
+                Clear search
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Filter Results Info */}
+        {statusFilter !== 'all' && (
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 text-orange-600 dark:text-orange-400">🔍</div>
+                <span className="text-orange-800 dark:text-orange-200 font-medium">
+                  Active filter:
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                  Status: {statusFilter.toUpperCase()}
+                </span>
+                <span className="text-orange-600 dark:text-orange-300 text-sm">
+                  ({coupons.length} coupon{coupons.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => handleStatusFilterChange('all')}
+                className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200 text-sm font-medium"
+              >
+                Clear filter
+              </button>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

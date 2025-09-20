@@ -18,12 +18,21 @@ const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -31,7 +40,7 @@ const AdminUsers: React.FC = () => {
       const params = {
         page: currentPage,
         limit: 10,
-        search: searchTerm,
+        search: debouncedSearchTerm || undefined,
         role: roleFilter !== 'all' ? roleFilter : undefined,
         isActive: statusFilter !== 'all' ? statusFilter === 'active' : undefined
       };
@@ -48,7 +57,7 @@ const AdminUsers: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, roleFilter, statusFilter]);
+  }, [currentPage, debouncedSearchTerm, roleFilter, statusFilter]);
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
@@ -87,6 +96,17 @@ const AdminUsers: React.FC = () => {
     }
   };
 
+  // Handle filter changes
+  const handleRoleFilterChange = (role: string) => {
+    setRoleFilter(role);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -121,16 +141,21 @@ const AdminUsers: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search users..."
+                placeholder="Search by name, email, or phone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
+              {searchTerm !== debouncedSearchTerm && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                </div>
+              )}
             </div>
 
             <select
               value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
+              onChange={(e) => handleRoleFilterChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Roles</option>
@@ -140,7 +165,7 @@ const AdminUsers: React.FC = () => {
 
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Status</option>
@@ -149,6 +174,65 @@ const AdminUsers: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Search Results Info */}
+        {debouncedSearchTerm && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Search results for "{debouncedSearchTerm}"
+                </span>
+                <span className="text-blue-600 dark:text-blue-300 text-sm">
+                  ({users.length} user{users.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => setSearchTerm('')}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+              >
+                Clear search
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Filter Results Info */}
+        {(roleFilter !== 'all' || statusFilter !== 'all') && (
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 text-orange-600 dark:text-orange-400">🔍</div>
+                <span className="text-orange-800 dark:text-orange-200 font-medium">
+                  Active filters:
+                </span>
+                {roleFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                    Role: {roleFilter.toUpperCase()}
+                  </span>
+                )}
+                {statusFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                    Status: {statusFilter.toUpperCase()}
+                  </span>
+                )}
+                <span className="text-orange-600 dark:text-orange-300 text-sm">
+                  ({users.length} user{users.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  handleRoleFilterChange('all');
+                  handleStatusFilterChange('all');
+                }}
+                className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200 text-sm font-medium"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Users Table */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">

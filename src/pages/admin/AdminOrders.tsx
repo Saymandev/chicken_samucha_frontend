@@ -6,6 +6,7 @@ import {
   Package,
   Search,
   Truck,
+  X,
   XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -67,6 +68,7 @@ const AdminOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,13 +76,23 @@ const AdminOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
         page: currentPage,
         limit: 10,
-        search: searchTerm,
+        search: debouncedSearchTerm || undefined,
         status: statusFilter !== 'all' ? statusFilter : undefined,
         paymentMethod: paymentFilter !== 'all' ? paymentFilter : undefined
       };
@@ -88,7 +100,7 @@ const AdminOrders: React.FC = () => {
       const response = await adminAPI.getAllOrders(params);
       if (response.data.success) {
         setOrders(response.data.orders || []);
-        setTotalPages(response.data.pagination?.pages || 1);
+        setTotalPages(response.data.totalPages || 1);
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -97,7 +109,7 @@ const AdminOrders: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, statusFilter, paymentFilter]);
+  }, [currentPage, debouncedSearchTerm, statusFilter, paymentFilter]);
 
   useEffect(() => {
     fetchOrders();
@@ -248,6 +260,17 @@ const AdminOrders: React.FC = () => {
     }
   };
 
+  // Handle filter changes
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handlePaymentFilterChange = (payment: string) => {
+    setPaymentFilter(payment);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
 
 
   const getPaymentMethodColor = (method: string) => {
@@ -336,29 +359,45 @@ const AdminOrders: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Delivery Management</h3>
           <div className="flex flex-wrap gap-3">
             <button
-              onClick={() => setStatusFilter('out_for_delivery')}
-              className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm"
+              onClick={() => handleStatusFilterChange('out_for_delivery')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+                statusFilter === 'out_for_delivery' 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-green-500 text-white hover:bg-green-600'
+              }`}
             >
               <Truck className="w-4 h-4" />
               Ready to Mark Delivered
             </button>
             <button
-              onClick={() => setStatusFilter('ready')}
-              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+              onClick={() => handleStatusFilterChange('ready')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+                statusFilter === 'ready' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+              }`}
             >
               <Package className="w-4 h-4" />
               Send for Delivery
             </button>
             <button
-              onClick={() => setStatusFilter('pending')}
-              className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm"
+              onClick={() => handleStatusFilterChange('pending')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+                statusFilter === 'pending' 
+                  ? 'bg-yellow-600 text-white' 
+                  : 'bg-yellow-500 text-white hover:bg-yellow-600'
+              }`}
             >
               <Clock className="w-4 h-4" />
               New Orders
             </button>
             <button
-              onClick={() => setStatusFilter('all')}
-              className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm"
+              onClick={() => handleStatusFilterChange('all')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+                statusFilter === 'all' 
+                  ? 'bg-gray-600 text-white' 
+                  : 'bg-gray-500 text-white hover:bg-gray-600'
+              }`}
             >
               <Eye className="w-4 h-4" />
               View All
@@ -373,16 +412,29 @@ const AdminOrders: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search orders..."
+                placeholder="Search by order number, customer name, or phone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
+              {searchTerm !== debouncedSearchTerm && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                </div>
+              )}
+              {searchTerm && searchTerm === debouncedSearchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Status</option>
@@ -397,7 +449,7 @@ const AdminOrders: React.FC = () => {
 
             <select
               value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
+              onChange={(e) => handlePaymentFilterChange(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Payments</option>
@@ -409,6 +461,65 @@ const AdminOrders: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Search Results Info */}
+        {debouncedSearchTerm && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-200 font-medium">
+                  Search results for "{debouncedSearchTerm}"
+                </span>
+                <span className="text-blue-600 dark:text-blue-300 text-sm">
+                  ({orders.length} order{orders.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => setSearchTerm('')}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+              >
+                Clear search
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Filter Results Info */}
+        {(statusFilter !== 'all' || paymentFilter !== 'all') && (
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 text-orange-600 dark:text-orange-400">🔍</div>
+                <span className="text-orange-800 dark:text-orange-200 font-medium">
+                  Active filters:
+                </span>
+                {statusFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                    Status: {statusFilter.replace('_', ' ').toUpperCase()}
+                  </span>
+                )}
+                {paymentFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                    Payment: {paymentFilter.toUpperCase()}
+                  </span>
+                )}
+                <span className="text-orange-600 dark:text-orange-300 text-sm">
+                  ({orders.length} order{orders.length !== 1 ? 's' : ''} found)
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  handleStatusFilterChange('all');
+                  handlePaymentFilterChange('all');
+                }}
+                className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200 text-sm font-medium"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Orders List */}
         <div className="space-y-4 mb-8">

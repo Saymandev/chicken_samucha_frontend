@@ -46,6 +46,7 @@ const AdminCategories: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: { en: '', bn: '' },
     description: { en: '', bn: '' },
@@ -70,13 +71,23 @@ const AdminCategories: React.FC = () => {
     '🥐', '🍞', '🥨', '🧀', '🥓', '🍳', '🥞', '🧇', '🥯', '🍯'
   ];
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
         page: currentPage,
         limit: 10,
-        search: searchTerm || undefined,
+        search: debouncedSearchTerm || undefined,
         withProductCount: true
       };
       const response = await categoriesAPI.getAllCategories(params);
@@ -90,7 +101,7 @@ const AdminCategories: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm]);
+  }, [currentPage, debouncedSearchTerm]);
 
   useEffect(() => {
     fetchCategories();
@@ -218,20 +229,45 @@ const AdminCategories: React.FC = () => {
       {/* Search and Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <input
               type="text"
-              placeholder="Search categories..."
+              placeholder="Search by name, description, or slug..."
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1); // Reset to first page when searching
-              }}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
+            {searchTerm !== debouncedSearchTerm && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-500"></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Search Results Info */}
+      {debouncedSearchTerm && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 text-blue-600 dark:text-blue-400">🔍</div>
+              <span className="text-blue-800 dark:text-blue-200 font-medium">
+                Search results for "{debouncedSearchTerm}"
+              </span>
+              <span className="text-blue-600 dark:text-blue-300 text-sm">
+                ({categories.length} categor{categories.length !== 1 ? 'ies' : 'y'} found)
+              </span>
+            </div>
+            <button
+              onClick={() => setSearchTerm('')}
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+            >
+              Clear search
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
