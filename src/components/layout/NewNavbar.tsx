@@ -296,7 +296,7 @@ const NewNavbar: React.FC = () => {
                                     </div>
                                     <div className="flex-1">
                                       <div className="font-medium text-gray-900 dark:text-white text-sm">
-                                        {category.name[language]}
+                                      {category.name[language] || category.name.en}
                                       </div>
                                       <div className="text-xs text-gray-500 dark:text-gray-400">
                                         {category.productCount} products
@@ -527,7 +527,7 @@ const NewNavbar: React.FC = () => {
                           className="block text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
-                          {category.name[language]} ({category.productCount})
+                          {category.name[language] || category.name.en} ({category.productCount})
                         </Link>
                         {category.children && category.children.length > 0 && (
                           <div className="mt-1 ml-4 space-y-1">
