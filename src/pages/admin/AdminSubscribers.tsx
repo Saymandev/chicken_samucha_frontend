@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import EMAIL_TEMPLATES from '../../constants/emailTemplates';
 import { subscriptionsAPI } from '../../utils/api';
 
 interface Subscriber {
@@ -17,6 +18,7 @@ const AdminSubscribers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [templateId, setTemplateId] = useState('');
 
   const load = async () => {
     try {
@@ -49,9 +51,9 @@ const AdminSubscribers: React.FC = () => {
     }
     try {
       setLoading(true);
-      const res = await subscriptionsAPI.broadcast({ subject, html: `<p>${message}</p>` });
+      const res = await subscriptionsAPI.broadcast({ subject, html: message.startsWith('<') ? message : `<p>${message}</p>` });
       toast.success(`Sent: ${res.data?.sent || 0}`);
-      setSubject(''); setMessage('');
+      setSubject(''); setMessage(''); setTemplateId('');
     } catch (e) {} finally { setLoading(false); }
   };
 
@@ -72,7 +74,17 @@ const AdminSubscribers: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-8 border border-gray-200 dark:border-gray-700">
         <h2 className="font-semibold mb-3 text-gray-900 dark:text-white">Quick Broadcast</h2>
         <div className="grid md:grid-cols-4 gap-3">
-          <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-1" />
+          <select value={templateId} onChange={(e)=>{
+            const id = e.target.value; setTemplateId(id);
+            const t = EMAIL_TEMPLATES.find(x=>x.id===id);
+            if (t) { setSubject(t.subject); setMessage(t.html); }
+          }} className="px-3 py-2 rounded border dark:bg-gray-900">
+            <option value="">Template (optional)</option>
+            {EMAIL_TEMPLATES.map(t=> (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
+          <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Message (HTML supported)" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
           <button onClick={handleBroadcast} disabled={loading} className="btn-primary">Send</button>
         </div>

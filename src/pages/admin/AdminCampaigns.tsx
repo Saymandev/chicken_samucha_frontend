@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import EMAIL_TEMPLATES from '../../constants/emailTemplates';
 import { campaignsAPI } from '../../utils/api';
 
 interface Campaign {
@@ -19,6 +20,7 @@ const AdminCampaigns: React.FC = () => {
   const [subject, setSubject] = useState('');
   const [html, setHtml] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
+  const [templateId, setTemplateId] = useState('');
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -39,7 +41,7 @@ const AdminCampaigns: React.FC = () => {
       setLoading(true);
       await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledFor || undefined });
       toast.success('Campaign created');
-      setName(''); setSubject(''); setHtml(''); setScheduledFor('');
+      setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setTemplateId('');
       load();
     } catch (e) {} finally { setLoading(false); }
   };
@@ -60,6 +62,16 @@ const AdminCampaigns: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 mb-8">
         <h2 className="font-semibold mb-3 text-gray-900 dark:text-white">Create Campaign</h2>
         <div className="grid md:grid-cols-2 gap-3">
+          <select value={templateId} onChange={(e)=>{
+            const id = e.target.value; setTemplateId(id);
+            const t = EMAIL_TEMPLATES.find(x=>x.id===id);
+            if (t) { setSubject(t.subject); setHtml(t.html); if (!name) setName(t.name); }
+          }} className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2">
+            <option value="">Choose a template (optional)</option>
+            {EMAIL_TEMPLATES.map(t=> (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
           <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML Content" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
