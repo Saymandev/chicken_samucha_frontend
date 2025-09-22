@@ -1,0 +1,121 @@
+import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { campaignsAPI } from '../../utils/api';
+
+interface Campaign {
+  id: string;
+  name: string;
+  subject: string;
+  status: string;
+  scheduledFor?: string;
+  sentAt?: string;
+  stats?: { recipients: number; sent: number; failed: number };
+  createdAt: string;
+}
+
+const AdminCampaigns: React.FC = () => {
+  const [items, setItems] = useState<Campaign[]>([]);
+  const [name, setName] = useState('');
+  const [subject, setSubject] = useState('');
+  const [html, setHtml] = useState('');
+  const [scheduledFor, setScheduledFor] = useState('');
+  const [sources, setSources] = useState<string>('');
+  const [joinedAfter, setJoinedAfter] = useState('');
+  const [joinedBefore, setJoinedBefore] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const load = async () => {
+    try {
+      const res = await campaignsAPI.list();
+      setItems(res.data?.data || []);
+    } catch (e) {}
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleCreate = async () => {
+    if (!name || !subject || !html) {
+      toast.error('Name, subject and content are required');
+      return;
+    }
+    try {
+      setLoading(true);
+      const filters: any = {};
+      if (sources.trim()) filters.source = sources.split(',').map(s=>s.trim()).filter(Boolean);
+      if (joinedAfter) filters.joinedAfter = joinedAfter;
+      if (joinedBefore) filters.joinedBefore = joinedBefore;
+      await campaignsAPI.create({ name, subject, html, filters, scheduledFor: scheduledFor || undefined });
+      toast.success('Campaign created');
+      setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setSources(''); setJoinedAfter(''); setJoinedBefore('');
+      load();
+    } catch (e) {} finally { setLoading(false); }
+  };
+
+  const handleSend = async (id: string) => {
+    try {
+      setLoading(true);
+      await campaignsAPI.sendNow(id);
+      toast.success('Sending started');
+      load();
+    } catch (e) {} finally { setLoading(false); }
+  };
+
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Campaigns</h1>
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 mb-8">
+        <h2 className="font-semibold mb-3 text-gray-900 dark:text-white">Create Campaign</h2>
+        <div className="grid md:grid-cols-2 gap-3">
+          <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded border dark:bg-gray-900" />
+          <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
+          <input value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML Content" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
+          <input value={sources} onChange={(e)=>setSources(e.target.value)} placeholder="Sources (comma-separated, e.g. footer,checkout)" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
+          <div className="grid grid-cols-2 gap-3 md:col-span-2">
+            <input type="datetime-local" value={joinedAfter} onChange={(e)=>setJoinedAfter(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Joined After" />
+            <input type="datetime-local" value={joinedBefore} onChange={(e)=>setJoinedBefore(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Joined Before" />
+          </div>
+          <input type="datetime-local" value={scheduledFor} onChange={(e)=>setScheduledFor(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Schedule (optional)" />
+          <div className="flex items-center">
+            <button onClick={handleCreate} disabled={loading} className="btn-primary">Save Campaign</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Scheduled</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stats</th>
+              <th className="px-4 py-3" />
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {items.map(c => (
+              <tr key={c.id}>
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{c.name}</td>
+                <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{c.subject}</td>
+                <td className="px-4 py-3 text-sm">{c.status}</td>
+                <td className="px-4 py-3 text-sm">{c.scheduledFor ? new Date(c.scheduledFor).toLocaleString() : '-'}</td>
+                <td className="px-4 py-3 text-sm">
+                  {c.stats ? `${c.stats.sent}/${c.stats.recipients} (failed ${c.stats.failed})` : '-'}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <button onClick={()=>handleSend(c.id)} className="text-primary-600 hover:underline">Send now</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default AdminCampaigns;
+
+

@@ -403,10 +403,37 @@ export const publicAPI = {
   getActivePromotions: (params?: any) => api.get('/promotions', { params }),
   trackPromotionView: (id: string) => api.post(`/promotions/${id}/view`),
   trackPromotionClick: (id: string) => api.post(`/promotions/${id}/click`),
+  // Announcements
+  getAnnouncement: () => api.get('/content/announcement'),
   
   // Refunds (Customer)
   createRefundRequest: (data: any) => api.post('/refunds', data),
   getMyRefunds: (params?: any) => api.get('/refunds', { params })
+};
+
+// Subscriptions API
+export const subscriptionsAPI = {
+  subscribe: (email: string, name?: string) =>
+    api.post('/subscriptions/subscribe', {
+      email,
+      name,
+      consent: true,
+      source: 'footer'
+    }),
+  unsubscribe: (email: string) =>
+    api.post('/subscriptions/unsubscribe', { email }),
+  list: (params?: { page?: number; limit?: number; status?: 'active'|'unsubscribed' }) =>
+    api.get('/subscriptions', { params }),
+  broadcast: (data: { subject: string; html?: string; text?: string; }) =>
+    api.post('/subscriptions/broadcast', data)
+};
+
+// Campaigns API (Admin)
+export const campaignsAPI = {
+  create: (data: { name: string; subject: string; html?: string; text?: string; filters?: any; scheduledFor?: string; }) =>
+    api.post('/admin/campaigns', data),
+  list: () => api.get('/admin/campaigns'),
+  sendNow: (id: string) => api.post(`/admin/campaigns/${id}/send`)
 };
 
 // Coupon API

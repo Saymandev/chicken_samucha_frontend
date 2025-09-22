@@ -41,6 +41,7 @@ import ProfilePage from './pages/ProfilePage';
 import WishlistPage from './pages/WishlistPage';
 
 // Admin Pages
+import AdminCampaigns from './pages/admin/AdminCampaigns';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminChat from './pages/admin/AdminChat';
 import AdminContent from './pages/admin/AdminContent';
@@ -51,6 +52,7 @@ import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminRefunds from './pages/admin/AdminRefunds';
 import AdminReports from './pages/admin/AdminReports';
 import AdminReviews from './pages/admin/AdminReviews';
+import AdminSubscribers from './pages/admin/AdminSubscribers';
 import AdminUsers from './pages/admin/AdminUsers';
 
 // Components
@@ -298,6 +300,26 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <AdminReports />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/subscribers"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminSubscribers />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/campaigns"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminCampaigns />
                 </AdminLayout>
               </ProtectedRoute>
             }

@@ -6,10 +6,12 @@ import {
   MapPin,
   Phone
 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
+import { subscriptionsAPI } from '../../utils/api';
 
 const Footer: React.FC = () => {
   const { t } = useTranslation();
@@ -45,6 +47,27 @@ const Footer: React.FC = () => {
       ]
     }
   ];
+
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscribe = async () => {
+    const emailRegex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+    if (!emailRegex.test(email)) {
+      toast.error(language === 'bn' ? 'সঠিক ইমেইল দিন' : 'Please enter a valid email');
+      return;
+    }
+    try {
+      setLoading(true);
+      await subscriptionsAPI.subscribe(email);
+      setEmail('');
+      toast.success(language === 'bn' ? 'সাবস্ক্রাইব সম্পন্ন!' : 'Subscribed successfully!');
+    } catch (err) {
+      // interceptor shows errors
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -143,8 +166,10 @@ const Footer: React.FC = () => {
                 type="email"
                 placeholder={language === 'bn' ? 'আপনার ইমেইল ঠিকানা' : 'Your email address'}
                 className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-primary-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <button className="btn-primary px-6 py-2 whitespace-nowrap">
+              <button onClick={handleSubscribe} disabled={loading} className="btn-primary px-6 py-2 whitespace-nowrap disabled:opacity-60">
                 {language === 'bn' ? 'সাবস্ক্রাইব' : 'Subscribe'}
               </button>
             </div>
