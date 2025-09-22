@@ -38,12 +38,31 @@ const api: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });
 
-// Request interceptor - cookies are sent automatically with withCredentials
+// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        // Check if token is expired by decoding it (basic check)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+        
+        if (payload.exp && payload.exp < currentTime) {
+          // Token is expired, remove it
+          localStorage.removeItem('token');
+        } else {
+          // Token seems valid, add to headers
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        // Invalid token format, remove it
+        localStorage.removeItem('token');
+      }
+    }
+    
     // Don't set Content-Type for FormData - let browser handle it
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
@@ -71,7 +90,8 @@ api.interceptors.response.use(
       
       switch (status) {
         case 401:
-          // Unauthorized - let route guards handle navigation
+          // Unauthorized - clear token and let route guards handle navigation
+          localStorage.removeItem('token');
           toast.error('Session expired. Please login again.');
           break;
         case 403:
