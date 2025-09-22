@@ -4,7 +4,7 @@ import io, { Socket } from 'socket.io-client';
 import { publicAPI } from '../utils/api';
 
 interface Promotion {
-  _id: string;
+  id: string;
   title: {
     en: string;
     bn: string;
@@ -53,8 +53,9 @@ interface Promotion {
 
 // Check if promotion should be shown based on display frequency
 const shouldShowPromotion = (promotion: Promotion, pathname: string): boolean => {
-    const sessionKey = `promotion_${promotion._id}_session`;
-    const dailyKey = `promotion_${promotion._id}_daily`;
+    const pid: any = (promotion as any).id || (promotion as any)._id;
+    const sessionKey = `promotion_${pid}_session`;
+    const dailyKey = `promotion_${pid}_daily`;
     
     // Provide defaults for missing fields
     const displayFrequency = promotion.displayFrequency || 'always';
@@ -134,8 +135,9 @@ export const usePromotions = () => {
 
   // Mark promotion as shown
   const markPromotionAsShown = (promotion: Promotion) => {
-    const sessionKey = `promotion_${promotion._id}_session`;
-    const dailyKey = `promotion_${promotion._id}_daily`;
+    const id = (promotion as any).id || (promotion as any)._id;
+    const sessionKey = `promotion_${id}_session`;
+    const dailyKey = `promotion_${id}_daily`;
     
     switch (promotion.displayFrequency) {
       case 'once_per_session':
@@ -226,7 +228,7 @@ export const usePromotions = () => {
   // Handle promotion click
   const handlePromotionClick = async () => {
     if (currentPromotion) {
-      await trackPromotionClick(currentPromotion._id);
+      await trackPromotionClick(currentPromotion.id);
     }
   };
 
@@ -234,36 +236,38 @@ export const usePromotions = () => {
   const handlePromotionUpdate = useCallback((data: any) => {
     console.log('📢 Promotion update received:', data);
     const { promotion, action } = data;
+    // Normalize id for socket payloads that might use _id
+    const normalized = promotion?.id ? promotion : { ...promotion, id: promotion?._id };
     
     if (action === 'created' || action === 'activated') {
       // Add new promotion to the list
       setPromotions(prev => {
-        const exists = prev.find(p => p._id === promotion._id);
+        const exists = prev.find(p => p.id === normalized.id);
         if (!exists) {
-          return [promotion, ...prev];
+          return [normalized, ...prev];
         }
         return prev;
       });
       
       // Check if this promotion should be shown
-      const shouldShow = shouldShowPromotion(promotion, location.pathname);
+      const shouldShow = shouldShowPromotion(normalized, location.pathname);
       if (shouldShow) {
-        setCurrentPromotion(promotion);
+        setCurrentPromotion(normalized);
       }
     } else if (action === 'deactivated' || action === 'deleted') {
       // Remove promotion from the list
-      setPromotions(prev => prev.filter(p => p._id !== promotion._id));
+      setPromotions(prev => prev.filter(p => p.id !== normalized.id));
       
       // Close modal if this was the current promotion
-      setCurrentPromotion(prev => prev?._id === promotion._id ? null : prev);
+      setCurrentPromotion(prev => prev?.id === normalized.id ? null : prev);
     } else if (action === 'updated') {
       // Update existing promotion
       setPromotions(prev => 
-        prev.map(p => p._id === promotion._id ? promotion : p)
+        prev.map(p => p.id === normalized.id ? normalized : p)
       );
       
       // Update current promotion if it's the same one
-      setCurrentPromotion(prev => prev?._id === promotion._id ? promotion : prev);
+      setCurrentPromotion(prev => prev?.id === normalized.id ? normalized : prev);
     }
   }, [location.pathname]);
 
@@ -301,7 +305,7 @@ export const usePromotions = () => {
   // Track view when promotion is shown
   useEffect(() => {
     if (currentPromotion) {
-      trackPromotionView(currentPromotion._id);
+      trackPromotionView(currentPromotion.id);
     }
   }, [currentPromotion]);
 
