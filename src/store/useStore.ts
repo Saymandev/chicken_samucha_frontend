@@ -272,9 +272,7 @@ export const useStore = create<AppStore>()(
     {
       name: 'chicken-samosa-store',
       partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
+        // Only persist non-sensitive data
         theme: state.theme,
         language: state.language,
         cart: state.cart,

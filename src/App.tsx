@@ -72,7 +72,7 @@ import { usePromotions } from './hooks/usePromotions';
 
 // Component to handle layout based on route
 function AppContent() {
-  const { theme, user } = useStore();
+  const { theme, user, setUser, setToken } = useStore();
   const { isCartOpen, closeCart } = useCart();
   const location = useLocation();
   
@@ -81,6 +81,34 @@ function AppContent() {
   
   // Promotion modal logic (only for non-admin routes)
   const { currentPromotion, closePromotion, handlePromotionClick } = usePromotions();
+  
+  // Initialize user from server on app start
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const response = await fetch(`${process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api'}/auth/me`, {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user) {
+            // Populate user state from server
+            setUser(data.user);
+            setToken('cookie-based'); // Placeholder since we don't store tokens
+          }
+        }
+      } catch (error) {
+        // User not authenticated or server error - continue as guest
+        console.log('No active session found');
+      }
+    };
+    
+    // Only initialize if no user in state (fresh load)
+    if (!user) {
+      initializeAuth();
+    }
+  }, [setUser, setToken, user]);
   
 
   // Socket connection for real-time notifications
