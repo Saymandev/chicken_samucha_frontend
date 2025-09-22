@@ -5,7 +5,7 @@ import { publicAPI } from '../utils/api';
 
 interface Promotion {
   id: string;
-  _id?: string;
+  _id: string;
   title: {
     en: string;
     bn: string;
@@ -174,8 +174,8 @@ export const usePromotions = () => {
     if (response.data.success) {
       const promotions = (response.data.promotions || []).map((p: any) => ({
         ...p,
-        id: p?.id ?? p?._id,
-        _id: p?._id ?? p?.id
+        id: String(p?.id ?? p?._id ?? ''),
+        _id: String(p?._id ?? p?.id ?? '')
       }));
       setPromotions(promotions);
       
@@ -244,8 +244,8 @@ export const usePromotions = () => {
     // Normalize id for socket payloads that might use _id
     const normalized = {
       ...promotion,
-      id: promotion?.id ?? promotion?._id,
-      _id: promotion?._id ?? promotion?.id
+      id: String(promotion?.id ?? promotion?._id ?? ''),
+      _id: String(promotion?._id ?? promotion?.id ?? '')
     };
     
     if (action === 'created' || action === 'activated') {
