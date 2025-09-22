@@ -152,6 +152,45 @@ const NewNavbar: React.FC = () => {
   ];
 
   // Product quick links are now top-level nav items; no dropdown items needed
+  const renderCategoryTree = (node: Category, depth: number, onClick?: () => void) => {
+    const indent = depth > 0 ? `ml-${Math.min(depth * 4, 12)}` : '';
+    return (
+      <div key={node.id} className="">
+        <Link
+          to={`/products?category=${node.slug}`}
+          className={`flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${indent}`}
+          onClick={onClick}
+        >
+          {depth === 0 ? (
+            <div 
+              className="w-6 h-6 rounded flex items-center justify-center text-sm"
+              style={{ backgroundColor: node.color + '20' }}
+            >
+              {node.icon}
+            </div>
+          ) : (
+            <span className="text-gray-400">•</span>
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-gray-900 dark:text-white text-sm truncate">
+              {node.name[language] || node.name.en}
+            </div>
+            {depth === 0 && (
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {node.productCount} products
+              </div>
+            )}
+          </div>
+          <span className="text-xs text-gray-500">{node.productCount}</span>
+        </Link>
+        {node.children && node.children.length > 0 && (
+          <div className="ml-4 space-y-1">
+            {node.children.map(child => renderCategoryTree(child, depth + 1, onClick))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const userMenuItems = [
     ...(user?.role === 'admin' ? [
@@ -282,46 +321,7 @@ const NewNavbar: React.FC = () => {
                             </div>
                           ) : categories.length > 0 ? (
                             <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
-                              {categories.map((category) => (
-                                <div key={category.id} className="">
-                                  <Link
-                                    to={`/products?category=${category.slug}`}
-                                    className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                  >
-                                    <div 
-                                      className="w-6 h-6 rounded flex items-center justify-center text-sm"
-                                      style={{ backgroundColor: category.color + '20' }}
-                                    >
-                                      {category.icon}
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="font-medium text-gray-900 dark:text-white text-sm">
-                                      {category.name[language] || category.name.en}
-                                      </div>
-                                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {category.productCount} products
-                                      </div>
-                                    </div>
-                                  </Link>
-                                  {category.children && category.children.length > 0 && (
-                                    <div className="ml-10 space-y-1">
-                                      {category.children.map((child) => (
-                                        <Link
-                                          key={child.id}
-                                          to={`/products?category=${child.slug}`}
-                                          className="flex items-center space-x-2 px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
-                                        >
-                                          <span className="text-gray-400">•</span>
-                                          <span className="flex-1 text-gray-700 dark:text-gray-300">
-                                            {child.name[language]}
-                                          </span>
-                                          <span className="text-xs text-gray-500">{child.productCount}</span>
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
+                              {categories.map((category) => renderCategoryTree(category, 0))}
                             </div>
                           ) : (
                             <div className="text-sm text-gray-500 dark:text-gray-400 py-2">
@@ -520,31 +520,7 @@ const NewNavbar: React.FC = () => {
                     <span>Categories</span>
                   </div>
                   <div className="ml-6 space-y-3">
-                    {categories.map((category) => (
-                      <div key={category.id}>
-                        <Link
-                          to={`/products?category=${category.slug}`}
-                          className="block text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {category.name[language] || category.name.en} ({category.productCount})
-                        </Link>
-                        {category.children && category.children.length > 0 && (
-                          <div className="mt-1 ml-4 space-y-1">
-                            {category.children.map((child) => (
-                              <Link
-                                key={child.id}
-                                to={`/products?category=${child.slug}`}
-                                className="block text-xs text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                              >
-                                {child.name[language]} ({child.productCount})
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {categories.map((category) => renderCategoryTree(category, 0, () => setIsMobileMenuOpen(false)))}
                   </div>
                 </div>
               </div>
