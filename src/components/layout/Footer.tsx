@@ -6,12 +6,12 @@ import {
   MapPin,
   Phone
 } from 'lucide-react';
-import React, { useState } from 'react';
-import toast from 'react-hot-toast';
+import React from 'react';
+// import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
-import { subscriptionsAPI } from '../../utils/api';
+// import { subscriptionsAPI } from '../../utils/api';
 
 const Footer: React.FC = () => {
   const { t } = useTranslation();
@@ -48,26 +48,9 @@ const Footer: React.FC = () => {
     }
   ];
 
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  // Newsletter disabled (state removed)
 
-  const handleSubscribe = async () => {
-    const emailRegex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
-    if (!emailRegex.test(email)) {
-      toast.error(language === 'bn' ? 'সঠিক ইমেইল দিন' : 'Please enter a valid email');
-      return;
-    }
-    try {
-      setLoading(true);
-      await subscriptionsAPI.subscribe(email);
-      setEmail('');
-      toast.success(language === 'bn' ? 'সাবস্ক্রাইব সম্পন্ন!' : 'Subscribed successfully!');
-    } catch (err) {
-      // interceptor shows errors
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Newsletter disabled (no-op)
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -150,31 +133,7 @@ const Footer: React.FC = () => {
           ))}
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="max-w-2xl mx-auto text-center">
-            <h3 className={`font-semibold text-lg text-white mb-4 ${
-              language === 'bn' ? 'font-bengali' : ''
-            }`}>
-              {language === 'bn' 
-                ? 'বিশেষ অফার এবং আপডেট পেতে সাবস্ক্রাইব করুন'
-                : 'Subscribe for special offers and updates'
-              }
-            </h3>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder={language === 'bn' ? 'আপনার ইমেইল ঠিকানা' : 'Your email address'}
-                className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-primary-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <button onClick={handleSubscribe} disabled={loading} className="btn-primary px-6 py-2 whitespace-nowrap disabled:opacity-60">
-                {language === 'bn' ? 'সাবস্ক্রাইব' : 'Subscribe'}
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Newsletter Signup - hidden as per configuration */}
 
         {/* Social Media & Copyright */}
         <div className="mt-8 pt-8 border-t border-gray-800">

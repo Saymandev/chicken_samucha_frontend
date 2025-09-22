@@ -1,24 +1,25 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import toast from 'react-hot-toast';
 
-// Transform MongoDB _id to id for frontend consistency
+// Transform MongoDB _id to id for frontend consistency (deep)
 const transformData = (data: any): any => {
   if (Array.isArray(data)) {
     return data.map(transformData);
   }
-  
-  if (data && typeof data === 'object' && data._id) {
-    const { _id, ...rest } = data;
-    return {
-      id: _id,
-      ...rest,
-      ...Object.keys(rest).reduce((acc, key) => {
-        acc[key] = transformData(rest[key]);
-        return acc;
-      }, {} as any)
-    };
+
+  if (data && typeof data === 'object') {
+    const result: any = {};
+    // If object has _id, map it to id
+    if (Object.prototype.hasOwnProperty.call(data, '_id')) {
+      result.id = (data as any)._id;
+    }
+    for (const key of Object.keys(data)) {
+      if (key === '_id') continue;
+      result[key] = transformData((data as any)[key]);
+    }
+    return result;
   }
-  
+
   return data;
 };
 // changes made here

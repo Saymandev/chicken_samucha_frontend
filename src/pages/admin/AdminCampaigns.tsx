@@ -19,9 +19,6 @@ const AdminCampaigns: React.FC = () => {
   const [subject, setSubject] = useState('');
   const [html, setHtml] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
-  const [sources, setSources] = useState<string>('');
-  const [joinedAfter, setJoinedAfter] = useState('');
-  const [joinedBefore, setJoinedBefore] = useState('');
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -40,13 +37,9 @@ const AdminCampaigns: React.FC = () => {
     }
     try {
       setLoading(true);
-      const filters: any = {};
-      if (sources.trim()) filters.source = sources.split(',').map(s=>s.trim()).filter(Boolean);
-      if (joinedAfter) filters.joinedAfter = joinedAfter;
-      if (joinedBefore) filters.joinedBefore = joinedBefore;
-      await campaignsAPI.create({ name, subject, html, filters, scheduledFor: scheduledFor || undefined });
+      await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledFor || undefined });
       toast.success('Campaign created');
-      setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setSources(''); setJoinedAfter(''); setJoinedBefore('');
+      setName(''); setSubject(''); setHtml(''); setScheduledFor('');
       load();
     } catch (e) {} finally { setLoading(false); }
   };
@@ -70,11 +63,6 @@ const AdminCampaigns: React.FC = () => {
           <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML Content" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
-          <input value={sources} onChange={(e)=>setSources(e.target.value)} placeholder="Sources (comma-separated, e.g. footer,checkout)" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
-          <div className="grid grid-cols-2 gap-3 md:col-span-2">
-            <input type="datetime-local" value={joinedAfter} onChange={(e)=>setJoinedAfter(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Joined After" />
-            <input type="datetime-local" value={joinedBefore} onChange={(e)=>setJoinedBefore(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Joined Before" />
-          </div>
           <input type="datetime-local" value={scheduledFor} onChange={(e)=>setScheduledFor(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Schedule (optional)" />
           <div className="flex items-center">
             <button onClick={handleCreate} disabled={loading} className="btn-primary">Save Campaign</button>
