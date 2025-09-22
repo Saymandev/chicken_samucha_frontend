@@ -70,6 +70,7 @@ const AdminSubscribers: React.FC = () => {
             <option value="all">All</option>
           </select>
           <button onClick={load} className="btn-primary px-4 py-2">Refresh</button>
+          <button onClick={async()=>{ try { setLoading(true); const res = await subscriptionsAPI.backfill(); toast.success(`Backfill done. Created: ${res.data?.created||0}, Skipped: ${res.data?.skipped||0}`); await load(); } catch(e){} finally { setLoading(false); } }} disabled={loading} className="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-60">Backfill Users</button>
         </div>
       </div>
 

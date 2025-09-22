@@ -426,7 +426,8 @@ export const subscriptionsAPI = {
   list: (params?: { page?: number; limit?: number; status?: 'active'|'unsubscribed' }) =>
     api.get('/subscriptions', { params }),
   broadcast: (data: { subject: string; html?: string; text?: string; }) =>
-    api.post('/subscriptions/broadcast', data)
+    api.post('/subscriptions/broadcast', data),
+  backfill: () => api.post('/subscriptions/backfill')
 };
 
 // Campaigns API (Admin)
