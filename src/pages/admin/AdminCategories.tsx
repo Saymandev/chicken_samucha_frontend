@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Edit2,
-  Eye,
-  EyeOff,
-  Plus,
-  Save,
-  Trash2,
-  X
+    Edit2,
+    Eye,
+    EyeOff,
+    Plus,
+    Save,
+    Trash2,
+    X
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';

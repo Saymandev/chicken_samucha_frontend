@@ -1,16 +1,16 @@
 import { motion } from 'framer-motion';
 import {
-    Calendar,
-    Edit,
-    Eye,
-    Gift,
-    Plus,
-    Search,
-    Star,
-    ToggleLeft,
-    ToggleRight,
-    Trash2,
-    TrendingUp
+  Calendar,
+  Edit,
+  Eye,
+  Gift,
+  Plus,
+  Search,
+  Star,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  TrendingUp
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
