@@ -5,6 +5,7 @@ import { publicAPI } from '../utils/api';
 
 interface Promotion {
   id: string;
+  _id?: string;
   title: {
     en: string;
     bn: string;
@@ -171,7 +172,11 @@ export const usePromotions = () => {
     });
     
     if (response.data.success) {
-      const promotions = response.data.promotions || [];
+      const promotions = (response.data.promotions || []).map((p: any) => ({
+        ...p,
+        id: p?.id ?? p?._id,
+        _id: p?._id ?? p?.id
+      }));
       setPromotions(promotions);
       
       // Find the first promotion that should be shown
@@ -237,7 +242,11 @@ export const usePromotions = () => {
     console.log('📢 Promotion update received:', data);
     const { promotion, action } = data;
     // Normalize id for socket payloads that might use _id
-    const normalized = promotion?.id ? promotion : { ...promotion, id: promotion?._id };
+    const normalized = {
+      ...promotion,
+      id: promotion?.id ?? promotion?._id,
+      _id: promotion?._id ?? promotion?.id
+    };
     
     if (action === 'created' || action === 'activated') {
       // Add new promotion to the list
