@@ -22,6 +22,7 @@ const AdminCampaigns: React.FC = () => {
   const [scheduledFor, setScheduledFor] = useState('');
   const [templateId, setTemplateId] = useState('');
   const [templateValues, setTemplateValues] = useState<Record<string,string>>({});
+  const [showHtml, setShowHtml] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -96,9 +97,12 @@ const AdminCampaigns: React.FC = () => {
           )}
           <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
-          <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
-            <textarea value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML (auto-generated from fields, still editable)" className="px-3 py-2 rounded border dark:bg-gray-900 min-h-[220px]" />
-            <div className="border rounded-lg p-3 dark:border-gray-700 bg-white text-black overflow-auto" dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="md:col-span-2 grid gap-4">
+            <div className="border rounded-lg p-3 dark:border-gray-700 bg-white text-black overflow-auto shadow-sm" dangerouslySetInnerHTML={{ __html: html }} />
+            <button type="button" onClick={()=>setShowHtml(!showHtml)} className="text-sm text-gray-600 dark:text-gray-300 underline w-max">{showHtml ? 'Hide HTML' : 'Advanced: Edit HTML'}</button>
+            {showHtml && (
+              <textarea value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML (advanced)" className="px-3 py-2 rounded border dark:bg-gray-900 min-h-[220px] font-mono text-xs" />
+            )}
           </div>
           <input type="datetime-local" value={scheduledFor} onChange={(e)=>setScheduledFor(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Schedule (optional)" />
           <div className="flex items-center">

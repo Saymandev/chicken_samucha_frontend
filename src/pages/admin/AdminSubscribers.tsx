@@ -20,6 +20,7 @@ const AdminSubscribers: React.FC = () => {
   const [message, setMessage] = useState('');
   const [templateId, setTemplateId] = useState('');
   const [templateValues, setTemplateValues] = useState<Record<string,string>>({});
+  const [showHtml, setShowHtml] = useState(false);
 
   const load = async () => {
     try {
@@ -74,7 +75,7 @@ const AdminSubscribers: React.FC = () => {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-8 border border-gray-200 dark:border-gray-700">
         <h2 className="font-semibold mb-3 text-gray-900 dark:text-white">Quick Broadcast</h2>
-        <div className="grid md:grid-cols-4 gap-3">
+        <div className="grid md:grid-cols-4 gap-3 items-start">
           <select value={templateId} onChange={(e)=>{
             const id = e.target.value; setTemplateId(id);
             const t = EMAIL_TEMPLATES.find(x=>x.id===id);
@@ -106,9 +107,12 @@ const AdminSubscribers: React.FC = () => {
             </div>
           )}
           <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
-          <div className="md:col-span-2 grid md:grid-cols-2 gap-3 items-start">
-            <textarea value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Message preview (auto-generated from fields)" className="px-3 py-2 rounded border dark:bg-gray-900 min-h-[200px]" />
-            <div className="border rounded-lg p-3 dark:border-gray-700 bg-white text-black overflow-auto" dangerouslySetInnerHTML={{ __html: message }} />
+          <div className="md:col-span-2 grid gap-3 items-start">
+            <div className="border rounded-lg p-3 dark:border-gray-700 bg-white text-black overflow-auto shadow-sm" dangerouslySetInnerHTML={{ __html: message }} />
+            <button type="button" onClick={()=>setShowHtml(!showHtml)} className="text-sm text-gray-600 dark:text-gray-300 underline w-max">{showHtml ? 'Hide HTML' : 'Advanced: Edit HTML'}</button>
+            {showHtml && (
+              <textarea value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="HTML (advanced)" className="px-3 py-2 rounded border dark:bg-gray-900 min-h-[180px] font-mono text-xs" />
+            )}
           </div>
           <button onClick={handleBroadcast} disabled={loading} className="btn-primary">Send</button>
         </div>
