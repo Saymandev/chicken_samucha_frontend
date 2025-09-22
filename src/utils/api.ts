@@ -431,7 +431,7 @@ export const subscriptionsAPI = {
 
 // Campaigns API (Admin)
 export const campaignsAPI = {
-  create: (data: { name: string; subject: string; html?: string; text?: string; filters?: any; scheduledFor?: string; }) =>
+  create: (data: { name: string; subject: string; html?: string; text?: string; filters?: any; scheduledFor?: string; clientTzOffset?: number; }) =>
     api.post('/admin/campaigns', data),
   list: () => api.get('/admin/campaigns'),
   sendNow: (id: string) => api.post(`/admin/campaigns/${id}/send`)

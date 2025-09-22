@@ -41,7 +41,8 @@ const AdminCampaigns: React.FC = () => {
     }
     try {
       setLoading(true);
-      await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledFor || undefined });
+      const clientTzOffset = new Date().getTimezoneOffset();
+      await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledFor || undefined, clientTzOffset });
       toast.success('Campaign created');
       setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setTemplateId(''); setTemplateValues({});
       load();
