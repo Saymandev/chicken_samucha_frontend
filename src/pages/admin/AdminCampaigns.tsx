@@ -21,6 +21,7 @@ const AdminCampaigns: React.FC = () => {
   const [html, setHtml] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [templateId, setTemplateId] = useState('');
+  const [templateValues, setTemplateValues] = useState<Record<string,string>>({});
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -41,7 +42,7 @@ const AdminCampaigns: React.FC = () => {
       setLoading(true);
       await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledFor || undefined });
       toast.success('Campaign created');
-      setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setTemplateId('');
+      setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setTemplateId(''); setTemplateValues({});
       load();
     } catch (e) {} finally { setLoading(false); }
   };
@@ -65,16 +66,40 @@ const AdminCampaigns: React.FC = () => {
           <select value={templateId} onChange={(e)=>{
             const id = e.target.value; setTemplateId(id);
             const t = EMAIL_TEMPLATES.find(x=>x.id===id);
-            if (t) { setSubject(t.subject); setHtml(t.html); if (!name) setName(t.name); }
+            if (t) {
+              setSubject(t.subject);
+              const values = { ...t.defaults };
+              setTemplateValues(values);
+              setHtml(t.render(values));
+              if (!name) setName(t.name);
+            }
           }} className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2">
             <option value="">Choose a template (optional)</option>
             {EMAIL_TEMPLATES.map(t=> (
               <option key={t.id} value={t.id}>{t.name}</option>
             ))}
           </select>
+          {templateId && (
+            <div className="md:col-span-2 grid md:grid-cols-2 gap-3">
+              {(EMAIL_TEMPLATES.find(t=>t.id===templateId)?.fields || []).map(f => (
+                <input key={f.key} value={templateValues[f.key] || ''}
+                  onChange={(e)=>{
+                    const v = { ...templateValues, [f.key]: e.target.value };
+                    setTemplateValues(v);
+                    const tmpl = EMAIL_TEMPLATES.find(t=>t.id===templateId)!;
+                    setHtml(tmpl.render(v));
+                  }}
+                  placeholder={f.label}
+                  className="px-3 py-2 rounded border dark:bg-gray-900" />
+              ))}
+            </div>
+          )}
           <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded border dark:bg-gray-900" />
           <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
-          <input value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML Content" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
+          <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
+            <textarea value={html} onChange={(e)=>setHtml(e.target.value)} placeholder="HTML (auto-generated from fields, still editable)" className="px-3 py-2 rounded border dark:bg-gray-900 min-h-[220px]" />
+            <div className="border rounded-lg p-3 dark:border-gray-700 bg-white text-black overflow-auto" dangerouslySetInnerHTML={{ __html: html }} />
+          </div>
           <input type="datetime-local" value={scheduledFor} onChange={(e)=>setScheduledFor(e.target.value)} className="px-3 py-2 rounded border dark:bg-gray-900" placeholder="Schedule (optional)" />
           <div className="flex items-center">
             <button onClick={handleCreate} disabled={loading} className="btn-primary">Save Campaign</button>

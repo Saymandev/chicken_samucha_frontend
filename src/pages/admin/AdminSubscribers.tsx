@@ -19,6 +19,7 @@ const AdminSubscribers: React.FC = () => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [templateId, setTemplateId] = useState('');
+  const [templateValues, setTemplateValues] = useState<Record<string,string>>({});
 
   const load = async () => {
     try {
@@ -53,7 +54,7 @@ const AdminSubscribers: React.FC = () => {
       setLoading(true);
       const res = await subscriptionsAPI.broadcast({ subject, html: message.startsWith('<') ? message : `<p>${message}</p>` });
       toast.success(`Sent: ${res.data?.sent || 0}`);
-      setSubject(''); setMessage(''); setTemplateId('');
+      setSubject(''); setMessage(''); setTemplateId(''); setTemplateValues({});
     } catch (e) {} finally { setLoading(false); }
   };
 
@@ -77,15 +78,38 @@ const AdminSubscribers: React.FC = () => {
           <select value={templateId} onChange={(e)=>{
             const id = e.target.value; setTemplateId(id);
             const t = EMAIL_TEMPLATES.find(x=>x.id===id);
-            if (t) { setSubject(t.subject); setMessage(t.html); }
+            if (t) {
+              setSubject(t.subject);
+              const values = { ...t.defaults };
+              setTemplateValues(values);
+              setMessage(t.render(values));
+            }
           }} className="px-3 py-2 rounded border dark:bg-gray-900">
             <option value="">Template (optional)</option>
             {EMAIL_TEMPLATES.map(t=> (
               <option key={t.id} value={t.id}>{t.name}</option>
             ))}
           </select>
+          {templateId && (
+            <div className="md:col-span-3 grid md:grid-cols-3 gap-3">
+              {(EMAIL_TEMPLATES.find(t=>t.id===templateId)?.fields || []).map(f => (
+                <input key={f.key} value={templateValues[f.key] || ''}
+                  onChange={(e)=>{
+                    const v = { ...templateValues, [f.key]: e.target.value };
+                    setTemplateValues(v);
+                    const tmpl = EMAIL_TEMPLATES.find(t=>t.id===templateId)!;
+                    setMessage(tmpl.render(v));
+                  }}
+                  placeholder={f.label}
+                  className="px-3 py-2 rounded border dark:bg-gray-900" />
+              ))}
+            </div>
+          )}
           <input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject" className="px-3 py-2 rounded border dark:bg-gray-900" />
-          <input value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Message (HTML supported)" className="px-3 py-2 rounded border dark:bg-gray-900 md:col-span-2" />
+          <div className="md:col-span-2 grid md:grid-cols-2 gap-3 items-start">
+            <textarea value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Message preview (auto-generated from fields)" className="px-3 py-2 rounded border dark:bg-gray-900 min-h-[200px]" />
+            <div className="border rounded-lg p-3 dark:border-gray-700 bg-white text-black overflow-auto" dangerouslySetInnerHTML={{ __html: message }} />
+          </div>
           <button onClick={handleBroadcast} disabled={loading} className="btn-primary">Send</button>
         </div>
       </div>
