@@ -41,8 +41,11 @@ const AdminCampaigns: React.FC = () => {
     }
     try {
       setLoading(true);
-      const clientTzOffset = new Date().getTimezoneOffset();
-      await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledFor || undefined, clientTzOffset });
+      // Convert local datetime-local to UTC ISO to avoid date rollovers
+      const scheduledIso = scheduledFor
+        ? new Date(scheduledFor).toISOString()
+        : undefined;
+      await campaignsAPI.create({ name: name || subject, subject, html, filters: {}, scheduledFor: scheduledIso });
       toast.success('Campaign created');
       setName(''); setSubject(''); setHtml(''); setScheduledFor(''); setTemplateId(''); setTemplateValues({});
       load();
@@ -134,8 +137,9 @@ const AdminCampaigns: React.FC = () => {
                 <td className="px-4 py-3 text-sm">
                   {c.stats ? `${c.stats.sent}/${c.stats.recipients} (failed ${c.stats.failed})` : '-'}
                 </td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-right space-x-4">
                   <button onClick={()=>handleSend(c.id)} className="text-primary-600 hover:underline">Send now</button>
+                  <button onClick={async()=>{ try { await campaignsAPI.delete(c.id); toast.success('Deleted'); load(); } catch(e){} }} className="text-red-600 hover:underline">Delete</button>
                 </td>
               </tr>
             ))}
