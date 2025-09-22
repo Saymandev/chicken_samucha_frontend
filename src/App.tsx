@@ -22,6 +22,7 @@ import CookiePolicyPage from './pages/CookiePolicyPage';
 import FAQPage from './pages/FAQPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import LoginPage from './pages/LoginPage';
+import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import RefundHistoryPage from './pages/RefundHistoryPage';
 import RefundPolicyPage from './pages/RefundPolicyPage';
@@ -326,10 +327,7 @@ function AppContent() {
           />
           
           {/* 404 Page */}
-          <Route path="*" element={<div className="text-center py-20">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
-            <p className="text-gray-600 dark:text-gray-400">Page not found</p>
-          </div>} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
       
