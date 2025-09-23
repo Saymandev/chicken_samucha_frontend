@@ -32,10 +32,14 @@ const CategoryProductsSection: React.FC<CategoryProductsSectionProps> = ({
     (async () => {
       try {
         setLoading(true);
+        console.log(`Fetching products for category: ${categorySlug}`);
         const res = await productsAPI.getProducts({ category: categorySlug, limit });
+        console.log(`Products response for ${categorySlug}:`, res.data);
         const items = res.data?.products || res.data?.data || [];
+        console.log(`Products found for ${categorySlug}:`, items.length);
         if (mounted) setProducts(items);
       } catch (e) {
+        console.error(`Error fetching products for ${categorySlug}:`, e);
         if (mounted) setProducts([]);
       } finally {
         if (mounted) setLoading(false);

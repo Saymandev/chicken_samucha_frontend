@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useStore } from '../../store/useStore';
-import { categoriesAPI } from '../../utils/api';
+import { categoriesAPI, productsAPI } from '../../utils/api';
 import CategoryProductsSection from './CategoryProductsSection';
 
 interface Category {
@@ -29,29 +28,82 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
   limit = 8,
   maxCategories = 6
 }) => {
-  const { language } = useStore();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchCategoriesWithProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await categoriesAPI.getAllCategories();
-      if (response.data.success) {
+      console.log('Fetching categories...');
+      
+      // First try with productCount
+      const response = await categoriesAPI.getAllCategories({ withProductCount: 'true', limit: 50 });
+      console.log('Categories API response:', response.data);
+      
+      if (response.data.success && response.data.data) {
         // Filter categories that have products
-        const categoriesWithProducts = response.data.data.filter(
-          (category: Category) => category.productCount > 0
+        let categoriesWithProducts = response.data.data.filter(
+          (category: Category) => category.productCount && category.productCount > 0
         );
+        
+        console.log('Categories with productCount > 0:', categoriesWithProducts.length);
+        
+        // If no categories with productCount, try without productCount and check manually
+        if (categoriesWithProducts.length === 0) {
+          console.log('No categories with productCount, trying all categories...');
+          const allCategoriesResponse = await categoriesAPI.getAllCategories({ limit: 50 });
+          
+          if (allCategoriesResponse.data.success && allCategoriesResponse.data.data) {
+            const allCategories = allCategoriesResponse.data.data;
+            console.log('All categories found:', allCategories.length);
+            
+            // Check first few categories for products
+            const checkCategories = allCategories.slice(0, 10); // Check first 10 categories
+            const categoriesWithProductsPromises = checkCategories.map(async (category: Category) => {
+              try {
+                const productsResponse = await productsAPI.getProducts({ category: category.slug, limit: 1 });
+                const hasProducts = productsResponse.data.success && 
+                  (productsResponse.data.products?.length > 0 || productsResponse.data.data?.length > 0);
+                console.log(`Category ${category.slug} has products:`, hasProducts);
+                return hasProducts ? { ...category, productCount: 1 } : null;
+              } catch (error) {
+                console.error(`Error checking products for category ${category.slug}:`, error);
+                return null;
+              }
+            });
+            
+            const results = await Promise.all(categoriesWithProductsPromises);
+            categoriesWithProducts = results.filter(Boolean);
+            console.log('Categories with products found:', categoriesWithProducts.length);
+          }
+        }
+        
         // Sort by product count (most products first) and limit
         const sortedCategories = categoriesWithProducts
-          .sort((a: Category, b: Category) => b.productCount - a.productCount)
+          .sort((a: Category, b: Category) => (b.productCount || 0) - (a.productCount || 0))
           .slice(0, maxCategories);
         
+        console.log('Final sorted categories to display:', sortedCategories.length);
         setCategories(sortedCategories);
+      } else {
+        console.log('No categories found in response');
+        setCategories([]);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setCategories([]);
+      // Fallback: try to get categories without product count
+      try {
+        const fallbackResponse = await categoriesAPI.getAllCategories({ limit: maxCategories });
+        if (fallbackResponse.data.success && fallbackResponse.data.data) {
+          console.log('Using fallback categories:', fallbackResponse.data.data.length);
+          setCategories(fallbackResponse.data.data);
+        } else {
+          setCategories([]);
+        }
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
+        setCategories([]);
+      }
     } finally {
       setLoading(false);
     }
