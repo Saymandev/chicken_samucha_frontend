@@ -425,7 +425,6 @@ const CheckoutPage: React.FC = () => {
 
         clearCart();
         toast.success('Order placed successfully!');
-        return;
         navigate(`/track-order?orderNumber=${response.data.order.orderNumber}`);
       }
     } catch (error: any) {

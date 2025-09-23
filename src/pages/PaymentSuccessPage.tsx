@@ -26,8 +26,27 @@ const PaymentSuccessPage: React.FC = () => {
       (async () => {
         try {
           if (order) {
-            const res = await ordersAPI.trackOrder(order);
-            clearCart()
+            // Add small delay to allow backend to process the order
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Retry logic for order tracking
+            let retries = 3;
+            while (retries > 0) {
+              try {
+                await ordersAPI.trackOrder(order);
+                clearCart();
+                break;
+              } catch (e) {
+                retries--;
+                if (retries === 0) {
+                  // Final fallback - clear cart anyway
+                  try { clearCart(); } catch {}
+                } else {
+                  // Wait before retry
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+              }
+            }
           }
         } catch (e) {
           // if order lookup fails (e.g., 404), clear the whole cart as a fallback
