@@ -209,6 +209,7 @@ export const contentAPI = {
   getHeroContent: () => api.get('/content/hero'),
   getSliderItems: (params?: { page?: number; limit?: number; search?: string }) => 
     api.get('/content/slider', { params }),
+  getDeliverySettings: () => api.get('/content/delivery-settings'),
   // Payment settings removed - only SSLCommerz and COD are supported
   createSliderItem: (itemData: FormData) => api.post('/content/slider', itemData, {
     headers: { 'Content-Type': 'multipart/form-data' }

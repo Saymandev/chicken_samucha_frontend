@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { couponAPI, ordersAPI, paymentsAPI, productsAPI } from '../utils/api';
+import { couponAPI, ordersAPI, paymentsAPI, productsAPI, contentAPI } from '../utils/api';
 
 interface CustomerInfo {
   name: string;
@@ -74,15 +74,27 @@ const CheckoutPage: React.FC = () => {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  // Delivery charge is handled by delivery settings, not payment settings
-  const baseDeliveryCharge = 60; // Default fallback
-  const freeThreshold = 500; // Default fallback
+  // Delivery settings (pulled from backend public endpoint)
+  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number } | null>(null);
+  const baseDeliveryCharge = deliverySettings?.deliveryCharge ?? 60; // Default fallback
+  const freeThreshold = deliverySettings?.freeDeliveryThreshold ?? 500; // Default fallback
   const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold ? 0 : baseDeliveryCharge);
   const couponDiscount = appliedCoupon?.discount || 0;
   const finalTotal = Math.max(0, cartTotal + deliveryCharge - couponDiscount);
 
   useEffect(() => {
     fetchPaymentSettings();
+    // Fetch delivery settings
+    (async () => {
+      try {
+        const res = await contentAPI.getDeliverySettings();
+        if (res.data?.success) {
+          setDeliverySettings(res.data.settings);
+        }
+      } catch (e) {
+        // keep defaults
+      }
+    })();
   }, []);
 
   const fetchPaymentSettings = async () => {
