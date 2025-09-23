@@ -350,7 +350,7 @@ export const adminAPI = {
   
   getSliderItems: (params?: { page?: number; limit?: number; search?: string }) => 
     api.get('/admin/content/slider', { params }),
-  createSliderItem: (itemData: FormData) => api.post('/content/slider', itemData, {
+  createSliderItem: (itemData: FormData) => api.post('/admin/content/slider', itemData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   updateSliderItem: (id: string, itemData: any) => api.put(`/admin/content/slider/${id}`, itemData),

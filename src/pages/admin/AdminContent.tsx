@@ -54,7 +54,7 @@ const AdminContent: React.FC = () => {
 
   const fetchSliderItems = async () => {
     try {
-      const sliderResponse = await contentAPI.getSliderItems({
+      const sliderResponse = await adminAPI.getSliderItems({
         page: currentPage,
         limit: 10,
         search: searchTerm || undefined
@@ -79,7 +79,7 @@ const AdminContent: React.FC = () => {
       }
 
       // Fetch slider items
-      const sliderResponse = await contentAPI.getSliderItems({
+      const sliderResponse = await adminAPI.getSliderItems({
         page: currentPage,
         limit: 10,
         search: searchTerm || undefined
@@ -145,9 +145,9 @@ const AdminContent: React.FC = () => {
       toast.success('Slider item updated');
       
       // Refresh slider items
-      const response = await contentAPI.getSliderItems();
+      const response = await adminAPI.getSliderItems();
       if (response.data.success) {
-        setSliderItems(response.data.sliderItems || []);
+        setSliderItems(response.data.items || []);
       }
     } catch (error) {
       toast.error('Failed to update slider item');
@@ -194,9 +194,9 @@ const AdminContent: React.FC = () => {
       toast.success('Slider item deleted successfully');
       
       // Refresh slider items
-      const response = await contentAPI.getSliderItems();
+      const response = await adminAPI.getSliderItems();
       if (response.data.success) {
-        setSliderItems(response.data.sliderItems || []);
+        setSliderItems(response.data.items || []);
       }
     } catch (error) {
       console.error('Delete slider item error:', error);
@@ -242,9 +242,9 @@ const AdminContent: React.FC = () => {
       }
       
       // Refresh slider items
-      const response = await contentAPI.getSliderItems();
+      const response = await adminAPI.getSliderItems();
       if (response.data.success) {
-        setSliderItems(response.data.sliderItems || []);
+        setSliderItems(response.data.items || []);
       }
       
       closeSliderModal();
