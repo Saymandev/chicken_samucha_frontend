@@ -280,51 +280,31 @@ const CheckoutPage: React.FC = () => {
         return;
       }
 
-      // 2) Only after successful initiation, create the order
-      const formData = new FormData();
-      // send the same provisional order number so backend and SSLCommerz refer to the same order
-      formData.append('orderNumber', provisionalOrderNumber);
-
-      // customer
-      formData.append('customer[name]', customerInfo.name);
-      formData.append('customer[phone]', customerInfo.phone);
-      formData.append('customer[email]', customerInfo.email);
-
-      if (deliveryMethod === 'delivery') {
-        formData.append('customer[address][street]', customerInfo.address.street);
-        formData.append('customer[address][area]', customerInfo.address.area);
-        formData.append('customer[address][city]', customerInfo.address.city);
-        formData.append('customer[address][district]', customerInfo.address.district);
-      }
-
-      // items
-      cart.forEach((item, index) => {
-        const productId = (item.product as any).id || (item.product as any)._id;
-        formData.append(`items[${index}][product]`, productId);
-        formData.append(`items[${index}][quantity]`, item.quantity.toString());
-      });
-
-      // payment
-      formData.append('paymentInfo[method]', 'sslcommerz');
-
-      // delivery
-      const address = deliveryMethod === 'delivery'
-        ? `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`
-        : 'Pickup from restaurant';
-      formData.append('deliveryInfo[method]', deliveryMethod);
-      formData.append('deliveryInfo[address]', address);
-      formData.append('deliveryInfo[phone]', customerInfo.phone);
-      formData.append('deliveryInfo[deliveryCharge]', deliveryCharge.toString());
-
-      // totals
-      formData.append('totalAmount', String(cartTotal));
-      formData.append('finalAmount', String(finalTotal));
-
-      const orderResponse = await ordersAPI.createOrder(formData);
-      if (!orderResponse.data?.success) {
-        toast.error(orderResponse.data?.message || 'Failed to create order');
-        return;
-      }
+      // 2) Persist checkout payload locally; create the order after successful payment
+      try {
+        const payload = {
+          orderNumber: provisionalOrderNumber,
+          customer: customerInfo,
+          items: cart.map(item => ({
+            product: (item.product as any).id || (item.product as any)._id,
+            quantity: item.quantity
+          })),
+          paymentInfo: { method: 'sslcommerz' },
+          deliveryInfo: {
+            method: deliveryMethod,
+            address: deliveryMethod === 'delivery'
+              ? `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`
+              : 'Pickup from restaurant',
+            phone: customerInfo.phone,
+            deliveryCharge
+          },
+          totals: {
+            totalAmount: cartTotal,
+            finalAmount: finalTotal
+          }
+        };
+        localStorage.setItem(`checkout:${provisionalOrderNumber}`, JSON.stringify(payload));
+      } catch {}
 
       // 3) Redirect to SSLCommerz gateway
       const gatewayUrl = paymentResponse.data.data.gatewayPageURL;

@@ -26,27 +26,49 @@ const PaymentSuccessPage: React.FC = () => {
       (async () => {
         try {
           if (order) {
-            // Add small delay to allow backend to process the order
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Retry logic for order tracking
-            let retries = 3;
-            while (retries > 0) {
-              try {
-                await ordersAPI.trackOrder(order);
-                clearCart();
-                break;
-              } catch (e) {
-                retries--;
-                if (retries === 0) {
-                  // Final fallback - clear cart anyway
-                  try { clearCart(); } catch {}
-                } else {
-                  // Wait before retry
-                  await new Promise(resolve => setTimeout(resolve, 1000));
-                }
+            // Create the order now using stored checkout payload
+            const key = `checkout:${order}`;
+            const stored = localStorage.getItem(key);
+            if (stored) {
+              const data = JSON.parse(stored);
+              const formData = new FormData();
+              if (data.orderNumber) formData.append('orderNumber', data.orderNumber);
+              // customer
+              formData.append('customer[name]', data.customer.name);
+              formData.append('customer[phone]', data.customer.phone);
+              formData.append('customer[email]', data.customer.email);
+              if (data.deliveryInfo.method === 'delivery') {
+                const [street, area, city] = (data.deliveryInfo.address || '').split(',').map((s: string) => s.trim());
+                if (street) formData.append('customer[address][street]', street);
+                if (area) formData.append('customer[address][area]', area);
+                if (city) formData.append('customer[address][city]', city);
+                // district optional
               }
+              // items
+              (data.items || []).forEach((it: any, idx: number) => {
+                formData.append(`items[${idx}][product]`, it.product);
+                formData.append(`items[${idx}][quantity]`, String(it.quantity));
+              });
+              // payment
+              formData.append('paymentInfo[method]', 'sslcommerz');
+              // delivery
+              formData.append('deliveryInfo[method]', data.deliveryInfo.method);
+              formData.append('deliveryInfo[address]', data.deliveryInfo.address || '');
+              formData.append('deliveryInfo[phone]', data.deliveryInfo.phone || '');
+              formData.append('deliveryInfo[deliveryCharge]', String(data.deliveryInfo.deliveryCharge || 0));
+              // totals
+              formData.append('totalAmount', String(data.totals?.totalAmount || 0));
+              formData.append('finalAmount', String(data.totals?.finalAmount || 0));
+
+              try {
+                await ordersAPI.createOrder(formData);
+              } catch {}
+              try { localStorage.removeItem(key); } catch {}
             }
+
+            // Track to show order details and clear cart
+            await ordersAPI.trackOrder(order);
+            clearCart();
           }
         } catch (e) {
           // if order lookup fails (e.g., 404), clear the whole cart as a fallback

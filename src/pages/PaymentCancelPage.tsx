@@ -19,6 +19,8 @@ const PaymentCancelPage: React.FC = () => {
     
     if (order) {
       setOrderNumber(order);
+      // Cleanup any stored checkout payload for this provisional order
+      try { localStorage.removeItem(`checkout:${order}`); } catch {}
     }
     if (statusParam) {
       setStatus(statusParam);
