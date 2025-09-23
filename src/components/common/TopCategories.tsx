@@ -82,16 +82,16 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
               {/* Category Image/Icon */}
               <div className="relative mb-3">
                 {category.image?.url ? (
-                  <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-700">
+                  <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-orange-500 transition-all duration-300">
                     <img
                       src={category.image.url}
                       alt={category.name[language]}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
                 ) : (
                   <div
-                    className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full flex items-center justify-center text-3xl ring-1 ring-gray-200 dark:ring-gray-700"
+                    className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full flex items-center justify-center text-3xl ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-orange-500 transition-all duration-300"
                     style={{ backgroundColor: category.color + '20' }}
                   >
                     {category.icon}

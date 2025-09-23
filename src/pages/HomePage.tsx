@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import CategoryProductsSection from '../components/common/CategoryProductsSection';
+import DynamicCategorySections from '../components/common/DynamicCategorySections';
 import HeroSlider from '../components/common/HeroSlider';
 import ReviewSlider from '../components/common/ReviewSlider';
 import {
@@ -147,12 +147,10 @@ const HomePage: React.FC = () => {
         )}
       </section>
 
-      {/* Curated Category Sections */}
-      <CategoryProductsSection categorySlug="snack" headingEn="Snacks" headingBn="স্ন্যাকস" limit={10} />
-      <CategoryProductsSection categorySlug="honey" headingEn="Honey" headingBn="মধু" limit={10} />
-      <CategoryProductsSection categorySlug="nuts" headingEn="Nuts" headingBn="বাদাম" limit={10} />
-
-      {/* Top Categories Section */}
+        {/* Dynamic Category Sections */}
+        <DynamicCategorySections limit={8} maxCategories={6} />
+        
+        {/* Top Categories Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <motion.div
@@ -284,7 +282,6 @@ const HomePage: React.FC = () => {
           </div>
         </section>
       )}
-
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
