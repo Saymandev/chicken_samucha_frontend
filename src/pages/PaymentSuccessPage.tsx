@@ -8,7 +8,7 @@ import { ordersAPI } from '../utils/api';
 const PaymentSuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { language, removeFromCart } = useStore();
+  const { language, removeFromCart, clearCart } = useStore();
   
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +36,8 @@ const PaymentSuccessPage: React.FC = () => {
             }
           }
         } catch (e) {
-          // silently ignore; user can clear cart manually
+          // if order lookup fails (e.g., 404), clear the whole cart as a fallback
+          try { clearCart(); } catch {}
         } finally {
           setIsLoading(false);
         }
@@ -45,7 +46,7 @@ const PaymentSuccessPage: React.FC = () => {
       // If not success, redirect to fail page
       navigate(`/payment/fail?order=${order}&status=${status}`);
     }
-  }, [searchParams, navigate, removeFromCart]);
+  }, [searchParams, navigate, removeFromCart, clearCart]);
 
   if (isLoading) {
     return (
