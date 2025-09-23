@@ -114,9 +114,9 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
                 style={{ backgroundImage: `url(${item.image.url})` }}
               />
               
-              {/* Elegant Gradient Overlay for Cosmetics */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              {/* Light overlay for better text readability without darkening the image */}
+              <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
               
               {/* Floating cosmetic elements */}
               <div className="absolute top-20 right-20 w-16 h-16 bg-pink-400/20 rounded-full blur-xl animate-pulse"></div>
@@ -138,7 +138,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
                           language === 'bn' ? 'font-bengali' : 'font-serif'
                         }`}
                         style={{ 
-                          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                          textShadow: '2px 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)',
                           background: 'linear-gradient(135deg, #ffffff 0%, #f8f4ff 50%, #e8d5ff 100%)',
                           WebkitBackgroundClip: 'text',
                           WebkitTextFillColor: 'transparent',
@@ -161,7 +161,10 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
                       className={`text-xl md:text-2xl mb-8 opacity-95 max-w-2xl leading-relaxed ${
                         language === 'bn' ? 'font-bengali' : ''
                       }`}
-                      style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
+                      style={{ 
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5)',
+                        color: 'white'
+                      }}
                     >
                       {item.description[language]}
                     </motion.p>

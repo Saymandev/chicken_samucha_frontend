@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import CategoryProductsSection from '../components/common/CategoryProductsSection';
 import HeroSlider from '../components/common/HeroSlider';
 import ReviewSlider from '../components/common/ReviewSlider';
 import {
@@ -145,6 +146,11 @@ const HomePage: React.FC = () => {
           <HeroSlider items={sliderItems} />
         )}
       </section>
+
+      {/* Curated Category Sections */}
+      <CategoryProductsSection categorySlug="snack" headingEn="Snacks" headingBn="স্ন্যাকস" limit={10} />
+      <CategoryProductsSection categorySlug="honey" headingEn="Honey" headingBn="মধু" limit={10} />
+      <CategoryProductsSection categorySlug="nuts" headingEn="Nuts" headingBn="বাদাম" limit={10} />
 
       {/* Top Categories Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">

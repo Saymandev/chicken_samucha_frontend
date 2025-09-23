@@ -82,7 +82,7 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
               {/* Category Image/Icon */}
               <div className="relative mb-3">
                 {category.image?.url ? (
-                  <div className="w-16 h-16 mx-auto rounded-full overflow-hidden">
+                  <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-700">
                     <img
                       src={category.image.url}
                       alt={category.name[language]}
@@ -91,7 +91,7 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
                   </div>
                 ) : (
                   <div
-                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl"
+                    className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full flex items-center justify-center text-3xl ring-1 ring-gray-200 dark:ring-gray-700"
                     style={{ backgroundColor: category.color + '20' }}
                   >
                     {category.icon}
@@ -106,10 +106,7 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
                 {category.name[language]}
               </h3>
 
-              {/* Sales Info */}
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {language === 'bn' ? 'বিক্রিত:' : 'Sold:'} {category.totalSales}
-              </p>
+              {/* No product count as requested */}
             </div>
           </Link>
         </motion.div>
