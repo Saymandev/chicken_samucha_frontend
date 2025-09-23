@@ -635,7 +635,7 @@ const AdminContent: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Title (English) *
+                    Title (English)
                   </label>
                   <input
                     type="text"
@@ -645,8 +645,7 @@ const AdminContent: React.FC = () => {
                       title: { ...newSliderItem.title, en: e.target.value }
                     })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter English title"
-                    required
+                    placeholder="Enter English title (optional)"
                   />
                 </div>
                 <div>
@@ -670,7 +669,7 @@ const AdminContent: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Description (English) *
+                    Description (English)
                   </label>
                   <textarea
                     value={newSliderItem.description.en}
@@ -680,8 +679,7 @@ const AdminContent: React.FC = () => {
                     })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter English description"
-                    required
+                    placeholder="Enter English description (optional)"
                   />
                 </div>
                 <div>
@@ -823,9 +821,9 @@ const AdminContent: React.FC = () => {
               </button>
               <button
                 onClick={createOrUpdateSliderItem}
-                disabled={savingSettings || !newSliderItem.title.en || !newSliderItem.description.en || (!editingSlider && !selectedImage)}
+                disabled={savingSettings || (!editingSlider && !selectedImage)}
                 className={`px-6 py-2 rounded-lg transition-colors ${
-                  savingSettings || !newSliderItem.title.en || !newSliderItem.description.en || (!editingSlider && !selectedImage)
+                  savingSettings || (!editingSlider && !selectedImage)
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-orange-500 hover:bg-orange-600'
                 } text-white`}

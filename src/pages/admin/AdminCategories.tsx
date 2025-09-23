@@ -59,6 +59,7 @@ const AdminCategories: React.FC = () => {
     parentCategory: '',
     isSubcategory: false
   });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   // Color presets
   const colorPresets = [
@@ -111,11 +112,28 @@ const AdminCategories: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const submitData = new FormData();
+      submitData.append('name[en]', formData.name.en);
+      submitData.append('name[bn]', formData.name.bn);
+      submitData.append('description[en]', formData.description.en);
+      submitData.append('description[bn]', formData.description.bn);
+      submitData.append('slug', formData.slug);
+      submitData.append('icon', formData.icon);
+      submitData.append('color', formData.color);
+      submitData.append('isActive', String(formData.isActive));
+      submitData.append('sortOrder', String(formData.sortOrder));
+      submitData.append('parentCategory', formData.parentCategory);
+      submitData.append('isSubcategory', String(formData.isSubcategory));
+      
+      if (selectedImage) {
+        submitData.append('image', selectedImage);
+      }
+
       if (editingCategory) {
-        await categoriesAPI.updateCategory(editingCategory._id, formData);
+        await categoriesAPI.updateCategory(editingCategory._id, submitData);
         toast.success('Category updated successfully');
       } else {
-        await categoriesAPI.createCategory(formData);
+        await categoriesAPI.createCategory(submitData);
         toast.success('Category created successfully');
       }
       setShowModal(false);
@@ -142,6 +160,7 @@ const AdminCategories: React.FC = () => {
       parentCategory: (category.parentCategory as any)?._id || '',
       isSubcategory: Boolean(category.isSubcategory)
     });
+    setSelectedImage(null);
     setShowModal(true);
   };
 
@@ -181,6 +200,7 @@ const AdminCategories: React.FC = () => {
       parentCategory: '',
       isSubcategory: false
     });
+    setSelectedImage(null);
   };
 
   const generateSlug = (name: string) => {
@@ -305,12 +325,22 @@ const AdminCategories: React.FC = () => {
             {/* Category Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div 
-                  className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: category.color + '20' }}
-                >
-                  {category.icon}
-                </div>
+                {category.image?.url ? (
+                  <div className="w-12 h-12 rounded-lg overflow-hidden">
+                    <img 
+                      src={category.image.url} 
+                      alt={category.name.en}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+                    style={{ backgroundColor: category.color + '20' }}
+                  >
+                    {category.icon}
+                  </div>
+                )}
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
                     {category.name.en}
@@ -561,6 +591,49 @@ const AdminCategories: React.FC = () => {
                           />
                         ))}
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Image Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Category Image
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                        className="hidden"
+                        id="category-image-upload"
+                      />
+                      <label
+                        htmlFor="category-image-upload"
+                        className="cursor-pointer flex flex-col items-center"
+                      >
+                        <div className="text-4xl mb-4">📷</div>
+                        <p className="text-gray-600 dark:text-gray-400">
+                          {selectedImage 
+                            ? selectedImage.name 
+                            : editingCategory?.image?.url
+                              ? 'Click to change image (optional)'
+                              : 'Click to upload image (optional)'
+                          }
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                          Recommended: 400x400px, Max: 5MB
+                        </p>
+                        {editingCategory?.image?.url && !selectedImage && (
+                          <div className="mt-3">
+                            <img 
+                              src={editingCategory.image.url} 
+                              alt="Current" 
+                              className="w-24 h-24 object-cover rounded-lg border"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Current image</p>
+                          </div>
+                        )}
+                      </label>
                     </div>
                   </div>
 

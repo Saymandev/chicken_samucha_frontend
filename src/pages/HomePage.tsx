@@ -9,6 +9,7 @@ import {
   GridSkeleton,
   ProductCardSkeleton
 } from '../components/common/Skeleton';
+import TopCategories from '../components/common/TopCategories';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
 import { contentAPI, productsAPI, reviewsAPI } from '../utils/api';
@@ -130,7 +131,7 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative">
         {loadingSlider ? (
-          <div className="relative h-96 md:h-[500px] bg-gray-200 dark:bg-gray-700 animate-pulse">
+          <div className="relative h-[500px] md:h-[600px] bg-gray-200 dark:bg-gray-700 animate-pulse">
             <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-200 dark:from-gray-600 dark:to-gray-700" />
             <div className="relative z-10 h-full flex items-center justify-center">
               <div className="text-center space-y-4">
@@ -143,6 +144,39 @@ const HomePage: React.FC = () => {
         ) : (
           <HeroSlider items={sliderItems} />
         )}
+      </section>
+
+      {/* Top Categories Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
+              language === 'bn' ? 'font-bengali' : ''
+            }`}>
+              {language === 'bn' ? 'শীর্ষ ক্যাটাগরি' : 'Top Categories'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+              {language === 'bn' 
+                ? 'সবচেয়ে জনপ্রিয় ক্যাটাগরিগুলো দেখুন'
+                : 'Discover our most popular categories'
+              }
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <TopCategories limit={4} />
+          </motion.div>
+        </div>
       </section>
 
       {/* Featured Products Section */}
