@@ -27,13 +27,7 @@ const PaymentSuccessPage: React.FC = () => {
         try {
           if (order) {
             const res = await ordersAPI.trackOrder(order);
-            if (res.data?.success && res.data?.order?.items) {
-              const items: any[] = res.data.order.items;
-              items.forEach((it: any) => {
-                const pid = (it.product && (it.product._id || it.product.id)) || it.product;
-                if (pid) removeFromCart(pid);
-              });
-            }
+            clearCart()
           }
         } catch (e) {
           // if order lookup fails (e.g., 404), clear the whole cart as a fallback

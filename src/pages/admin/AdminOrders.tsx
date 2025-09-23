@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-    CheckCircle,
-    Clock,
-    Eye,
-    Package,
-    Search,
-    Truck,
-    X,
-    XCircle
+  CheckCircle,
+  Clock,
+  Eye,
+  Package,
+  Search,
+  Truck,
+  X,
+  XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
