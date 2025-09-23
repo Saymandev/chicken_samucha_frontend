@@ -24,21 +24,14 @@ interface SliderItem {
   order: number;
 }
 
-interface PaymentSettings {
-  bkash: { enabled: boolean; merchantNumber: string; apiKey: string };
-  nagad: { enabled: boolean; merchantNumber: string; apiKey: string };
-  rocket: { enabled: boolean; merchantNumber: string; apiKey: string };
-  upay: { enabled: boolean; merchantNumber: string; apiKey: string };
-  cashOnDelivery: { enabled: boolean; deliveryCharge: number };
-}
+// Payment settings interface removed - only SSLCommerz and COD are supported
 
 const AdminContent: React.FC = () => {
   const [heroContent, setHeroContent] = useState<HeroContent | null>(null);
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
-  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
   const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'payments' | 'delivery'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'delivery'>('hero');
   const [newSliderItem, setNewSliderItem] = useState<SliderItem | null>(null);
   const [editingSlider, setEditingSlider] = useState<SliderItem | null>(null);
   const [showSliderModal, setShowSliderModal] = useState(false);
@@ -96,11 +89,7 @@ const AdminContent: React.FC = () => {
         setTotalPages(sliderResponse.data.pagination?.pages || 1);
       }
 
-      // Fetch payment settings
-      const paymentResponse = await adminAPI.getPaymentSettings();
-      if (paymentResponse.data.success) {
-        setPaymentSettings(paymentResponse.data.settings);
-      }
+      // Payment settings removed - only SSLCommerz and COD are supported
 
       // Fetch system settings (delivery)
       try {
@@ -127,13 +116,7 @@ const AdminContent: React.FC = () => {
         backgroundImage: { url: '', public_id: '' }
       });
       setSliderItems([]);
-      setPaymentSettings({
-        bkash: { enabled: false, merchantNumber: '', apiKey: '' },
-        nagad: { enabled: false, merchantNumber: '', apiKey: '' },
-        rocket: { enabled: false, merchantNumber: '', apiKey: '' },
-        upay: { enabled: false, merchantNumber: '', apiKey: '' },
-        cashOnDelivery: { enabled: false, deliveryCharge: 0 }
-      });
+      // Payment settings removed - only SSLCommerz and COD are supported
     } finally {
       setLoading(false);
     }
@@ -154,20 +137,7 @@ const AdminContent: React.FC = () => {
     }
   };
 
-  const updatePaymentSettings = async () => {
-    if (!paymentSettings) return;
-    
-    try {
-      setSavingSettings(true);
-      await adminAPI.updatePaymentSettings(paymentSettings);
-      toast.success('Payment settings updated successfully');
-    } catch (error) {
-      console.error('Update payment settings error:', error);
-      toast.error('Failed to update payment settings');
-    } finally {
-      setSavingSettings(false);
-    }
-  };
+  // Payment settings update function removed - only SSLCommerz and COD are supported
 
   const toggleSliderItem = async (itemId: string) => {
     try {
@@ -286,80 +256,7 @@ const AdminContent: React.FC = () => {
     }
   };
 
-  const PaymentMethodCard = ({ 
-    method, 
-    settings, 
-    onToggle, 
-    onUpdate 
-  }: { 
-    method: string; 
-    settings: any; 
-    onToggle: () => void; 
-    onUpdate: (field: string, value: any) => void; 
-  }) => (
-    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="font-semibold text-gray-900 dark:text-white capitalize">
-          {method === 'cashOnDelivery' ? 'Cash on Delivery' : method}
-        </h4>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.enabled}
-            onChange={onToggle}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-        </label>
-      </div>
-
-      {settings.enabled && (
-        <div className="space-y-3">
-          {method !== 'cashOnDelivery' ? (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Merchant Number
-                </label>
-                <input
-                  type="text"
-                  value={settings.merchantNumber}
-                  onChange={(e) => onUpdate('merchantNumber', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                  placeholder="Enter merchant number"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  API Key
-                </label>
-                <input
-                  type="password"
-                  value={settings.apiKey}
-                  onChange={(e) => onUpdate('apiKey', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                  placeholder="Enter API key"
-                />
-              </div>
-            </>
-          ) : (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Delivery Charge (৳)
-              </label>
-              <input
-                type="number"
-                value={settings.deliveryCharge}
-                onChange={(e) => onUpdate('deliveryCharge', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
-                placeholder="Enter delivery charge"
-              />
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  // PaymentMethodCard component removed - only SSLCommerz and COD are supported
 
   if (loading) {
     return <AdminPageSkeleton />;
@@ -374,7 +271,7 @@ const AdminContent: React.FC = () => {
               Content Management
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage website content, delivery, and Bangladesh payment settings
+              Manage website content and delivery settings
             </p>
           </div>
         </div>
@@ -385,7 +282,6 @@ const AdminContent: React.FC = () => {
             {[
               { id: 'hero', label: 'Hero Section', icon: <Image className="w-4 h-4" /> },
               { id: 'slider', label: 'Slider Items', icon: <FileText className="w-4 h-4" /> },
-              { id: 'payments', label: 'BD Payments', icon: <Settings className="w-4 h-4" /> },
               { id: 'delivery', label: 'Delivery', icon: <Settings className="w-4 h-4" /> }
             ].map((tab) => (
               <button
@@ -711,102 +607,7 @@ const AdminContent: React.FC = () => {
           </div>
         )}
 
-        {/* Bangladesh Payments Tab */}
-        {activeTab === 'payments' && paymentSettings && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-              Bangladesh Mobile Payment Settings
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <PaymentMethodCard
-                method="bkash"
-                settings={paymentSettings.bkash}
-                onToggle={() => setPaymentSettings({
-                  ...paymentSettings,
-                  bkash: { ...paymentSettings.bkash, enabled: !paymentSettings.bkash.enabled }
-                })}
-                onUpdate={(field, value) => setPaymentSettings({
-                  ...paymentSettings,
-                  bkash: { ...paymentSettings.bkash, [field]: value }
-                })}
-              />
-
-              <PaymentMethodCard
-                method="nagad"
-                settings={paymentSettings.nagad}
-                onToggle={() => setPaymentSettings({
-                  ...paymentSettings,
-                  nagad: { ...paymentSettings.nagad, enabled: !paymentSettings.nagad.enabled }
-                })}
-                onUpdate={(field, value) => setPaymentSettings({
-                  ...paymentSettings,
-                  nagad: { ...paymentSettings.nagad, [field]: value }
-                })}
-              />
-
-              <PaymentMethodCard
-                method="rocket"
-                settings={paymentSettings.rocket}
-                onToggle={() => setPaymentSettings({
-                  ...paymentSettings,
-                  rocket: { ...paymentSettings.rocket, enabled: !paymentSettings.rocket.enabled }
-                })}
-                onUpdate={(field, value) => setPaymentSettings({
-                  ...paymentSettings,
-                  rocket: { ...paymentSettings.rocket, [field]: value }
-                })}
-              />
-
-              <PaymentMethodCard
-                method="upay"
-                settings={paymentSettings.upay}
-                onToggle={() => setPaymentSettings({
-                  ...paymentSettings,
-                  upay: { ...paymentSettings.upay, enabled: !paymentSettings.upay.enabled }
-                })}
-                onUpdate={(field, value) => setPaymentSettings({
-                  ...paymentSettings,
-                  upay: { ...paymentSettings.upay, [field]: value }
-                })}
-              />
-
-              <PaymentMethodCard
-                method="cashOnDelivery"
-                settings={paymentSettings.cashOnDelivery}
-                onToggle={() => setPaymentSettings({
-                  ...paymentSettings,
-                  cashOnDelivery: { ...paymentSettings.cashOnDelivery, enabled: !paymentSettings.cashOnDelivery.enabled }
-                })}
-                onUpdate={(field, value) => setPaymentSettings({
-                  ...paymentSettings,
-                  cashOnDelivery: { ...paymentSettings.cashOnDelivery, [field]: value }
-                })}
-              />
-            </div>
-
-            <div className="mt-6">
-              <button
-                onClick={updatePaymentSettings}
-                disabled={savingSettings}
-                className={`px-6 py-3 rounded-lg transition-colors ${
-                  savingSettings 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-orange-500 hover:bg-orange-600'
-                } text-white`}
-              >
-                {savingSettings ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving...
-                  </div>
-                ) : (
-                  'Update Payment Settings'
-                )}
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Payments tab removed - only SSLCommerz and COD are supported */}
       </div>
 
       {/* Slider Creation Modal */}

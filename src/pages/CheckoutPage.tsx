@@ -4,14 +4,13 @@ import {
   MapPin,
   Phone,
   ShoppingCart,
-  Upload,
   User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { contentAPI, couponAPI, ordersAPI, productsAPI } from '../utils/api';
+import { couponAPI, ordersAPI, paymentsAPI, productsAPI } from '../utils/api';
 
 interface CustomerInfo {
   name: string;
@@ -27,7 +26,7 @@ interface CustomerInfo {
 }
 
 interface PaymentInfo {
-  method: 'bkash' | 'nagad' | 'rocket' | 'upay' | 'cash_on_delivery';
+  method: 'sslcommerz' | 'cash_on_delivery';
   transactionId?: string;
   screenshot?: File;
 }
@@ -60,7 +59,7 @@ const CheckoutPage: React.FC = () => {
   });
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
-    method: 'bkash'
+    method: 'sslcommerz'
   });
 
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('delivery');
@@ -75,9 +74,9 @@ const CheckoutPage: React.FC = () => {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  // Free delivery uses threshold from settings (fallback 500)
-  const baseDeliveryCharge = paymentSettings?.deliveryCharge ?? paymentSettings?.cashOnDelivery?.deliveryCharge ?? 60;
-  const freeThreshold = paymentSettings?.freeDeliveryThreshold ?? 500;
+  // Delivery charge is handled by delivery settings, not payment settings
+  const baseDeliveryCharge = 60; // Default fallback
+  const freeThreshold = 500; // Default fallback
   const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold ? 0 : baseDeliveryCharge);
   const couponDiscount = appliedCoupon?.discount || 0;
   const finalTotal = Math.max(0, cartTotal + deliveryCharge - couponDiscount);
@@ -89,19 +88,16 @@ const CheckoutPage: React.FC = () => {
   const fetchPaymentSettings = async () => {
     try {
       setLoadingSettings(true);
-      const response = await contentAPI.getPaymentSettings();
+      const response = await paymentsAPI.getPaymentMethods();
       if (response.data.success) {
-        setPaymentSettings(response.data.settings);
+        setPaymentSettings(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching payment settings:', error);
       // Use default settings if fetch fails
       setPaymentSettings({
-        bkash: { enabled: true, merchantNumber: '01234567890' },
-        nagad: { enabled: true, merchantNumber: '01234567891' },
-        rocket: { enabled: true, merchantNumber: '01234567892' },
-        upay: { enabled: false, merchantNumber: '01234567893' },
-        cashOnDelivery: { enabled: true, deliveryCharge: 60 }
+        sslcommerz: { enabled: true },
+        cash_on_delivery: { enabled: true }
       });
     } finally {
       setLoadingSettings(false);
@@ -146,81 +142,27 @@ const CheckoutPage: React.FC = () => {
     setCouponCode('');
   };
 
-  // Bangladesh mobile payment methods (filtered by admin settings)
+  // Payment methods - only SSLCommerz and Cash on Delivery
   const getPaymentMethods = () => {
     if (!paymentSettings) return [];
 
     const allMethods = [
       {
-        id: 'bkash',
-        name: 'bKash',
-        logo: '📱',
-        color: 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/20 dark:text-pink-200 dark:border-pink-800',
-        number: paymentSettings.bkash?.merchantNumber || '01234567890',
-        enabled: paymentSettings.bkash?.enabled,
+        id: 'sslcommerz',
+        name: 'SSLCommerz',
+        logo: '🏦',
+        color: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-200 dark:border-indigo-800',
+        number: '',
+        enabled: paymentSettings.sslcommerz?.enabled,
         instructions: [
-          'Go to bKash app/dial *247#',
-          'Select "Send Money"',
-          `Enter merchant number: ${paymentSettings.bkash?.merchantNumber || '01234567890'}`,
-          'Enter amount: ৳' + finalTotal,
-          'Enter reference: Your phone number',
-          'Complete the transaction',
-          'Take a screenshot of confirmation',
-          'Upload the screenshot below'
-        ]
-      },
-      {
-        id: 'nagad',
-        name: 'Nagad',
-        logo: '💰',
-        color: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-200 dark:border-orange-800',
-        number: paymentSettings.nagad?.merchantNumber || '01234567891',
-        enabled: paymentSettings.nagad?.enabled,
-        instructions: [
-          'Go to Nagad app/dial *167#',
-          'Select "Send Money"',
-          `Enter merchant number: ${paymentSettings.nagad?.merchantNumber || '01234567891'}`,
-          'Enter amount: ৳' + finalTotal,
-          'Enter reference: Your phone number',
-          'Complete the transaction',
-          'Take a screenshot of confirmation',
-          'Upload the screenshot below'
-        ]
-      },
-      {
-        id: 'rocket',
-        name: 'Rocket',
-        logo: '🚀',
-        color: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-200 dark:border-purple-800',
-        number: paymentSettings.rocket?.merchantNumber || '01234567892',
-        enabled: paymentSettings.rocket?.enabled,
-        instructions: [
-          'Go to Rocket app/dial *322#',
-          'Select "Send Money"',
-          `Enter merchant number: ${paymentSettings.rocket?.merchantNumber || '01234567892'}`,
-          'Enter amount: ৳' + finalTotal,
-          'Enter reference: Your phone number',
-          'Complete the transaction',
-          'Take a screenshot of confirmation',
-          'Upload the screenshot below'
-        ]
-      },
-      {
-        id: 'upay',
-        name: 'Upay',
-        logo: '💳',
-        color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-800',
-        number: paymentSettings.upay?.merchantNumber || '01234567893',
-        enabled: paymentSettings.upay?.enabled,
-        instructions: [
-          'Go to Upay app',
-          'Select "Send Money"',
-          `Enter merchant number: ${paymentSettings.upay?.merchantNumber || '01234567893'}`,
-          'Enter amount: ৳' + finalTotal,
-          'Enter reference: Your phone number',
-          'Complete the transaction',
-          'Take a screenshot of confirmation',
-          'Upload the screenshot below'
+          'Click "Pay with SSLCommerz" to proceed',
+          'You will be redirected to SSLCommerz payment page',
+          'Choose your preferred payment method:',
+          '• Credit/Debit Card (Visa, Mastercard, Amex)',
+          '• Mobile Banking (bKash, Nagad, Rocket)',
+          '• Internet Banking',
+          'Complete the payment securely',
+          'You will be redirected back automatically'
         ]
       },
       {
@@ -229,7 +171,7 @@ const CheckoutPage: React.FC = () => {
         logo: '💵',
         color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-200 dark:border-green-800',
         number: '',
-        enabled: paymentSettings.cashOnDelivery?.enabled,
+        enabled: paymentSettings.cash_on_delivery?.enabled,
         instructions: deliveryMethod === 'pickup' ? [
           'Pay cash when you collect your order',
           'Keep exact amount ready: ৳' + finalTotal,
@@ -271,17 +213,7 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size should be less than 5MB');
-        return;
-      }
-      setPaymentInfo({ ...paymentInfo, screenshot: file });
-      toast.success('Screenshot uploaded successfully');
-    }
-  };
+  // File upload not needed for SSLCommerz or COD
 
   const validateForm = () => {
     if (!customerInfo.name || !customerInfo.phone) {
@@ -304,18 +236,104 @@ const CheckoutPage: React.FC = () => {
       return false;
     }
 
-    if (paymentInfo.method !== 'cash_on_delivery') {
-      if (!paymentInfo.transactionId) {
-        toast.error('Please enter transaction ID');
-        return false;
-      }
-      if (!paymentInfo.screenshot) {
-        toast.error('Please upload payment screenshot');
-        return false;
-      }
-    }
+    // SSLCommerz and Cash on Delivery don't require transaction ID or screenshot
+    // SSLCommerz redirects to payment gateway, COD is paid on delivery
 
     return true;
+  };
+
+  // Handle SSLCommerz payment
+  const handleSSLCommerzPayment = async () => {
+    try {
+      setLoading(true);
+
+      // First create the order
+      const orderData = {
+        customer: customerInfo,
+        items: cart.map(item => ({
+          product: item.product.id || (item.product as any)._id,
+          quantity: item.quantity
+        })),
+        paymentInfo: {
+          method: 'sslcommerz'
+        },
+        deliveryInfo: {
+          method: deliveryMethod,
+          address: deliveryMethod === 'delivery' 
+            ? `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`
+            : 'Pickup from restaurant',
+          phone: customerInfo.phone,
+          deliveryCharge: deliveryCharge
+        },
+        totalAmount: cartTotal,
+        finalAmount: finalTotal
+      };
+
+      // Create order first - convert to FormData
+      const formData = new FormData();
+      
+      // Add customer info
+      formData.append('customer[name]', orderData.customer.name);
+      formData.append('customer[phone]', orderData.customer.phone);
+      formData.append('customer[email]', orderData.customer.email);
+      
+      // Add address if delivery
+      if (orderData.deliveryInfo.method === 'delivery') {
+        formData.append('customer[address][street]', orderData.customer.address.street);
+        formData.append('customer[address][area]', orderData.customer.address.area);
+        formData.append('customer[address][city]', orderData.customer.address.city);
+        formData.append('customer[address][district]', orderData.customer.address.district);
+      }
+      
+      // Add items
+      orderData.items.forEach((item, index) => {
+        formData.append(`items[${index}][product]`, item.product);
+        formData.append(`items[${index}][quantity]`, item.quantity.toString());
+      });
+      
+      // Add payment info
+      formData.append('paymentInfo[method]', orderData.paymentInfo.method);
+      
+      // Add delivery info
+      formData.append('deliveryInfo[method]', orderData.deliveryInfo.method);
+      formData.append('deliveryInfo[address]', orderData.deliveryInfo.address);
+      formData.append('deliveryInfo[phone]', orderData.deliveryInfo.phone);
+      formData.append('deliveryInfo[deliveryCharge]', orderData.deliveryInfo.deliveryCharge.toString());
+
+      const orderResponse = await ordersAPI.createOrder(formData);
+      
+      if (orderResponse.data.success) {
+        const orderNumber = orderResponse.data.order.orderNumber;
+        
+        // Initiate SSLCommerz payment
+        const paymentData = {
+          orderNumber: orderNumber,
+          totalAmount: finalTotal,
+          customer: customerInfo,
+          items: cart.map(item => ({
+            name: item.product.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        };
+
+        const paymentResponse = await paymentsAPI.initiateSSLCommerzPayment(paymentData);
+        
+        if (paymentResponse.data.success) {
+          // Redirect to SSLCommerz payment page
+          window.location.href = paymentResponse.data.data.gatewayPageURL;
+        } else {
+          toast.error(paymentResponse.data.message || 'Failed to initiate payment');
+        }
+      } else {
+        toast.error(orderResponse.data.message || 'Failed to create order');
+      }
+    } catch (error: any) {
+      console.error('SSLCommerz payment error:', error);
+      toast.error(error.response?.data?.message || 'Payment initiation failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePlaceOrder = async () => {
@@ -339,6 +357,12 @@ const CheckoutPage: React.FC = () => {
         toast.error('Invalid quantity in cart. Please refresh and try again.');
         return;
       }
+    }
+
+    // Handle SSLCommerz payment differently
+    if (paymentInfo.method === 'sslcommerz') {
+      await handleSSLCommerzPayment();
+      return;
     }
 
     try {
@@ -372,9 +396,6 @@ const CheckoutPage: React.FC = () => {
       
       // Send payment info in the format backend expects
       formData.append('paymentInfo[method]', paymentInfo.method);
-      if (paymentInfo.transactionId) {
-        formData.append('paymentInfo[transactionId]', paymentInfo.transactionId);
-      }
       
       // Send delivery info
       formData.append('deliveryInfo[method]', deliveryMethod);
@@ -386,10 +407,7 @@ const CheckoutPage: React.FC = () => {
       formData.append('deliveryInfo[phone]', customerInfo.phone);
       formData.append('deliveryInfo[deliveryCharge]', deliveryCharge.toString());
       
-      // Add payment screenshot if provided
-      if (paymentInfo.screenshot) {
-        formData.append('paymentScreenshot', paymentInfo.screenshot);
-      }
+      // Payment screenshot not needed for SSLCommerz or COD
 
       
 
@@ -709,43 +727,23 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Transaction Details */}
-                {paymentInfo.method !== 'cash_on_delivery' && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Transaction ID *
-                      </label>
-                      <input
-                        type="text"
-                        value={paymentInfo.transactionId || ''}
-                        onChange={(e) => setPaymentInfo({ ...paymentInfo, transactionId: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                        placeholder="Enter transaction ID from your payment"
-                      />
-                    </div>
+                {/* Transaction Details - Not needed for SSLCommerz or COD */}
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Payment Screenshot *
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                          id="screenshot-upload"
-                        />
-                        <label htmlFor="screenshot-upload" className="cursor-pointer">
-                          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-600 dark:text-gray-400">
-                            {paymentInfo.screenshot ? paymentInfo.screenshot.name : 'Click to upload payment screenshot'}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                            PNG, JPG up to 5MB
-                          </p>
-                        </label>
+                {/* SSLCommerz Payment Button */}
+                {paymentInfo.method === 'sslcommerz' && (
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+                    <div className="text-center">
+                      <div className="text-4xl mb-3">🏦</div>
+                      <h3 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-2">
+                        Secure Payment with SSLCommerz
+                      </h3>
+                      <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-4">
+                        You will be redirected to a secure payment page where you can pay with your preferred method.
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-2 text-xs text-indigo-600 dark:text-indigo-400">
+                        <span className="bg-indigo-100 dark:bg-indigo-800 px-2 py-1 rounded">💳 Cards</span>
+                        <span className="bg-indigo-100 dark:bg-indigo-800 px-2 py-1 rounded">📱 Mobile Banking</span>
+                        <span className="bg-indigo-100 dark:bg-indigo-800 px-2 py-1 rounded">🏦 Internet Banking</span>
                       </div>
                     </div>
                   </div>

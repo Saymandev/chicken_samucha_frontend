@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-  CheckCircle,
-  Clock,
-  Eye,
-  Package,
-  Search,
-  Truck,
-  X,
-  XCircle
+    CheckCircle,
+    Clock,
+    Eye,
+    Package,
+    Search,
+    Truck,
+    X,
+    XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -437,10 +437,7 @@ const AdminOrders: React.FC = () => {
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Payments</option>
-              <option value="bkash">bKash</option>
-              <option value="nagad">Nagad</option>
-              <option value="rocket">Rocket</option>
-              <option value="upay">Upay</option>
+              <option value="sslcommerz">SSLCommerz</option>
               <option value="cash_on_delivery">Cash on Delivery</option>
             </select>
           </div>

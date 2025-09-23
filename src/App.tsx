@@ -37,6 +37,9 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import NotificationsPage from './pages/NotificationsPage';
 import OrdersPage from './pages/OrdersPage';
+import PaymentCancelPage from './pages/PaymentCancelPage';
+import PaymentFailPage from './pages/PaymentFailPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import WishlistPage from './pages/WishlistPage';
@@ -134,6 +137,11 @@ function AppContent() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          
+          {/* Payment Result Pages */}
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/fail" element={<PaymentFailPage />} />
+          <Route path="/payment/cancel" element={<PaymentCancelPage />} />
           
           {/* Auth Routes */}
           <Route path="/login" element={<LoginPage />} />

@@ -209,7 +209,7 @@ export const contentAPI = {
   getHeroContent: () => api.get('/content/hero'),
   getSliderItems: (params?: { page?: number; limit?: number; search?: string }) => 
     api.get('/content/slider', { params }),
-  getPaymentSettings: () => api.get('/content/payment-settings'),
+  // Payment settings removed - only SSLCommerz and COD are supported
   createSliderItem: (itemData: FormData) => api.post('/content/slider', itemData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
@@ -357,9 +357,7 @@ export const adminAPI = {
   deleteSliderItem: (id: string) => api.delete(`/admin/content/slider/${id}`),
   toggleSliderItem: (id: string) => api.put(`/admin/content/slider/${id}/toggle`),
   
-  // Bangladesh payment settings
-  getPaymentSettings: () => api.get('/admin/settings/payments'),
-  updatePaymentSettings: (settings: any) => api.put('/admin/settings/payments', settings),
+  // Payment settings removed - only SSLCommerz and COD are supported
 
   // System settings (general, delivery, etc.)
   getSystemSettings: () => api.get('/admin/settings'),
@@ -473,36 +471,31 @@ export const couponAPI = {
   deleteCoupon: (id: string) => api.delete(`/coupons/${id}`)
 };
 
-// Bangladesh Mobile Payment API
-export const bdPaymentAPI = {
-  // bKash
-  initiateBkashPayment: (data: any) => api.post('/payments/bkash/initiate', data),
-  verifyBkashPayment: (paymentId: string) => api.post(`/payments/bkash/verify/${paymentId}`),
+// Mobile payment methods removed - only SSLCommerz and Cash on Delivery are supported
+
+// Payment API - only SSLCommerz and Cash on Delivery
+export const paymentsAPI = {
+  // Get payment methods
+  getPaymentMethods: () => api.get('/payments/methods'),
   
-  // Nagad
-  initiateNagadPayment: (data: any) => api.post('/payments/nagad/initiate', data),
-  verifyNagadPayment: (paymentId: string) => api.post(`/payments/nagad/verify/${paymentId}`),
+  // SSLCommerz payment
+  initiateSSLCommerzPayment: (data: {
+    orderNumber: string;
+    totalAmount: number;
+    customer: any;
+    items: any[];
+  }) => api.post('/payments/sslcommerz/initiate', data),
   
-  // Rocket
-  initiateRocketPayment: (data: any) => api.post('/payments/rocket/initiate', data),
-  verifyRocketPayment: (paymentId: string) => api.post(`/payments/rocket/verify/${paymentId}`),
+  // Get SSLCommerz payment status
+  getSSLCommerzPaymentStatus: (orderNumber: string) => 
+    api.get(`/payments/sslcommerz/status/${orderNumber}`),
   
-  // Upay
-  initiateUpayPayment: (data: any) => api.post('/payments/upay/initiate', data),
-  verifyUpayPayment: (paymentId: string) => api.post(`/payments/upay/verify/${paymentId}`),
-  
-  // General payment verification
-  verifyMobilePayment: (data: { method: string; transactionId: string; screenshot?: File }) => {
-    const formData = new FormData();
-    formData.append('method', data.method);
-    formData.append('transactionId', data.transactionId);
-    if (data.screenshot) {
-      formData.append('screenshot', data.screenshot);
-    }
-    return api.post('/payments/mobile/verify', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-  }
+  // SSLCommerz refund
+  refundSSLCommerzPayment: (data: {
+    bankTranId: string;
+    refundAmount: number;
+    refundRemarks?: string;
+  }) => api.post('/payments/sslcommerz/refund', data)
 };
 
 // Reports & Analytics API
