@@ -3,11 +3,12 @@ import { ArrowRight, CheckCircle, Home, Package } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
+import { ordersAPI } from '../utils/api';
 
 const PaymentSuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { language } = useStore();
+  const { language, removeFromCart } = useStore();
   
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -21,12 +22,30 @@ const PaymentSuccessPage: React.FC = () => {
     }
     
     if (status === 'success') {
-      setIsLoading(false);
+      // remove only purchased items from cart based on order contents
+      (async () => {
+        try {
+          if (order) {
+            const res = await ordersAPI.trackOrder(order);
+            if (res.data?.success && res.data?.order?.items) {
+              const items: any[] = res.data.order.items;
+              items.forEach((it: any) => {
+                const pid = (it.product && (it.product._id || it.product.id)) || it.product;
+                if (pid) removeFromCart(pid);
+              });
+            }
+          }
+        } catch (e) {
+          // silently ignore; user can clear cart manually
+        } finally {
+          setIsLoading(false);
+        }
+      })();
     } else {
       // If not success, redirect to fail page
       navigate(`/payment/fail?order=${order}&status=${status}`);
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, removeFromCart]);
 
   if (isLoading) {
     return (
