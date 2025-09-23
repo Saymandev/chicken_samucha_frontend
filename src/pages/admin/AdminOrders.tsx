@@ -603,6 +603,11 @@ const AdminOrders: React.FC = () => {
                       <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.provider}</p>
                     </div>
                   )}
+                  {/* Debug: Show all payment info fields */}
+                  <div className="col-span-full mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                    <strong>Debug Payment Info:</strong>
+                    <pre>{JSON.stringify(order.paymentInfo, null, 2)}</pre>
+                  </div>
                   {order.paymentInfo.paymentNumber && (
                     <div>
                       <span className="text-sm text-gray-600 dark:text-gray-300">Payment Number:</span>
@@ -773,9 +778,17 @@ const AdminOrders: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Order Details - {selectedOrder.orderNumber}
-                  </h2>
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                      Order Details - {selectedOrder.orderNumber}
+                    </h2>
+                    <button
+                      onClick={() => fetchOrders()}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                    >
+                      Refresh
+                    </button>
+                  </div>
                   <button
                     onClick={() => setShowOrderModal(false)}
                     className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 self-end sm:self-auto"
