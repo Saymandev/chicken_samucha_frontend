@@ -110,7 +110,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
             <div className="relative h-full w-full">
               {/* Background Image with better aspect ratio and cover positioning */}
               <div 
-                className="absolute inset-0 w-full h-full object-cover "
+                className="absolute inset-0 w-full h-full object-cover bg-cover bg-center bg-no-repeat"
                 style={{ 
                   backgroundImage: `url(${item.image.url})`,
                   

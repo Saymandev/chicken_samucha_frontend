@@ -147,8 +147,7 @@ const HomePage: React.FC = () => {
         )}
       </section>
 
-        {/* Dynamic Category Sections */}
-        <DynamicCategorySections limit={8} maxCategories={6} />
+       
         
         {/* Top Categories Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
@@ -282,6 +281,8 @@ const HomePage: React.FC = () => {
           </div>
         </section>
       )}
+       {/* Dynamic Category Sections */}
+       <DynamicCategorySections limit={8} maxCategories={6} />
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
