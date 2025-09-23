@@ -42,9 +42,15 @@ interface Order {
   finalAmount: number;
   orderStatus: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled';
   paymentInfo: {
-    method: 'bkash' | 'nagad' | 'rocket' | 'upay' | 'cash_on_delivery';
+    method: 'bkash' | 'nagad' | 'rocket' | 'upay' | 'cash_on_delivery' | 'sslcommerz';
     status: 'pending' | 'verified' | 'failed';
     transactionId?: string;
+    bankTransactionId?: string;
+    paymentNumber?: string;
+    paymentGateway?: string;
+    provider?: string;
+    cardType?: string;
+    cardBrand?: string;
     screenshot?: { url: string };
   };
   deliveryInfo?: {
@@ -591,10 +597,40 @@ const AdminOrders: React.FC = () => {
                       {order.paymentInfo.status.toUpperCase()}
                     </p>
                   </div>
+                  {order.paymentInfo.provider && (
+                    <div>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Provider:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.provider}</p>
+                    </div>
+                  )}
+                  {order.paymentInfo.paymentNumber && (
+                    <div>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Payment Number:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.paymentNumber}</p>
+                    </div>
+                  )}
                   {order.paymentInfo.transactionId && (
                     <div className="sm:col-span-2 lg:col-span-1">
                       <span className="text-sm text-gray-600 dark:text-gray-300">Transaction ID:</span>
                       <p className="font-medium text-gray-900 dark:text-white break-all">{order.paymentInfo.transactionId}</p>
+                    </div>
+                  )}
+                  {order.paymentInfo.bankTransactionId && (
+                    <div className="sm:col-span-2 lg:col-span-1">
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Bank Transaction ID:</span>
+                      <p className="font-medium text-gray-900 dark:text-white break-all">{order.paymentInfo.bankTransactionId}</p>
+                    </div>
+                  )}
+                  {order.paymentInfo.cardBrand && (
+                    <div>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Card Brand:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.cardBrand}</p>
+                    </div>
+                  )}
+                  {order.paymentInfo.cardType && (
+                    <div>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Card Type:</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{order.paymentInfo.cardType}</p>
                     </div>
                   )}
                 </div>
