@@ -282,6 +282,8 @@ const CheckoutPage: React.FC = () => {
 
       // 2) Only after successful initiation, create the order
       const formData = new FormData();
+      // send the same provisional order number so backend and SSLCommerz refer to the same order
+      formData.append('orderNumber', provisionalOrderNumber);
 
       // customer
       formData.append('customer[name]', customerInfo.name);
