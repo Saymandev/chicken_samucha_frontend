@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { couponAPI, ordersAPI, paymentsAPI, productsAPI, contentAPI } from '../utils/api';
+import { contentAPI, couponAPI, ordersAPI, paymentsAPI, productsAPI } from '../utils/api';
 
 interface CustomerInfo {
   name: string;
@@ -259,90 +259,77 @@ const CheckoutPage: React.FC = () => {
     try {
       setLoading(true);
 
-      // First create the order
-      const orderData = {
+      // 1) Initiate SSLCommerz first with a provisional order number
+      const provisionalOrderNumber = `ORD${Date.now()}`;
+
+      const paymentData = {
+        orderNumber: provisionalOrderNumber,
+        totalAmount: finalTotal,
         customer: customerInfo,
         items: cart.map(item => ({
-          product: item.product.id || (item.product as any)._id,
+          name: item.product.name,
+          price: item.price,
           quantity: item.quantity
-        })),
-        paymentInfo: {
-          method: 'sslcommerz'
-        },
-        deliveryInfo: {
-          method: deliveryMethod,
-          address: deliveryMethod === 'delivery' 
-            ? `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`
-            : 'Pickup from restaurant',
-          phone: customerInfo.phone,
-          deliveryCharge: deliveryCharge
-        },
-        totalAmount: cartTotal,
-        finalAmount: finalTotal
+        }))
       };
 
-      // Create order first - convert to FormData
-      const formData = new FormData();
-      
-      // Add customer info
-      formData.append('customer[name]', orderData.customer.name);
-      formData.append('customer[phone]', orderData.customer.phone);
-      formData.append('customer[email]', orderData.customer.email);
-      
-      // Add address if delivery
-      if (orderData.deliveryInfo.method === 'delivery') {
-        formData.append('customer[address][street]', orderData.customer.address.street);
-        formData.append('customer[address][area]', orderData.customer.address.area);
-        formData.append('customer[address][city]', orderData.customer.address.city);
-        formData.append('customer[address][district]', orderData.customer.address.district);
+      const paymentResponse = await paymentsAPI.initiateSSLCommerzPayment(paymentData);
+
+      if (!paymentResponse.data?.success) {
+        toast.error(paymentResponse.data?.message || 'Failed to initiate payment');
+        return;
       }
-      
-      // Add items
-      orderData.items.forEach((item, index) => {
-        formData.append(`items[${index}][product]`, item.product);
+
+      // 2) Only after successful initiation, create the order
+      const formData = new FormData();
+
+      // customer
+      formData.append('customer[name]', customerInfo.name);
+      formData.append('customer[phone]', customerInfo.phone);
+      formData.append('customer[email]', customerInfo.email);
+
+      if (deliveryMethod === 'delivery') {
+        formData.append('customer[address][street]', customerInfo.address.street);
+        formData.append('customer[address][area]', customerInfo.address.area);
+        formData.append('customer[address][city]', customerInfo.address.city);
+        formData.append('customer[address][district]', customerInfo.address.district);
+      }
+
+      // items
+      cart.forEach((item, index) => {
+        const productId = (item.product as any).id || (item.product as any)._id;
+        formData.append(`items[${index}][product]`, productId);
         formData.append(`items[${index}][quantity]`, item.quantity.toString());
       });
-      
-      // Add payment info
-      formData.append('paymentInfo[method]', orderData.paymentInfo.method);
-      
-      // Add delivery info
-      formData.append('deliveryInfo[method]', orderData.deliveryInfo.method);
-      formData.append('deliveryInfo[address]', orderData.deliveryInfo.address);
-      formData.append('deliveryInfo[phone]', orderData.deliveryInfo.phone);
-      formData.append('deliveryInfo[deliveryCharge]', orderData.deliveryInfo.deliveryCharge.toString());
+
+      // payment
+      formData.append('paymentInfo[method]', 'sslcommerz');
+
+      // delivery
+      const address = deliveryMethod === 'delivery'
+        ? `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`
+        : 'Pickup from restaurant';
+      formData.append('deliveryInfo[method]', deliveryMethod);
+      formData.append('deliveryInfo[address]', address);
+      formData.append('deliveryInfo[phone]', customerInfo.phone);
+      formData.append('deliveryInfo[deliveryCharge]', deliveryCharge.toString());
+
+      // totals
+      formData.append('totalAmount', String(cartTotal));
+      formData.append('finalAmount', String(finalTotal));
 
       const orderResponse = await ordersAPI.createOrder(formData);
-      
-      if (orderResponse.data.success) {
-        const orderNumber = orderResponse.data.order.orderNumber;
-        
-        // Initiate SSLCommerz payment
-        const paymentData = {
-          orderNumber: orderNumber,
-          totalAmount: finalTotal,
-          customer: customerInfo,
-          items: cart.map(item => ({
-            name: item.product.name,
-            price: item.price,
-            quantity: item.quantity
-          }))
-        };
-
-        const paymentResponse = await paymentsAPI.initiateSSLCommerzPayment(paymentData);
-        
-        if (paymentResponse.data.success) {
-          // Redirect to SSLCommerz payment page
-          window.location.href = paymentResponse.data.data.gatewayPageURL;
-        } else {
-          toast.error(paymentResponse.data.message || 'Failed to initiate payment');
-        }
-      } else {
-        toast.error(orderResponse.data.message || 'Failed to create order');
+      if (!orderResponse.data?.success) {
+        toast.error(orderResponse.data?.message || 'Failed to create order');
+        return;
       }
+
+      // 3) Redirect to SSLCommerz gateway
+      const gatewayUrl = paymentResponse.data.data.gatewayPageURL;
+      window.location.href = gatewayUrl;
     } catch (error: any) {
       console.error('SSLCommerz payment error:', error);
-      toast.error(error.response?.data?.message || 'Payment initiation failed');
+      toast.error(error?.response?.data?.message || 'Payment initiation failed');
     } finally {
       setLoading(false);
     }
