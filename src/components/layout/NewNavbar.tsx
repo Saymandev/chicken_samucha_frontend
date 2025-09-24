@@ -436,7 +436,7 @@ const NewNavbar: React.FC = () => {
               ) : (
                 <div className="flex flex-wrap justify-center gap-4 xl:gap-6 2xl:gap-8">
                   {menuItems.map((item) => (
-                    <div key={item.id} className="relative pt-4">
+                    <div key={item.id} className="relative">
                       {/* Small pill badge centered above item */}
                       {item.badge && (
                         <div
