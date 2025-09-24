@@ -92,7 +92,10 @@ api.interceptors.response.use(
         case 401:
           // Unauthorized - clear token and let route guards handle navigation
           localStorage.removeItem('token');
-          toast.error('Session expired. Please login again.');
+          // Show the actual error message from backend for better debugging
+          const errorMessage = data?.message || 'Session expired. Please login again.';
+          toast.error(errorMessage);
+          console.error('401 Error details:', data);
           break;
         case 403:
           toast.error('You do not have permission to perform this action.');
