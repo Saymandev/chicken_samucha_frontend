@@ -29,7 +29,7 @@ interface SliderItem {
 const AdminContent: React.FC = () => {
   const [heroContent, setHeroContent] = useState<HeroContent | null>(null);
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
-  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number } | null>(null);
+  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number; zones: Array<{ id: string; name: { en: string; bn: string }; price: number }> } | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'delivery'>('hero');
   const [newSliderItem, setNewSliderItem] = useState<SliderItem | null>(null);
@@ -98,7 +98,8 @@ const AdminContent: React.FC = () => {
           const s = systemResponse.data.settings;
           setDeliverySettings({
             deliveryCharge: s?.general?.deliveryCharge ?? 60,
-            freeDeliveryThreshold: s?.delivery?.freeDeliveryThreshold ?? 500
+            freeDeliveryThreshold: s?.delivery?.freeDeliveryThreshold ?? 500,
+            zones: Array.isArray(s?.delivery?.zones) ? s.delivery.zones : []
           });
         }
       } catch {}
@@ -422,16 +423,122 @@ const AdminContent: React.FC = () => {
                 />
               </div>
             </div>
+
+            {/* Delivery Zones */}
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delivery Zones</h3>
+                <button
+                  onClick={() => setDeliverySettings(ds => ds ? { ...ds, zones: [...ds.zones, { id: `zone-${Date.now()}`, name: { en: '', bn: '' }, price: 0 }] } : ds)}
+                  className="px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg"
+                >
+                  Add Zone
+                </button>
+              </div>
+              <div className="space-y-3">
+                {deliverySettings.zones.map((z, idx) => (
+                  <div key={z.id} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                    <div className="md:col-span-2">
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Name (EN)</label>
+                      <input
+                        value={z.name.en}
+                        onChange={(e) => setDeliverySettings(ds => {
+                          if (!ds) return ds;
+                          const zones = [...ds.zones];
+                          zones[idx] = { ...zones[idx], name: { ...zones[idx].name, en: e.target.value } };
+                          return { ...ds, zones };
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Name (BN)</label>
+                      <input
+                        value={z.name.bn}
+                        onChange={(e) => setDeliverySettings(ds => {
+                          if (!ds) return ds;
+                          const zones = [...ds.zones];
+                          zones[idx] = { ...zones[idx], name: { ...zones[idx].name, bn: e.target.value } };
+                          return { ...ds, zones };
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Price (৳)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={z.price}
+                        onChange={(e) => setDeliverySettings(ds => {
+                          if (!ds) return ds;
+                          const zones = [...ds.zones];
+                          zones[idx] = { ...zones[idx], price: parseInt(e.target.value) || 0 };
+                          return { ...ds, zones };
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div className="flex items-center justify-end md:justify-center gap-2">
+                      <button
+                        onClick={() => setDeliverySettings(ds => {
+                          if (!ds) return ds;
+                          if (idx === 0) return ds;
+                          const zones = [...ds.zones];
+                          const tmp = zones[idx-1];
+                          zones[idx-1] = zones[idx];
+                          zones[idx] = tmp;
+                          return { ...ds, zones };
+                        })}
+                        title="Move Up"
+                        className="px-2 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                      >↑</button>
+                      <button
+                        onClick={() => setDeliverySettings(ds => {
+                          if (!ds) return ds;
+                          if (idx === ds.zones.length - 1) return ds;
+                          const zones = [...ds.zones];
+                          const tmp = zones[idx+1];
+                          zones[idx+1] = zones[idx];
+                          zones[idx] = tmp;
+                          return { ...ds, zones };
+                        })}
+                        title="Move Down"
+                        className="px-2 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                      >↓</button>
+                      <button
+                        onClick={() => setDeliverySettings(ds => ds ? { ...ds, zones: ds.zones.filter((_, i) => i !== idx) } : ds)}
+                        className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {deliverySettings.zones.length === 0 && (
+                  <div className="text-sm text-gray-500 dark:text-gray-400">No zones added yet.</div>
+                )}
+              </div>
+            </div>
             <div className="mt-6">
               <button
                 onClick={async () => {
                   if (!deliverySettings) return;
                   try {
                     setSavingSettings(true);
+                    // Basic validation & normalization
+                    const cleanedZones = (deliverySettings.zones || [])
+                      .map((z, i) => ({
+                        id: z.id || `zone-${Date.now()}-${i}`,
+                        name: { en: (z.name?.en || '').trim(), bn: (z.name?.bn || '').trim() },
+                        price: Math.max(0, Number(z.price) || 0)
+                      }))
+                      .filter(z => z.name.en || z.name.bn);
+
                     await adminAPI.updateSystemSettings({
                       settings: {
                         general: { deliveryCharge: deliverySettings.deliveryCharge },
-                        delivery: { freeDeliveryThreshold: deliverySettings.freeDeliveryThreshold }
+                        delivery: { freeDeliveryThreshold: deliverySettings.freeDeliveryThreshold, zones: cleanedZones }
                       }
                     });
                     toast.success('Delivery settings updated successfully');

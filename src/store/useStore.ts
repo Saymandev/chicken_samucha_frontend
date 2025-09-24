@@ -20,6 +20,7 @@ export interface User {
   };
   preferredLanguage: 'en' | 'bn';
   preferredTheme: 'light' | 'dark';
+  lastDeliveryZoneId?: string | null;
 }
 
 export interface Product {

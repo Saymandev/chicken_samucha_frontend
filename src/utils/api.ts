@@ -158,6 +158,8 @@ export const authAPI = {
   markAllNotificationsAsRead: () => api.put('/users/notifications/mark-all-read'),
 };
 
+
+
 export const productsAPI = {
   getProducts: (params?: any) => api.get('/products', { params }),
   getFeaturedProducts: (limit?: number) =>

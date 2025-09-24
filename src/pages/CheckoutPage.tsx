@@ -75,8 +75,10 @@ const CheckoutPage: React.FC = () => {
   const [couponError, setCouponError] = useState('');
 
   // Delivery settings (pulled from backend public endpoint)
-  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number } | null>(null);
-  const baseDeliveryCharge = deliverySettings?.deliveryCharge ?? 60; // Default fallback
+  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number; zones?: Array<{ id: string; name: { en: string; bn: string }; price: number }> } | null>(null);
+  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const selectedZonePrice = deliverySettings?.zones?.find(z => z.id === selectedZoneId)?.price;
+  const baseDeliveryCharge = (selectedZonePrice ?? deliverySettings?.deliveryCharge) ?? 60; // Default fallback
   const freeThreshold = deliverySettings?.freeDeliveryThreshold ?? 500; // Default fallback
   const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold ? 0 : baseDeliveryCharge);
   const couponDiscount = appliedCoupon?.discount || 0;
@@ -90,12 +92,35 @@ const CheckoutPage: React.FC = () => {
         const res = await contentAPI.getDeliverySettings();
         if (res.data?.success) {
           setDeliverySettings(res.data.settings);
+          if (Array.isArray(res.data.settings?.zones) && res.data.settings.zones.length > 0) {
+            // Default by user last selection, else by address match (area/city/district), else first
+            const zones = res.data.settings.zones;
+            const byLast = user?.lastDeliveryZoneId && zones.find((z: any) => z.id === user.lastDeliveryZoneId)?.id;
+            const parts = [customerInfo.address.area, customerInfo.address.city, customerInfo.address.district]
+              .filter(Boolean)
+              .map((s) => String(s).toLowerCase());
+            const byAddress = zones.find((z: any) => {
+              const en = (z.name.en || '').toLowerCase();
+              const bn = (z.name.bn || '').toLowerCase();
+              return parts.some((p) => en.includes(p) || bn.includes(p));
+            })?.id;
+            setSelectedZoneId(byLast || byAddress || zones[0].id);
+          }
         }
       } catch (e) {
         // keep defaults
       }
     })();
   }, []);
+
+  // Persist selected zone for logged-in users when it changes
+  useEffect(() => {
+    if (!user || !selectedZoneId) return;
+    // fire and forget; avoid blocking UI
+    import('../utils/api').then(({ authAPI }: any) => {
+      authAPI.updateDetails({ lastDeliveryZoneId: selectedZoneId }).catch(() => {});
+    });
+  }, [selectedZoneId, user]);
 
   const fetchPaymentSettings = async () => {
     try {
@@ -513,6 +538,32 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Delivery Zones (place-based) */}
+              {deliveryMethod === 'delivery' && Array.isArray(deliverySettings?.zones) && (deliverySettings!.zones.length > 0) && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Delivery Area</h3>
+                  <div className="space-y-2">
+                    {deliverySettings!.zones.map((z) => (
+                      <label key={z.id} className="flex items-center justify-between gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            name="delivery-zone"
+                            checked={selectedZoneId === z.id}
+                            onChange={() => setSelectedZoneId(z.id)}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {language === 'bn' ? (z.name.bn || z.name.en) : (z.name.en || z.name.bn)}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">৳ {z.price.toFixed(2)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Delivery Method Selection */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
