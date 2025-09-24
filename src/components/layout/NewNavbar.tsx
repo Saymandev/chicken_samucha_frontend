@@ -1,18 +1,25 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronDown,
+  Facebook,
   Globe,
   Heart,
-  Home,
+  Instagram,
+  Linkedin,
   LogOut,
+  Mail,
   Menu,
   Moon,
   Package,
+  Phone,
+  Search,
   Settings,
   ShoppingCart,
   Sun,
+  Twitter,
   User,
-  X
+  X,
+  Youtube
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -120,34 +127,41 @@ const NewNavbar: React.FC = () => {
   const navItems = [
     {
       path: '/',
-      label: t('nav.home'),
-      icon: <Home className="w-4 h-4" />,
+      label: 'HOME',
+      icon: null,
       active: location.pathname === '/'
     },
     {
       path: '/products?filter=offers',
-      label: 'Offer Zone',
+      label: 'HOT OFFERS!',
       icon: null,
-      active: location.search.includes('filter=offers')
+      active: location.search.includes('filter=offers'),
+      badge: 'Sale'
     },
     {
       path: '/products?filter=best-seller',
-      label: 'Best Sellers',
+      label: 'BEST SELLERS',
       icon: null,
       active: location.search.includes('filter=best-seller')
     },
     {
       path: '/products',
-      label: 'All Products',
+      label: 'ALL PRODUCTS',
       icon: null,
       active: location.pathname.startsWith('/products') && !location.search.includes('filter=')
     },
     {
-      path: '#',
-      label: 'Categories',
-      icon: <Package className="w-4 h-4" />,
-      active: false,
-      hasDropdown: true
+      path: '/products?filter=combo',
+      label: 'COMBO',
+      icon: null,
+      active: location.search.includes('filter=combo'),
+      badge: 'Hot'
+    },
+    {
+      path: '/products?filter=clearance',
+      label: 'CLEARANCE',
+      icon: null,
+      active: location.search.includes('filter=clearance')
     }
   ];
 
@@ -250,240 +264,326 @@ const NewNavbar: React.FC = () => {
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 gap-2">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 shrink-0">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-              <Package className="w-5 h-5 text-white" />
+    <>
+      {/* Top Header Bar */}
+      <div className="bg-blue-900 text-white py-2 text-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center">
+            {/* Left Side - Contact Info */}
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <span>support@chickensamosa.com</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4" />
+                <span>Hotline: 01879 222 444</span>
+              </div>
             </div>
-            <span className="hidden sm:inline text-xl font-bold text-gray-900 dark:text-white">
-              {language === 'bn' ? 'চিকেন সমুচা' : 'Chicken Samosa'}
-            </span>
-          </Link>
+            
+            {/* Right Side - Social Links */}
+            <div className="flex items-center space-x-4">
+              <Link to="/contact" className="hover:text-blue-200 transition-colors">
+                Contact Us
+              </Link>
+              <div className="flex items-center space-x-3">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                  <Youtube className="w-4 h-4" />
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                  <Linkedin className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {/* Desktop Navigation (lg and up) */}
-          <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center space-x-8 overflow-visible flex-nowrap pr-2">
-            {navItems.map((item) => (
-              <div
-                key={item.path}
-                className="relative"
-                onMouseEnter={() => item.hasDropdown && setIsProductsMenuOpen(true)}
-                onMouseLeave={() => item.hasDropdown && setIsProductsMenuOpen(false)}
+      {/* Main Header */}
+      <div className="bg-blue-900 text-white py-4">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <Package className="w-6 h-6 text-blue-900" />
+              </div>
+              <div>
+                <div className="text-xl font-bold">chickensamosa.com</div>
+                <div className="text-xs opacity-90">PROUDLY BANGLADESHI</div>
+              </div>
+            </Link>
+
+            {/* Search Bar */}
+            <div className="flex-1 max-w-2xl mx-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search entire store here..."
+                  className="w-full px-4 py-3 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors">
+                  <Search className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Right Side - Cart and User */}
+            <div className="flex items-center space-x-6">
+              {/* Cart */}
+              <button
+                onClick={openCart}
+                className="flex items-center space-x-2 hover:text-blue-200 transition-colors"
               >
-                {item.hasDropdown ? (
-                  <div
-                    className="flex items-center space-x-1 cursor-pointer text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                    onClick={() => setIsProductsMenuOpen((prev) => !prev)}
+                <div className="relative">
+                  <ShoppingCart className="w-6 h-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm font-medium">My Cart</span>
+              </button>
+
+              {/* User Section */}
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-2">
+                  <User className="w-5 h-5" />
+                  <span className="text-sm">Hello {user?.name?.split(' ')[0]}!</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <User className="w-5 h-5" />
+                  <span className="text-sm">Hello Guest! <Link to="/login" className="underline hover:text-blue-200">Login</Link> / <Link to="/register" className="underline hover:text-blue-200">Register</Link></span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center h-16">
+            {/* Category Sidebar */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProductsMenuOpen(!isProductsMenuOpen)}
+                className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg transition-colors"
+              >
+                <Menu className="w-5 h-5" />
+                <span className="font-semibold">ALL CATEGORIES</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {/* Categories Dropdown */}
+              <AnimatePresence>
+                {isProductsMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
                   >
-                    {item.icon}
-                    <span className="font-medium whitespace-nowrap">{item.label}</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
-                ) : (
+                    {/* Categories */}
+                    <div className="px-4 py-2">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                        Categories
+                      </h3>
+                      {loadingCategories ? (
+                        <div className="space-y-2">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="flex items-center space-x-3">
+                              <Skeleton className="w-6 h-6 rounded" />
+                              <Skeleton className="h-4 w-20" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : categories.length > 0 ? (
+                        <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+                          {categories.map((category) => renderCategoryTree(category, 0))}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                          No categories available
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Main Navigation Links */}
+            <div className="flex-1 flex items-center justify-center space-x-8 ml-8">
+              {navItems.map((item) => (
+                <div key={item.path} className="relative">
                   <Link
                     to={item.path}
-                    className={`flex items-center space-x-1 transition-colors ${
+                    className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
                       item.active
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                        ? 'text-red-600 font-semibold'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-red-600 font-medium'
                     }`}
                   >
-                    {item.icon}
-                    <span className="font-medium whitespace-nowrap">{item.label}</span>
+                    <span className="whitespace-nowrap">{item.label}</span>
+                    {item.badge && (
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        item.badge === 'Hot' 
+                          ? 'bg-orange-100 text-orange-600' 
+                          : 'bg-red-100 text-red-600'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
-                )}
+                </div>
+              ))}
+            </div>
 
-                {/* Products Dropdown */}
-                {item.hasDropdown && (
+            {/* Right Side - Additional Actions */}
+            <div className="flex items-center space-x-4 ml-8">
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Notifications */}
+              {isAuthenticated && <UserNotificationDropdown />}
+
+              {/* User Menu */}
+              {isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                      {user?.avatar?.url ? (
+                        <img
+                          src={user?.avatar?.url}
+                          alt={user?.name}
+                          className="w-7 h-7 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-6 h-6 text-white" />
+                      )}
+                    </div>
+                    <span className="hidden xl:block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {user?.name || 'User'}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </button>
+
                   <AnimatePresence>
-                    {isProductsMenuOpen && (
+                    {isUserMenuOpen && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2"
                       >
-                        {/* Categories */}
-                        <div className="px-4 py-2">
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                            Categories
-                          </h3>
-                          {loadingCategories ? (
-                            <div className="space-y-2">
-                              {[1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center space-x-3">
-                                  <Skeleton className="w-6 h-6 rounded" />
-                                  <Skeleton className="h-4 w-20" />
-                                </div>
-                              ))}
-                            </div>
-                          ) : categories.length > 0 ? (
-                            <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
-                              {categories.map((category) => renderCategoryTree(category, 0))}
-                            </div>
-                          ) : (
-                            <div className="text-sm text-gray-500 dark:text-gray-400 py-2">
-                              No categories available
-                            </div>
-                          )}
-                        </div>
+                        {/* Quick Settings inside user dropdown */}
+                        <button
+                          onClick={() => handleLanguageChange(language === 'en' ? 'bn' : 'en')}
+                          className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Globe className="w-4 h-4" />
+                            <span>Language</span>
+                          </div>
+                          <span className="text-xs opacity-80">{language.toUpperCase()}</span>
+                        </button>
+                        <button
+                          onClick={toggleTheme}
+                          className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <div className="flex items-center space-x-2">
+                            {theme === 'light' ? (
+                              <Moon className="w-4 h-4" />
+                            ) : (
+                              <Sun className="w-4 h-4" />
+                            )}
+                            <span>Theme</span>
+                          </div>
+                          <span className="text-xs opacity-80">{theme === 'light' ? 'Light' : 'Dark'}</span>
+                        </button>
+                        <hr className="my-1 border-gray-200 dark:border-gray-700" />
+
+                        {userMenuItems.map((item) => (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            {item.icon}
+                            <span>{item.label}</span>
+                          </Link>
+                        ))}
+                        <hr className="my-2 border-gray-200 dark:border-gray-700" />
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 shrink-0">
-            {/* Wishlist */}
-            <Link
-              to="/wishlist"
-              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Cart */}
-            <button
-              onClick={openCart}
-              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Notifications */}
-            {isAuthenticated && <UserNotificationDropdown />}
-
-            {/* User Menu */}
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                  {user?.avatar?.url ? (
-                    <img
-                      src={user?.avatar?.url}
-                      alt={user?.name}
-                      className="w-7 h-7 rounded-full object-cover"
-                    />
-                  ) : (
-                    
-                      <User className="w-6 h-6 text-white" />
-                    
-                  )}
-                  </div>
-                  <span className="hidden xl:block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {user?.name || 'User'}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </button>
-
-                <AnimatePresence>
-                  {isUserMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2"
-                    >
-                      {/* Quick Settings inside user dropdown */}
-                      <button
-                        onClick={() => handleLanguageChange(language === 'en' ? 'bn' : 'en')}
-                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Globe className="w-4 h-4" />
-                          <span>Language</span>
-                        </div>
-                        <span className="text-xs opacity-80">{language.toUpperCase()}</span>
-                      </button>
-                      <button
-                        onClick={toggleTheme}
-                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <div className="flex items-center space-x-2">
-                          {theme === 'light' ? (
-                            <Moon className="w-4 h-4" />
-                          ) : (
-                            <Sun className="w-4 h-4" />
-                          )}
-                          <span>Theme</span>
-                        </div>
-                        <span className="text-xs opacity-80">{theme === 'light' ? 'Light' : 'Dark'}</span>
-                      </button>
-                      <hr className="my-1 border-gray-200 dark:border-gray-700" />
-
-                      {userMenuItems.map((item) => (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          {item.icon}
-                          <span>{item.label}</span>
-                        </Link>
-                      ))}
-                      <hr className="my-2 border-gray-200 dark:border-gray-700" />
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors"
-                >
-                  Register
-                </Link>
-              </div>
-            )}
-
-            {/* Mobile Menu Button (visible below lg) */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
+                </div>
               ) : (
-                <Menu className="w-5 h-5" />
+                <div className="flex items-center space-x-2">
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Register
+                  </Link>
+                </div>
               )}
-            </button>
-          </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </button>
+            </div>
         </div>
 
         {/* Mobile Menu (below lg) */}
@@ -497,19 +597,27 @@ const NewNavbar: React.FC = () => {
             >
               <div className="px-4 py-4 space-y-4">
                 {/* Top-level links: Home, Offer Zone, Best Sellers, All Products */}
-                {navItems.filter(i => !i.hasDropdown).map((item) => (
+                {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={`flex items-center space-x-2 transition-colors ${
                       item.active
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                        ? 'text-red-600 font-semibold'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-red-600 font-medium'
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {item.icon}
                     <span className="font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        item.badge === 'Hot' 
+                          ? 'bg-orange-100 text-orange-600' 
+                          : 'bg-red-100 text-red-600'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 ))}
 
@@ -528,7 +636,21 @@ const NewNavbar: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Click outside to close menus */}
+      {(isMobileMenuOpen || isUserMenuOpen || isProductsMenuOpen) && (
+        <div
+          className="fixed inset-0 z-40 pointer-events-auto"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsMobileMenuOpen(false);
+            setIsUserMenuOpen(false);
+            setIsProductsMenuOpen(false);
+          }}
+        />
+      )}
     </nav>
+    </>
   );
 };
 
