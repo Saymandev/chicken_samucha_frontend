@@ -436,19 +436,20 @@ const NewNavbar: React.FC = () => {
               ) : (
                 <div className="flex flex-wrap justify-center gap-2 xl:gap-4 2xl:gap-8">
                   {menuItems.map((item) => (
-                    <div key={item.id} className="relative">
-                      <button type="button"
-                        onClick={() => handleMenuClick(item)}
-                        className={`flex items-center space-x-1 xl:space-x-2 px-1 xl:px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base ${
-                          isMenuItemActive(item)
-                            ? 'text-orange-600 font-semibold'
-                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
-                        } ${item.cssClass || ''}`}
-                      >
-                        <span className="whitespace-nowrap truncate max-w-[120px] sm:max-w-[150px] lg:max-w-none">
-                          {language === 'bn' ? item.title.bn : item.title.en}
-                        </span>
-                        {item.badge && (
+                  <div key={item.id} className="relative group">
+                    <button type="button"
+                      onClick={() => handleMenuClick(item)}
+                      className={`flex items-center space-x-1 xl:space-x-2 px-1 xl:px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base ${
+                        isMenuItemActive(item)
+                          ? 'text-orange-600 font-semibold'
+                          : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                      } ${item.cssClass || ''}`}
+                    >
+                      <span className="whitespace-nowrap truncate max-w-[120px] sm:max-w-[150px] lg:max-w-none">
+                        {language === 'bn' ? item.title.bn : item.title.en}
+                      </span>
+                      {item.badge && (
+                        <>
                           <span className={`text-xs px-1 xl:px-1.5 2xl:px-2 py-0.5 xl:py-1 rounded-full ${
                             item.badge.color === 'orange' 
                               ? 'bg-orange-100 text-orange-600' 
@@ -462,9 +463,15 @@ const NewNavbar: React.FC = () => {
                           }`}>
                             {item.badge.text}
                           </span>
-                        )}
-                      </button>
-              </div>
+                          {/* Tooltip */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                            {item.badge.text}
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        </>
+                      )}
+                    </button>
+                  </div>
             ))}
           </div>
               )}
