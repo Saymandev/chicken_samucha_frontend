@@ -34,6 +34,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   const { language } = useStore();
   const [announcement, setAnnouncement] = useState<any>(null);
   const [hideBanner, setHideBanner] = useState(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -41,6 +42,17 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
       if (mounted) setAnnouncement(res.data?.announcement || null);
     }).catch(() => {});
     return () => { mounted = false; };
+  }, []);
+
+  // Track viewport to decide image fit strategy
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener ? mq.addEventListener('change', update) : mq.addListener(update);
+    return () => {
+      mq.removeEventListener ? mq.removeEventListener('change', update) : mq.removeListener(update);
+    };
   }, []);
 
   // Filter active items and sort by order
@@ -115,12 +127,12 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Background Image with contain to avoid cropping on any device */}
+              {/* Background Image – contain on small screens (no crop), cover on desktop (no empty bars) */}
               <div 
                 className="absolute inset-0 w-full h-full"
                 style={{ 
                   backgroundImage: `url(${item.image.url})`,
-                  backgroundSize: 'contain',
+                  backgroundSize: isDesktop ? 'cover' : 'contain',
                   backgroundPosition: 'center center',
                   backgroundRepeat: 'no-repeat',
                   width: '100%',
