@@ -260,8 +260,8 @@ const NewNavbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Header Bar */}
-      <div className="bg-orange-600 text-white py-2 text-xs sm:text-sm">
+      {/* Top Header Bar - Hidden on mobile */}
+      <div className="hidden sm:block bg-orange-600 text-white py-2 text-xs sm:text-sm">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
             {/* Left Side - Contact Info */}
@@ -340,25 +340,8 @@ const NewNavbar: React.FC = () => {
               </form>
             </div>
 
-            {/* Right Side - Cart and User */}
+            {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
-              {/* Cart */}
-              <button
-                onClick={openCart}
-                className="flex items-center space-x-1 sm:space-x-2 hover:text-orange-200 transition-colors p-2 sm:p-0 min-h-[44px] touch-manipulation"
-              >
-                <div className="relative">
-                  <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs sm:text-sm font-medium hidden sm:inline">My Cart</span>
-                <span className="text-xs sm:hidden">Cart</span>
-              </button>
-
               {/* User Section */}
               {isAuthenticated ? (
                 <div className="flex items-center space-x-1 sm:space-x-2">
@@ -484,6 +467,19 @@ const NewNavbar: React.FC = () => {
 
             {/* Right Side - Additional Actions */}
             <div className="flex items-center space-x-2 sm:space-x-4 ml-2 sm:ml-4 lg:ml-8">
+            {/* Cart */}
+            <button
+              onClick={openCart}
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
+            >
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
             {/* Wishlist */}
             <Link
               to="/wishlist"
@@ -626,6 +622,32 @@ const NewNavbar: React.FC = () => {
               className="lg:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4">
+                {/* Mobile Cart and Wishlist */}
+                <div className="flex items-center space-x-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => {
+                      openCart();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      My Cart {cartCount > 0 && `(${cartCount})`}
+                    </span>
+                  </button>
+                  <Link
+                    to="/wishlist"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Wishlist {wishlistCount > 0 && `(${wishlistCount})`}
+                    </span>
+                  </Link>
+                </div>
+
                 {/* Dynamic navigation menu items */}
                 <div className="space-y-2">
                   {menuItems.map((item) => (
