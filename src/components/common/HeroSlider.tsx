@@ -34,7 +34,6 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   const { language } = useStore();
   const [announcement, setAnnouncement] = useState<any>(null);
   const [hideBanner, setHideBanner] = useState(false);
-  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -44,16 +43,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
     return () => { mounted = false; };
   }, []);
 
-  // Track viewport to decide image fit strategy
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const update = () => setIsDesktop(mq.matches);
-    update();
-    mq.addEventListener ? mq.addEventListener('change', update) : mq.addListener(update);
-    return () => {
-      mq.removeEventListener ? mq.removeEventListener('change', update) : mq.removeListener(update);
-    };
-  }, []);
+  // No viewport switching needed – always contain to show full image on all devices
 
   // Filter active items and sort by order
   const activeItems = items.filter(item => item.isActive).sort((a, b) => a.order - b.order);
@@ -127,18 +117,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Background Image – contain on small screens (no crop), cover on desktop (no empty bars) */}
-              <div 
-                className="absolute inset-0 w-full h-full"
-                style={{ 
-                  backgroundImage: `url(${item.image.url})`,
-                  backgroundSize: isDesktop ? 'cover' : 'contain',
-                  backgroundPosition: 'center center',
-                  backgroundRepeat: 'no-repeat',
-                  width: '100%',
-                  height: '100%',
-                  backgroundColor: '#ffffff'
-                }}
+              {/* Full-width contained image on all devices (no cropping) */}
+              <img
+                src={item.image.url}
+                alt={item.title[language] || 'slide'}
+                className="absolute inset-0 w-full h-full object-contain bg-white"
+                loading="eager"
+                decoding="async"
               />
               
               {/* Light overlay for better text readability without darkening the image */}
