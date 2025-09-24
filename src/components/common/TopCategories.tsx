@@ -50,10 +50,10 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
         {[...Array(limit)].map((_, index) => (
-          <div key={index} className="bg-gray-200 dark:bg-gray-700 rounded-xl p-4 animate-pulse">
-            <div className="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-3"></div>
+          <div key={index} className="bg-gray-200 dark:bg-gray-700 rounded-xl p-3 md:p-4 animate-pulse">
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-2 md:mb-3"></div>
             <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mx-auto"></div>
           </div>
         ))}
@@ -66,7 +66,7 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
       {topCategories.map((category, index) => (
         <motion.div
           key={category._id}
@@ -78,11 +78,11 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
             to={`/products?category=${category.slug}`}
             className="block group"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
               {/* Category Image/Icon */}
               <div className="relative mb-3">
                 {category.image?.url ? (
-                  <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-orange-500 transition-all duration-300">
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-orange-500 transition-all duration-300">
                     <img
                       src={category.image.url}
                       alt={category.name[language]}
@@ -91,7 +91,7 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
                   </div>
                 ) : (
                   <div
-                    className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full flex items-center justify-center text-3xl ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-orange-500 transition-all duration-300"
+                    className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full flex items-center justify-center text-2xl md:text-3xl ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-orange-500 transition-all duration-300"
                     style={{ backgroundColor: category.color + '20' }}
                   >
                     {category.icon}
@@ -100,7 +100,7 @@ const TopCategories: React.FC<TopCategoriesProps> = ({ limit = 4 }) => {
               </div>
 
               {/* Category Name */}
-              <h3 className={`font-semibold text-gray-900 dark:text-white mb-1 ${
+              <h3 className={`font-semibold text-gray-900 dark:text-white mb-1 text-sm md:text-base ${
                 language === 'bn' ? 'font-bengali' : ''
               }`}>
                 {category.name[language]}
