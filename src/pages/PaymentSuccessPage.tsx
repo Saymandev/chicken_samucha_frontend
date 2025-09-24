@@ -16,6 +16,9 @@ const PaymentSuccessPage: React.FC = () => {
   useEffect(() => {
     const order = searchParams.get('order');
     const status = searchParams.get('status');
+    const verified = searchParams.get('verified');
+    const transactionId = searchParams.get('transactionId');
+    const provider = searchParams.get('provider');
     
     if (order) {
       setOrderNumber(order);
@@ -49,8 +52,15 @@ const PaymentSuccessPage: React.FC = () => {
                 formData.append(`items[${idx}][product]`, it.product);
                 formData.append(`items[${idx}][quantity]`, String(it.quantity));
               });
-              // payment
+              // payment - include verification data if available
               formData.append('paymentInfo[method]', 'sslcommerz');
+              if (verified === 'true' && transactionId) {
+                formData.append('paymentInfo[status]', 'verified');
+                formData.append('paymentInfo[transactionId]', transactionId);
+                formData.append('paymentInfo[paymentGateway]', 'sslcommerz');
+                formData.append('paymentInfo[provider]', provider || 'sslcommerz');
+                formData.append('paymentInfo[verifiedAt]', new Date().toISOString());
+              }
               // delivery
               formData.append('deliveryInfo[method]', data.deliveryInfo.method);
               formData.append('deliveryInfo[address]', data.deliveryInfo.address || '');
@@ -61,8 +71,13 @@ const PaymentSuccessPage: React.FC = () => {
               formData.append('finalAmount', String(data.totals?.finalAmount || 0));
 
               try {
-                await ordersAPI.createOrder(formData);
-              } catch {}
+                const response = await ordersAPI.createOrder(formData);
+                if (response.data.success) {
+                  console.log('✅ Order created successfully with payment verification');
+                }
+              } catch (error) {
+                console.error('❌ Order creation failed:', error);
+              }
               try { localStorage.removeItem(key); } catch {}
             }
 
@@ -71,6 +86,7 @@ const PaymentSuccessPage: React.FC = () => {
             clearCart();
           }
         } catch (e) {
+          console.error('❌ Payment success processing error:', e);
           // if order lookup fails (e.g., 404), clear the whole cart as a fallback
           try { clearCart(); } catch {}
         } finally {
