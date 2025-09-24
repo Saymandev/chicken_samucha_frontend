@@ -325,8 +325,8 @@ const NewNavbar: React.FC = () => {
               <div>
                 <div className="text-sm xs:text-lg sm:text-xl font-bold truncate">chickensamosa.com</div>
                 <div className="text-xs opacity-90 hidden sm:block">PROUDLY BANGLADESHI</div>
-              </div>
-            </Link>
+            </div>
+          </Link>
 
             {/* Search Bar */}
             <div className="w-full lg:flex-1 lg:max-w-2xl lg:mx-8 order-3 lg:order-2 min-w-0">
@@ -345,7 +345,7 @@ const NewNavbar: React.FC = () => {
                   <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </form>
-            </div>
+                  </div>
 
             {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
@@ -373,7 +373,7 @@ const NewNavbar: React.FC = () => {
       {/* Main Navigation */}
       <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex items-center h-12 sm:h-16 justify-between">
+          <div className="flex items-center min-h-12 sm:min-h-16 py-2 justify-between">
             {/* Category Sidebar */}
             <div className="relative">
               <button
@@ -387,14 +387,14 @@ const NewNavbar: React.FC = () => {
               </button>
 
               {/* Categories Dropdown */}
-              <AnimatePresence>
-                {isProductsMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
+                  <AnimatePresence>
+                    {isProductsMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
                     className="absolute top-full left-0 mt-2 w-64 sm:w-72 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-y-auto"
-                  >
+                      >
                         {/* Categories */}
                         <div className="px-3 sm:px-4 py-2">
                           <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
@@ -425,46 +425,48 @@ const NewNavbar: React.FC = () => {
               </div>
 
             {/* Main Navigation Links */}
-            <div className="flex-1 hidden lg:flex items-center justify-center space-x-2 xl:space-x-4 2xl:space-x-8 ml-2 xl:ml-4 2xl:ml-8 min-w-0">
+            <div className="flex-1 hidden lg:flex items-center justify-center ml-2 xl:ml-4 2xl:ml-8 min-w-0">
               {menuLoading ? (
                 // Loading skeleton for menu items
-                <div className="flex space-x-2 xl:space-x-4 2xl:space-x-8">
+                <div className="flex flex-wrap justify-center gap-2 xl:gap-4 2xl:gap-8">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
                     <Skeleton key={i} className="h-6 w-12 xl:w-16 2xl:w-20" />
                   ))}
                 </div>
               ) : (
-                menuItems.map((item) => (
-                  <div key={item.id} className="relative">
-                    <button type="button"
-                      onClick={() => handleMenuClick(item)}
-                      className={`flex items-center space-x-1 xl:space-x-2 px-1 xl:px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base ${
-                        isMenuItemActive(item)
-                          ? 'text-orange-600 font-semibold'
-                          : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
-                      } ${item.cssClass || ''}`}
-                    >
-                      <span className="whitespace-nowrap truncate max-w-[120px] sm:max-w-[150px] lg:max-w-none">
-                        {language === 'bn' ? item.title.bn : item.title.en}
-                      </span>
-                      {item.badge && (
-                        <span className={`text-xs px-1 xl:px-1.5 2xl:px-2 py-0.5 xl:py-1 rounded-full ${
-                          item.badge.color === 'orange' 
-                            ? 'bg-orange-100 text-orange-600' 
-                            : item.badge.color === 'green'
-                            ? 'bg-green-100 text-green-600'
-                            : item.badge.color === 'blue'
-                            ? 'bg-blue-100 text-blue-600'
-                            : item.badge.color === 'purple'
-                            ? 'bg-purple-100 text-purple-600'
-                            : 'bg-red-100 text-red-500'
-                        }`}>
-                          {item.badge.text}
+                <div className="flex flex-wrap justify-center gap-2 xl:gap-4 2xl:gap-8">
+                  {menuItems.map((item) => (
+                    <div key={item.id} className="relative">
+                      <button type="button"
+                        onClick={() => handleMenuClick(item)}
+                        className={`flex items-center space-x-1 xl:space-x-2 px-1 xl:px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base ${
+                          isMenuItemActive(item)
+                            ? 'text-orange-600 font-semibold'
+                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                        } ${item.cssClass || ''}`}
+                      >
+                        <span className="whitespace-nowrap truncate max-w-[120px] sm:max-w-[150px] lg:max-w-none">
+                          {language === 'bn' ? item.title.bn : item.title.en}
                         </span>
-                      )}
-                    </button>
-                  </div>
-                ))
+                        {item.badge && (
+                          <span className={`text-xs px-1 xl:px-1.5 2xl:px-2 py-0.5 xl:py-1 rounded-full ${
+                            item.badge.color === 'orange' 
+                              ? 'bg-orange-100 text-orange-600' 
+                              : item.badge.color === 'green'
+                              ? 'bg-green-100 text-green-600'
+                              : item.badge.color === 'blue'
+                              ? 'bg-blue-100 text-blue-600'
+                              : item.badge.color === 'purple'
+                              ? 'bg-purple-100 text-purple-600'
+                              : 'bg-red-100 text-red-500'
+                          }`}>
+                            {item.badge.text}
+                          </span>
+                        )}
+                      </button>
+              </div>
+            ))}
+          </div>
               )}
             </div>
 
@@ -525,12 +527,12 @@ const NewNavbar: React.FC = () => {
 
                 <AnimatePresence>
                   {isUserMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
                     className="absolute right-0 mt-2 w-48 sm:w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
-                  >
+                    >
                       {/* Quick Settings inside user dropdown */}
                       <button
                         onClick={() => handleLanguageChange(language === 'en' ? 'bn' : 'en')}
@@ -602,16 +604,16 @@ const NewNavbar: React.FC = () => {
             )}
 
               {/* Mobile Menu Button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="lg:hidden p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation"
-              >
-                {isMobileMenuOpen ? (
+            >
+              {isMobileMenuOpen ? (
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
+              ) : (
                   <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
-                )}
-              </button>
+              )}
+            </button>
           </div>
         </div>
 
@@ -628,7 +630,7 @@ const NewNavbar: React.FC = () => {
                 {/* Mobile Header with Logo and Cart/Wishlist */}
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
                   {/* Mobile Logo */}
-                  <Link 
+                  <Link
                     to="/" 
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -644,7 +646,7 @@ const NewNavbar: React.FC = () => {
 
                   {/* Mobile primary actions intentionally hidden per requirements */}
                   <div className="hidden" />
-                </div>
+                  </div>
 
                 {/* Dynamic navigation menu items */}
                 <div className="space-y-2">
@@ -678,7 +680,7 @@ const NewNavbar: React.FC = () => {
                           </span>
                         )}
                       </button>
-                    </div>
+                  </div>
                   ))}
                 </div>
 
