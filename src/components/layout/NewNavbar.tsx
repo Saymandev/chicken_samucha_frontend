@@ -83,6 +83,11 @@ const NewNavbar: React.FC = () => {
     fetchCategories();
   }, []);
 
+  // Debug menu items
+  useEffect(() => {
+    console.log('Menu items updated:', menuItems);
+  }, [menuItems]);
+
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
@@ -151,9 +156,11 @@ const NewNavbar: React.FC = () => {
 
   // Handle menu item click with filtering
   const handleMenuClick = (item: any) => {
+    console.log('Menu clicked:', item); // Debug log
     if (item.isExternal) {
       window.open(item.path, item.target);
     } else {
+      console.log('Navigating to:', item.path); // Debug log
       navigate(item.path);
     }
     // Close mobile menu if open
@@ -309,7 +316,7 @@ const NewNavbar: React.FC = () => {
       {/* Main Header */}
       <div className="bg-orange-600 text-white py-3 sm:py-4">
         <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex flex-col lg:flex-row items-center justify-between space-y-3 lg:space-y-0">
+          <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0 md:space-y-3">
             {/* Logo - Hidden on mobile and tablet */}
             <Link to="/" className="hidden md:flex items-center space-x-2 sm:space-x-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg flex items-center justify-center">
@@ -429,7 +436,7 @@ const NewNavbar: React.FC = () => {
               ) : (
                 menuItems.map((item) => (
                   <div key={item.id} className="relative">
-                    <button
+                    <button type="button"
                       onClick={() => handleMenuClick(item)}
                       className={`flex items-center space-x-1 xl:space-x-2 px-1 xl:px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base ${
                         isMenuItemActive(item)
@@ -495,7 +502,7 @@ const NewNavbar: React.FC = () => {
             {/* User Menu */}
             {isAuthenticated ? (
               <div className="relative">
-                <button
+                    <button type="button"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center space-x-1 sm:space-x-2 p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] touch-manipulation"
                 >
@@ -635,43 +642,19 @@ const NewNavbar: React.FC = () => {
                     </div>
                   </Link>
 
-                  {/* Mobile Cart and Wishlist */}
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => {
-                        openCart();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="relative p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      {cartCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                          {cartCount}
-                        </span>
-                      )}
-                    </button>
-                    <Link
-                      to="/wishlist"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="relative p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      {wishlistCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                          {wishlistCount}
-                        </span>
-                      )}
-                    </Link>
-                  </div>
+                  {/* Mobile primary actions intentionally hidden per requirements */}
+                  <div className="hidden" />
                 </div>
 
                 {/* Dynamic navigation menu items */}
                 <div className="space-y-2">
                   {menuItems.map((item) => (
                     <div key={item.id}>
-                      <button
-                        onClick={() => handleMenuClick(item)}
+                      <button type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMenuClick(item);
+                        }}
                         className={`flex items-center justify-between w-full space-x-2 transition-colors p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
                           isMenuItemActive(item)
                             ? 'text-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20'
@@ -701,16 +684,8 @@ const NewNavbar: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Categories list */}
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-3 sm:pt-4">
-                  <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 font-medium mb-3">
-                    <Package className="w-4 h-4" />
-                    <span>Categories</span>
-                  </div>
-                  <div className="ml-4 space-y-2">
-                    {categories.map((category) => renderCategoryTree(category, 0, () => setIsMobileMenuOpen(false)))}
-                  </div>
-                </div>
+                {/* Categories list hidden on mobile panel as requested */}
+                <div className="hidden" />
               </div>
             </motion.div>
           )}
@@ -722,10 +697,12 @@ const NewNavbar: React.FC = () => {
         <div
           className="fixed inset-0 z-40 pointer-events-auto"
           onClick={(e) => {
-            e.stopPropagation();
-            setIsMobileMenuOpen(false);
-            setIsUserMenuOpen(false);
-            setIsProductsMenuOpen(false);
+            // Only close if clicking on the backdrop, not on menu content
+            if (e.target === e.currentTarget) {
+              setIsMobileMenuOpen(false);
+              setIsUserMenuOpen(false);
+              setIsProductsMenuOpen(false);
+            }
           }}
         />
       )}
