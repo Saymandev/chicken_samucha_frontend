@@ -136,3 +136,4 @@ const getDefaultMenuItems = (): NavigationMenuItem[] => [
     permissions: ['public']
   }
 ];
+

@@ -71,6 +71,7 @@ const NewNavbar: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     // Simulate loading state
@@ -132,6 +133,31 @@ const NewNavbar: React.FC = () => {
     if (item.path !== '/' && location.pathname.startsWith(item.path)) return true;
     if (item.path.includes('?') && location.search.includes(item.path.split('?')[1])) return true;
     return false;
+  };
+
+  // Handle search functionality
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Handle menu item click with filtering
+  const handleMenuClick = (item: any) => {
+    if (item.isExternal) {
+      window.open(item.path, item.target);
+    } else {
+      navigate(item.path);
+    }
+    // Close mobile menu if open
+    setIsMobileMenuOpen(false);
   };
 
   // Product quick links are now top-level nav items; no dropdown items needed
@@ -294,16 +320,21 @@ const NewNavbar: React.FC = () => {
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl mx-8">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
                   placeholder="Search entire store here..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                   className="w-full px-4 py-3 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
-                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition-colors">
+                <button 
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition-colors"
+                >
                   <Search className="w-5 h-5" />
                 </button>
-              </div>
+              </form>
             </div>
 
             {/* Right Side - Cart and User */}
@@ -406,65 +437,33 @@ const NewNavbar: React.FC = () => {
               ) : (
                 menuItems.map((item) => (
                   <div key={item.id} className="relative">
-                    {item.isExternal ? (
-                      <a
-                        href={item.path}
-                        target={item.target}
-                        rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
-                          isMenuItemActive(item)
-                            ? 'text-orange-600 font-semibold'
-                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
-                        } ${item.cssClass || ''}`}
-                      >
-                        <span className="whitespace-nowrap">
-                          {language === 'bn' ? item.title.bn : item.title.en}
+                    <button
+                      onClick={() => handleMenuClick(item)}
+                      className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
+                        isMenuItemActive(item)
+                          ? 'text-orange-600 font-semibold'
+                          : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                      } ${item.cssClass || ''}`}
+                    >
+                      <span className="whitespace-nowrap">
+                        {language === 'bn' ? item.title.bn : item.title.en}
+                      </span>
+                      {item.badge && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          item.badge.color === 'orange' 
+                            ? 'bg-orange-100 text-orange-600' 
+                            : item.badge.color === 'green'
+                            ? 'bg-green-100 text-green-600'
+                            : item.badge.color === 'blue'
+                            ? 'bg-blue-100 text-blue-600'
+                            : item.badge.color === 'purple'
+                            ? 'bg-purple-100 text-purple-600'
+                            : 'bg-red-100 text-red-500'
+                        }`}>
+                          {item.badge.text}
                         </span>
-                        {item.badge && (
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            item.badge.color === 'orange' 
-                              ? 'bg-orange-100 text-orange-600' 
-                              : item.badge.color === 'green'
-                              ? 'bg-green-100 text-green-600'
-                              : item.badge.color === 'blue'
-                              ? 'bg-blue-100 text-blue-600'
-                              : item.badge.color === 'purple'
-                              ? 'bg-purple-100 text-purple-600'
-                              : 'bg-red-100 text-red-500'
-                          }`}>
-                            {item.badge.text}
-                          </span>
-                        )}
-                      </a>
-                    ) : (
-                      <Link
-                        to={item.path}
-                        className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
-                          isMenuItemActive(item)
-                            ? 'text-orange-600 font-semibold'
-                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
-                        } ${item.cssClass || ''}`}
-                      >
-                        <span className="whitespace-nowrap">
-                          {language === 'bn' ? item.title.bn : item.title.en}
-                        </span>
-                        {item.badge && (
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            item.badge.color === 'orange' 
-                              ? 'bg-orange-100 text-orange-600' 
-                              : item.badge.color === 'green'
-                              ? 'bg-green-100 text-green-600'
-                              : item.badge.color === 'blue'
-                              ? 'bg-blue-100 text-blue-600'
-                              : item.badge.color === 'purple'
-                              ? 'bg-purple-100 text-purple-600'
-                              : 'bg-red-100 text-red-500'
-                          }`}>
-                            {item.badge.text}
-                          </span>
-                        )}
-                      </Link>
-                    )}
+                      )}
+                    </button>
                   </div>
                 ))
               )}
@@ -617,67 +616,33 @@ const NewNavbar: React.FC = () => {
                 {/* Dynamic navigation menu items */}
                 {menuItems.map((item) => (
                   <div key={item.id}>
-                    {item.isExternal ? (
-                      <a
-                        href={item.path}
-                        target={item.target}
-                        rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        className={`flex items-center space-x-2 transition-colors ${
-                          isMenuItemActive(item)
-                            ? 'text-orange-600 font-semibold'
-                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
-                        } ${item.cssClass || ''}`}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <span className="font-medium">
-                          {language === 'bn' ? item.title.bn : item.title.en}
+                    <button
+                      onClick={() => handleMenuClick(item)}
+                      className={`flex items-center space-x-2 transition-colors ${
+                        isMenuItemActive(item)
+                          ? 'text-orange-600 font-semibold'
+                          : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                      } ${item.cssClass || ''}`}
+                    >
+                      <span className="font-medium">
+                        {language === 'bn' ? item.title.bn : item.title.en}
+                      </span>
+                      {item.badge && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          item.badge.color === 'orange' 
+                            ? 'bg-orange-100 text-orange-600' 
+                            : item.badge.color === 'green'
+                            ? 'bg-green-100 text-green-600'
+                            : item.badge.color === 'blue'
+                            ? 'bg-blue-100 text-blue-600'
+                            : item.badge.color === 'purple'
+                            ? 'bg-purple-100 text-purple-600'
+                            : 'bg-red-100 text-red-500'
+                        }`}>
+                          {item.badge.text}
                         </span>
-                        {item.badge && (
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            item.badge.color === 'orange' 
-                              ? 'bg-orange-100 text-orange-600' 
-                              : item.badge.color === 'green'
-                              ? 'bg-green-100 text-green-600'
-                              : item.badge.color === 'blue'
-                              ? 'bg-blue-100 text-blue-600'
-                              : item.badge.color === 'purple'
-                              ? 'bg-purple-100 text-purple-600'
-                              : 'bg-red-100 text-red-500'
-                          }`}>
-                            {item.badge.text}
-                          </span>
-                        )}
-                      </a>
-                    ) : (
-                      <Link
-                        to={item.path}
-                        className={`flex items-center space-x-2 transition-colors ${
-                          isMenuItemActive(item)
-                            ? 'text-orange-600 font-semibold'
-                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
-                        } ${item.cssClass || ''}`}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <span className="font-medium">
-                          {language === 'bn' ? item.title.bn : item.title.en}
-                        </span>
-                        {item.badge && (
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            item.badge.color === 'orange' 
-                              ? 'bg-orange-100 text-orange-600' 
-                              : item.badge.color === 'green'
-                              ? 'bg-green-100 text-green-600'
-                              : item.badge.color === 'blue'
-                              ? 'bg-blue-100 text-blue-600'
-                              : item.badge.color === 'purple'
-                              ? 'bg-purple-100 text-purple-600'
-                              : 'bg-red-100 text-red-500'
-                          }`}>
-                            {item.badge.text}
-                          </span>
-                        )}
-                      </Link>
-                    )}
+                      )}
+                    </button>
                   </div>
                 ))}
 
