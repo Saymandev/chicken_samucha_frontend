@@ -123,32 +123,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Background layers: blurred cover fill + sharp contained image to avoid cropping */}
-              {/* Blurred fill to hide letterboxing while keeping full image visible */}
-              <div
-                className="absolute inset-0 w-full h-full"
-                style={{
-                  backgroundImage: `url(${item.image.url})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center center',
-                  backgroundRepeat: 'no-repeat',
-                  filter: 'blur(12px)',
-                  transform: 'scale(1.08)',
-                  opacity: 0.35
-                }}
-              />
-              {/* Sharp contained image so nothing gets cropped */}
-              <div 
-                className="absolute inset-0 w-full h-full"
-                style={{ 
-                  backgroundImage: `url(${item.image.url})`,
-                  backgroundSize: 'contain',
-                  backgroundPosition: 'center center',
-                  backgroundRepeat: 'no-repeat',
-                  width: '100%',
-                  height: '100%',
-                  backgroundColor: '#ffffff'
-                }}
+              {/* Full-width contained image (no cropping) */}
+              <img
+                src={item.image.url}
+                alt={item.title[language] || 'slide'}
+                className="absolute inset-0 w-full h-full object-contain bg-white"
+                loading="eager"
+                decoding="async"
               />
               
               {/* Light overlay for better text readability without darkening the image */}
