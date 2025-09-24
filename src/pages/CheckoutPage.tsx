@@ -679,11 +679,16 @@ const CheckoutPage: React.FC = () => {
                       onChange={(e) => handleCustomerInfoChange('address.city', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     >
+                      <option value="Dhaka">Dhaka</option>
+                      <option value="Chittagong">Chittagong</option>
+                      <option value="Sylhet">Sylhet</option>
+                      <option value="Rajshahi">Rajshahi</option>
+                      <option value="Khulna">Khulna</option>
+                      <option value="Barisal">Barisal</option>
                       <option value="Rangpur">Rangpur</option>
-                      <option value="Dinajpur">Dinajpur</option>
-                      <option value="Panchagarh">Panchagarh</option>
-                      <option value="Thakurgaon">Thakurgaon</option>
+                      <option value="Mymensingh">Mymensingh</option>
                       
+                      <option value="Other">Other</option>
                     </select>
                   </div>
 
