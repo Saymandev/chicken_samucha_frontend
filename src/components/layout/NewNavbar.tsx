@@ -622,7 +622,7 @@ const NewNavbar: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="relative z-50 lg:hidden border-t border-gray-200 dark:border-gray-700"
+              className="lg:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4">
                 {/* Mobile Header with Logo and Cart/Wishlist */}
@@ -699,10 +699,7 @@ const NewNavbar: React.FC = () => {
             setIsUserMenuOpen(false);
             setIsProductsMenuOpen(false);
           }}
-        >
-          {/* Clicks inside the menu should NOT close the panel */}
-          <div className="h-full w-full" onClick={(e) => e.stopPropagation()} />
-        </div>
+        />
       )}
     </nav>
     </>
