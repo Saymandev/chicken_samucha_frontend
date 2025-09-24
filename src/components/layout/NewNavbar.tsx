@@ -344,16 +344,12 @@ const NewNavbar: React.FC = () => {
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
               {/* User Section */}
               {isAuthenticated ? (
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <User className="w-5 h-5" />
-                  <span className="text-xs sm:text-sm hidden md:inline">Hello {user?.name?.split(' ')[0]}!</span>
-                  <span className="text-xs md:hidden">{user?.name?.split(' ')[0]}</span>
-                </div>
+                ''
               ) : (
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <User className="w-5 h-5" />
                   <div className="hidden md:block text-sm">
-                    Hello Guest! <Link to="/login" className="underline hover:text-orange-200">Login</Link> / <Link to="/register" className="underline hover:text-orange-200">Register</Link>
+                     <Link to="/login" className="underline hover:text-orange-200">Login</Link> / <Link to="/register" className="underline hover:text-orange-200">Register</Link>
                   </div>
                   <div className="md:hidden flex space-x-1 text-xs">
                     <Link to="/login" className="underline hover:text-orange-200">Login</Link>
