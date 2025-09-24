@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion';
 import {
-    ArrowDown,
-    ArrowUp,
-    Edit,
-    ExternalLink,
-    Eye,
-    EyeOff,
-    Home,
-    Plus,
-    Trash2
+  ArrowDown,
+  ArrowUp,
+  Edit,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Home,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Skeleton } from '../../components/common/Skeleton';
@@ -47,6 +47,20 @@ const NavigationMenuPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<NavigationMenuItem | null>(null);
+  const [formData, setFormData] = useState({
+    title: { en: '', bn: '' },
+    path: '',
+    icon: '',
+    badge: { text: '', color: 'orange' as 'red' | 'orange' | 'green' | 'blue' | 'purple' },
+    isActive: true,
+    isExternal: false,
+    target: '_self' as '_self' | '_blank',
+    parentId: '',
+    permissions: [] as string[],
+    cssClass: '',
+    description: { en: '', bn: '' }
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchMenuItems();
@@ -112,6 +126,77 @@ const NavigationMenuPage: React.FC = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: { en: '', bn: '' },
+      path: '',
+      icon: '',
+      badge: { text: '', color: 'orange' as const },
+      isActive: true,
+      isExternal: false,
+      target: '_self' as const,
+      parentId: '',
+      permissions: [] as string[],
+      cssClass: '',
+      description: { en: '', bn: '' }
+    });
+    setEditingItem(null);
+    setShowForm(false);
+  };
+
+  const handleCreate = () => {
+    resetForm();
+    setShowForm(true);
+  };
+
+  const handleEdit = (item: NavigationMenuItem) => {
+    setFormData({
+      title: item.title,
+      path: item.path,
+      icon: item.icon || '',
+      badge: item.badge || { text: '', color: 'orange' as const },
+      isActive: item.isActive,
+      isExternal: item.isExternal,
+      target: item.target,
+      parentId: item.parentId || '',
+      permissions: item.permissions || [],
+      cssClass: item.cssClass || '',
+      description: item.description || { en: '', bn: '' }
+    });
+    setEditingItem(item);
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    try {
+      const submitData = {
+        ...formData,
+        badge: formData.badge.text ? formData.badge : undefined
+      };
+
+      if (editingItem) {
+        await navigationAPI.updateNavigationMenu(editingItem.id, submitData);
+        setMenuItems(menuItems.map(item => 
+          item.id === editingItem.id ? { ...item, ...submitData } : item
+        ));
+      } else {
+        const response = await navigationAPI.createNavigationMenu(submitData);
+        if (response.data.success) {
+          setMenuItems([...menuItems, response.data.data]);
+        }
+      }
+      
+      resetForm();
+    } catch (error) {
+      console.error('Error saving menu item:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const filteredItems = menuItems.filter(item =>
     item.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.title.bn.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -156,7 +241,7 @@ const NavigationMenuPage: React.FC = () => {
           />
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={handleCreate}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -283,7 +368,7 @@ const NavigationMenuPage: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => setEditingItem(item)}
+                        onClick={() => handleEdit(item)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                       >
                         <Edit className="w-4 h-4" />
@@ -312,6 +397,150 @@ const NavigationMenuPage: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400">
             {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding your first menu item'}
           </p>
+        </div>
+      )}
+      {/* Create / Edit Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {editingItem ? 'Edit Menu Item' : 'Add Menu Item'}
+              </h3>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="px-5 py-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Title (EN)</label>
+                  <input
+                    value={formData.title.en}
+                    onChange={(e) => setFormData({ ...formData, title: { ...formData.title, en: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Title (BN)</label>
+                  <input
+                    value={formData.title.bn}
+                    onChange={(e) => setFormData({ ...formData, title: { ...formData.title, bn: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Path</label>
+                  <input
+                    value={formData.path}
+                    onChange={(e) => setFormData({ ...formData, path: e.target.value })}
+                    placeholder="/products or https://example.com"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Icon (optional)</label>
+                  <input
+                    value={formData.icon}
+                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">CSS Class (optional)</label>
+                  <input
+                    value={formData.cssClass}
+                    onChange={(e) => setFormData({ ...formData, cssClass: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Badge Text</label>
+                  <input
+                    value={formData.badge.text}
+                    onChange={(e) => setFormData({ ...formData, badge: { ...formData.badge, text: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Badge Color</label>
+                  <select
+                    value={formData.badge.color}
+                    onChange={(e) => setFormData({ ...formData, badge: { ...formData.badge, color: e.target.value as any } })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="orange">Orange</option>
+                    <option value="green">Green</option>
+                    <option value="blue">Blue</option>
+                    <option value="purple">Purple</option>
+                    <option value="red">Red</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Target</label>
+                  <select
+                    value={formData.target}
+                    onChange={(e) => setFormData({ ...formData, target: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="_self">Same Tab</option>
+                    <option value="_blank">New Tab</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">External Link</label>
+                  <select
+                    value={formData.isExternal ? 'yes' : 'no'}
+                    onChange={(e) => setFormData({ ...formData, isExternal: e.target.value === 'yes' })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Description (EN)</label>
+                    <input
+                      value={formData.description.en}
+                      onChange={(e) => setFormData({ ...formData, description: { ...formData.description, en: e.target.value } })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Description (BN)</label>
+                    <input
+                      value={formData.description.bn}
+                      onChange={(e) => setFormData({ ...formData, description: { ...formData.description, bn: e.target.value } })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                >
+                  {submitting ? 'Saving...' : editingItem ? 'Update' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
