@@ -260,8 +260,8 @@ const NewNavbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Header Bar - Hidden on mobile */}
-      <div className="hidden sm:block bg-orange-600 text-white py-2 text-xs sm:text-sm">
+      {/* Top Header Bar - Hidden on mobile and tablet */}
+      <div className="hidden md:block bg-orange-600 text-white py-2 text-xs sm:text-sm">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
             {/* Left Side - Contact Info */}
@@ -310,8 +310,8 @@ const NewNavbar: React.FC = () => {
       <div className="bg-orange-600 text-white py-3 sm:py-4">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-3 lg:space-y-0">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+            {/* Logo - Hidden on mobile and tablet */}
+            <Link to="/" className="hidden md:flex items-center space-x-2 sm:space-x-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg flex items-center justify-center">
                 <Package className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
@@ -346,16 +346,16 @@ const NewNavbar: React.FC = () => {
               {isAuthenticated ? (
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <User className="w-5 h-5" />
-                  <span className="text-xs sm:text-sm hidden sm:inline">Hello {user?.name?.split(' ')[0]}!</span>
-                  <span className="text-xs sm:hidden">{user?.name?.split(' ')[0]}</span>
+                  <span className="text-xs sm:text-sm hidden md:inline">Hello {user?.name?.split(' ')[0]}!</span>
+                  <span className="text-xs md:hidden">{user?.name?.split(' ')[0]}</span>
                 </div>
               ) : (
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <User className="w-5 h-5" />
-                  <div className="hidden sm:block text-sm">
+                  <div className="hidden md:block text-sm">
                     Hello Guest! <Link to="/login" className="underline hover:text-orange-200">Login</Link> / <Link to="/register" className="underline hover:text-orange-200">Register</Link>
                   </div>
-                  <div className="sm:hidden flex space-x-1 text-xs">
+                  <div className="md:hidden flex space-x-1 text-xs">
                     <Link to="/login" className="underline hover:text-orange-200">Login</Link>
                     <span>/</span>
                     <Link to="/register" className="underline hover:text-orange-200">Register</Link>
@@ -370,7 +370,7 @@ const NewNavbar: React.FC = () => {
       {/* Main Navigation */}
       <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex items-center h-12 sm:h-16">
+          <div className="flex items-center h-12 sm:h-16 justify-between">
             {/* Category Sidebar */}
             <div className="relative">
               <button
@@ -466,7 +466,7 @@ const NewNavbar: React.FC = () => {
             </div>
 
             {/* Right Side - Additional Actions */}
-            <div className="flex items-center space-x-2 sm:space-x-4 ml-2 sm:ml-4 lg:ml-8">
+            <div className="flex items-center space-x-2">
             {/* Cart */}
             <button
               onClick={openCart}
@@ -622,30 +622,52 @@ const NewNavbar: React.FC = () => {
               className="lg:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4">
-                {/* Mobile Cart and Wishlist */}
-                <div className="flex items-center space-x-4 pb-3 border-b border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => {
-                      openCart();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      My Cart {cartCount > 0 && `(${cartCount})`}
-                    </span>
-                  </button>
-                  <Link
-                    to="/wishlist"
+                {/* Mobile Header with Logo and Cart/Wishlist */}
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+                  {/* Mobile Logo */}
+                  <Link 
+                    to="/" 
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Wishlist {wishlistCount > 0 && `(${wishlistCount})`}
-                    </span>
+                    <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <Package className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">chickensamosa.com</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">PROUDLY BANGLADESHI</div>
+                    </div>
                   </Link>
+
+                  {/* Mobile Cart and Wishlist */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => {
+                        openCart();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="relative p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                          {cartCount}
+                        </span>
+                      )}
+                    </button>
+                    <Link
+                      to="/wishlist"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="relative p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                          {wishlistCount}
+                        </span>
+                      )}
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Dynamic navigation menu items */}
