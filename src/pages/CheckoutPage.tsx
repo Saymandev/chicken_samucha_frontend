@@ -539,31 +539,7 @@ const CheckoutPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Delivery Zones (place-based) */}
-              {deliveryMethod === 'delivery' && Array.isArray(deliverySettings?.zones) && (deliverySettings!.zones.length > 0) && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Delivery Area</h3>
-                  <div className="space-y-2">
-                    {deliverySettings!.zones.map((z) => (
-                      <label key={z.id} className="flex items-center justify-between gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="radio"
-                            name="delivery-zone"
-                            checked={selectedZoneId === z.id}
-                            onChange={() => setSelectedZoneId(z.id)}
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {language === 'bn' ? (z.name.bn || z.name.en) : (z.name.en || z.name.bn)}
-                          </span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">৳ {z.price.toFixed(2)}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+              
 
               {/* Delivery Method Selection */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
@@ -707,7 +683,31 @@ const CheckoutPage: React.FC = () => {
                 </div>
               </div>
               )}
-
+{/* Delivery Zones (place-based) */}
+{deliveryMethod === 'delivery' && Array.isArray(deliverySettings?.zones) && (deliverySettings!.zones.length > 0) && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Delivery Area</h3>
+                  <div className="space-y-2">
+                    {deliverySettings!.zones.map((z) => (
+                      <label key={z.id} className="flex items-center justify-between gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            name="delivery-zone"
+                            checked={selectedZoneId === z.id}
+                            onChange={() => setSelectedZoneId(z.id)}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {language === 'bn' ? (z.name.bn || z.name.en) : (z.name.en || z.name.bn)}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">৳ {z.price.toFixed(2)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
               {/* Payment Method */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div className="flex items-center gap-3 mb-6">
