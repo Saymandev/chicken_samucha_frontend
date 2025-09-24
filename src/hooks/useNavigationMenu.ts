@@ -44,13 +44,19 @@ export const useNavigationMenu = () => {
       } else {
         setError('Failed to fetch navigation menu');
       }
-    } catch (err: any) {
-      console.error('Error fetching navigation menu:', err);
-      setError(err.response?.data?.message || 'Failed to fetch navigation menu');
-      
-      // Fallback to default menu items if API fails
-      setMenuItems(getDefaultMenuItems());
-    } finally {
+      } catch (err: any) {
+        // Gracefully handle missing route in backend (404) and other failures
+        const status = err?.response?.status;
+        if (status === 404) {
+          // Backend doesn't have /api/navigation yet – use fallback silently
+          setMenuItems(getDefaultMenuItems());
+          setError(null);
+        } else {
+          console.debug('Navigation API error (using fallback):', err);
+          setError(err?.response?.data?.message || 'Failed to fetch navigation menu');
+          setMenuItems(getDefaultMenuItems());
+        }
+      } finally {
       setLoading(false);
     }
   };
