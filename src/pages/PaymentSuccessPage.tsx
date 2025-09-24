@@ -19,6 +19,8 @@ const PaymentSuccessPage: React.FC = () => {
     const verified = searchParams.get('verified');
     const transactionId = searchParams.get('transactionId');
     const provider = searchParams.get('provider');
+    const cardBrand = searchParams.get('cardBrand');
+    const cardType = searchParams.get('cardType');
     
     if (order) {
       setOrderNumber(order);
@@ -59,6 +61,8 @@ const PaymentSuccessPage: React.FC = () => {
                 formData.append('paymentInfo[transactionId]', transactionId);
                 formData.append('paymentInfo[paymentGateway]', 'sslcommerz');
                 formData.append('paymentInfo[provider]', provider || 'sslcommerz');
+                formData.append('paymentInfo[cardBrand]', cardBrand || 'sslcommerz');
+                formData.append('paymentInfo[cardType]', cardType || 'sslcommerz');
                 formData.append('paymentInfo[verifiedAt]', new Date().toISOString());
               }
               // delivery
