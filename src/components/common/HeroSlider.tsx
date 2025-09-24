@@ -72,7 +72,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   }
 
   return (
-    <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-full overflow-hidden">
+    <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-screen overflow-hidden left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
       {announcement && !hideBanner && (
         <div className="absolute top-0 left-0 right-0 z-30">
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 flex items-center justify-between">
@@ -117,11 +117,11 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Full-width contained image on all devices (no cropping) */}
+              {/* Full-bleed image: fill container width & height */}
               <img
                 src={item.image.url}
                 alt={item.title[language] || 'slide'}
-                className="absolute inset-0 w-full h-full object-contain bg-white"
+                className="absolute inset-0 w-full h-full object-cover"
                 loading="eager"
                 decoding="async"
               />
