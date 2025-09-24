@@ -58,6 +58,7 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminReviews from './pages/admin/AdminReviews';
 import AdminSubscribers from './pages/admin/AdminSubscribers';
 import AdminUsers from './pages/admin/AdminUsers';
+import NavigationMenuPage from './pages/admin/NavigationMenuPage';
 
 // Components
 import FloatingChatButton from './components/common/FloatingChatButton';
@@ -329,6 +330,16 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <AdminCampaigns />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/navigation"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <NavigationMenuPage />
                 </AdminLayout>
               </ProtectedRoute>
             }

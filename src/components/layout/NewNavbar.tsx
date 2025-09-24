@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { useNavigationMenu } from '../../hooks/useNavigationMenu';
 import { useStore } from '../../store/useStore';
 import { categoriesAPI } from '../../utils/api';
 import { Skeleton } from '../common/Skeleton';
@@ -62,6 +63,7 @@ const NewNavbar: React.FC = () => {
   } = useStore();
   const { openCart } = useCart();
   const { wishlistCount } = useWishlist();
+  const { menuItems, loading: menuLoading } = useNavigationMenu();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -124,46 +126,13 @@ const NewNavbar: React.FC = () => {
     }
   };
 
-  const navItems = [
-    {
-      path: '/',
-      label: 'HOME',
-      icon: null,
-      active: location.pathname === '/'
-    },
-    {
-      path: '/products?filter=offers',
-      label: 'HOT OFFERS!',
-      icon: null,
-      active: location.search.includes('filter=offers'),
-      badge: 'Sale'
-    },
-    {
-      path: '/products?filter=best-seller',
-      label: 'BEST SELLERS',
-      icon: null,
-      active: location.search.includes('filter=best-seller')
-    },
-    {
-      path: '/products',
-      label: 'ALL PRODUCTS',
-      icon: null,
-      active: location.pathname.startsWith('/products') && !location.search.includes('filter=')
-    },
-    {
-      path: '/products?filter=combo',
-      label: 'COMBO',
-      icon: null,
-      active: location.search.includes('filter=combo'),
-      badge: 'Hot'
-    },
-    {
-      path: '/products?filter=clearance',
-      label: 'CLEARANCE',
-      icon: null,
-      active: location.search.includes('filter=clearance')
-    }
-  ];
+  // Helper function to check if a menu item is active
+  const isMenuItemActive = (item: any) => {
+    if (item.path === '/' && location.pathname === '/') return true;
+    if (item.path !== '/' && location.pathname.startsWith(item.path)) return true;
+    if (item.path.includes('?') && location.search.includes(item.path.split('?')[1])) return true;
+    return false;
+  };
 
   // Product quick links are now top-level nav items; no dropdown items needed
   const renderCategoryTree = (node: Category, depth: number, onClick?: () => void) => {
@@ -266,7 +235,7 @@ const NewNavbar: React.FC = () => {
   return (
     <>
       {/* Top Header Bar */}
-      <div className="bg-blue-900 text-white py-2 text-sm">
+      <div className="bg-orange-600 text-white py-2 text-sm">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
             {/* Left Side - Contact Info */}
@@ -283,23 +252,23 @@ const NewNavbar: React.FC = () => {
             
             {/* Right Side - Social Links */}
             <div className="flex items-center space-x-4">
-              <Link to="/contact" className="hover:text-blue-200 transition-colors">
+              <Link to="/contact" className="hover:text-orange-200 transition-colors">
                 Contact Us
               </Link>
               <div className="flex items-center space-x-3">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors">
                   <Facebook className="w-4 h-4" />
                 </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors">
                   <Youtube className="w-4 h-4" />
                 </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors">
                   <Twitter className="w-4 h-4" />
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors">
                   <Instagram className="w-4 h-4" />
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-200 transition-colors">
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors">
                   <Linkedin className="w-4 h-4" />
                 </a>
               </div>
@@ -309,13 +278,13 @@ const NewNavbar: React.FC = () => {
       </div>
 
       {/* Main Header */}
-      <div className="bg-blue-900 text-white py-4">
+      <div className="bg-orange-600 text-white py-4">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <Package className="w-6 h-6 text-blue-900" />
+                <Package className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <div className="text-xl font-bold">chickensamosa.com</div>
@@ -329,9 +298,9 @@ const NewNavbar: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Search entire store here..."
-                  className="w-full px-4 py-3 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
-                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors">
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition-colors">
                   <Search className="w-5 h-5" />
                 </button>
               </div>
@@ -342,7 +311,7 @@ const NewNavbar: React.FC = () => {
               {/* Cart */}
               <button
                 onClick={openCart}
-                className="flex items-center space-x-2 hover:text-blue-200 transition-colors"
+                className="flex items-center space-x-2 hover:text-orange-200 transition-colors"
               >
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
@@ -380,7 +349,7 @@ const NewNavbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsProductsMenuOpen(!isProductsMenuOpen)}
-                className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg transition-colors"
+                className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg transition-colors"
               >
                 <Menu className="w-5 h-5" />
                 <span className="font-semibold">ALL CATEGORIES</span>
@@ -427,29 +396,78 @@ const NewNavbar: React.FC = () => {
 
             {/* Main Navigation Links */}
             <div className="flex-1 flex items-center justify-center space-x-8 ml-8">
-              {navItems.map((item) => (
-                <div key={item.path} className="relative">
-                  <Link
-                    to={item.path}
-                    className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
-                      item.active
-                        ? 'text-red-600 font-semibold'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-red-600 font-medium'
-                    }`}
-                  >
-                    <span className="whitespace-nowrap">{item.label}</span>
-                    {item.badge && (
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        item.badge === 'Hot' 
-                          ? 'bg-orange-100 text-orange-600' 
-                          : 'bg-red-100 text-red-600'
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
+              {menuLoading ? (
+                // Loading skeleton for menu items
+                <div className="flex space-x-8">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Skeleton key={i} className="h-6 w-20" />
+                  ))}
                 </div>
-              ))}
+              ) : (
+                menuItems.map((item) => (
+                  <div key={item.id} className="relative">
+                    {item.isExternal ? (
+                      <a
+                        href={item.path}
+                        target={item.target}
+                        rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                        className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
+                          isMenuItemActive(item)
+                            ? 'text-orange-600 font-semibold'
+                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                        } ${item.cssClass || ''}`}
+                      >
+                        <span className="whitespace-nowrap">
+                          {language === 'bn' ? item.title.bn : item.title.en}
+                        </span>
+                        {item.badge && (
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            item.badge.color === 'orange' 
+                              ? 'bg-orange-100 text-orange-600' 
+                              : item.badge.color === 'green'
+                              ? 'bg-green-100 text-green-600'
+                              : item.badge.color === 'blue'
+                              ? 'bg-blue-100 text-blue-600'
+                              : item.badge.color === 'purple'
+                              ? 'bg-purple-100 text-purple-600'
+                              : 'bg-red-100 text-red-500'
+                          }`}>
+                            {item.badge.text}
+                          </span>
+                        )}
+                      </a>
+                    ) : (
+                      <Link
+                        to={item.path}
+                        className={`flex items-center space-x-2 px-3 py-2 transition-colors ${
+                          isMenuItemActive(item)
+                            ? 'text-orange-600 font-semibold'
+                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                        } ${item.cssClass || ''}`}
+                      >
+                        <span className="whitespace-nowrap">
+                          {language === 'bn' ? item.title.bn : item.title.en}
+                        </span>
+                        {item.badge && (
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            item.badge.color === 'orange' 
+                              ? 'bg-orange-100 text-orange-600' 
+                              : item.badge.color === 'green'
+                              ? 'bg-green-100 text-green-600'
+                              : item.badge.color === 'blue'
+                              ? 'bg-blue-100 text-blue-600'
+                              : item.badge.color === 'purple'
+                              ? 'bg-purple-100 text-purple-600'
+                              : 'bg-red-100 text-red-500'
+                          }`}>
+                            {item.badge.text}
+                          </span>
+                        )}
+                      </Link>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
 
             {/* Right Side - Additional Actions */}
@@ -559,13 +577,13 @@ const NewNavbar: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <Link
                     to="/login"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
                   >
                     Register
                   </Link>
@@ -596,29 +614,71 @@ const NewNavbar: React.FC = () => {
               className="lg:hidden border-t border-gray-200 dark:border-gray-700"
             >
               <div className="px-4 py-4 space-y-4">
-                {/* Top-level links: Home, Offer Zone, Best Sellers, All Products */}
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center space-x-2 transition-colors ${
-                      item.active
-                        ? 'text-red-600 font-semibold'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-red-600 font-medium'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <span className="font-medium">{item.label}</span>
-                    {item.badge && (
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        item.badge === 'Hot' 
-                          ? 'bg-orange-100 text-orange-600' 
-                          : 'bg-red-100 text-red-600'
-                      }`}>
-                        {item.badge}
-                      </span>
+                {/* Dynamic navigation menu items */}
+                {menuItems.map((item) => (
+                  <div key={item.id}>
+                    {item.isExternal ? (
+                      <a
+                        href={item.path}
+                        target={item.target}
+                        rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                        className={`flex items-center space-x-2 transition-colors ${
+                          isMenuItemActive(item)
+                            ? 'text-orange-600 font-semibold'
+                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                        } ${item.cssClass || ''}`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <span className="font-medium">
+                          {language === 'bn' ? item.title.bn : item.title.en}
+                        </span>
+                        {item.badge && (
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            item.badge.color === 'orange' 
+                              ? 'bg-orange-100 text-orange-600' 
+                              : item.badge.color === 'green'
+                              ? 'bg-green-100 text-green-600'
+                              : item.badge.color === 'blue'
+                              ? 'bg-blue-100 text-blue-600'
+                              : item.badge.color === 'purple'
+                              ? 'bg-purple-100 text-purple-600'
+                              : 'bg-red-100 text-red-500'
+                          }`}>
+                            {item.badge.text}
+                          </span>
+                        )}
+                      </a>
+                    ) : (
+                      <Link
+                        to={item.path}
+                        className={`flex items-center space-x-2 transition-colors ${
+                          isMenuItemActive(item)
+                            ? 'text-orange-600 font-semibold'
+                            : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
+                        } ${item.cssClass || ''}`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <span className="font-medium">
+                          {language === 'bn' ? item.title.bn : item.title.en}
+                        </span>
+                        {item.badge && (
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            item.badge.color === 'orange' 
+                              ? 'bg-orange-100 text-orange-600' 
+                              : item.badge.color === 'green'
+                              ? 'bg-green-100 text-green-600'
+                              : item.badge.color === 'blue'
+                              ? 'bg-blue-100 text-blue-600'
+                              : item.badge.color === 'purple'
+                              ? 'bg-purple-100 text-purple-600'
+                              : 'bg-red-100 text-red-500'
+                          }`}>
+                            {item.badge.text}
+                          </span>
+                        )}
+                      </Link>
                     )}
-                  </Link>
+                  </div>
                 ))}
 
                 {/* Categories list */}

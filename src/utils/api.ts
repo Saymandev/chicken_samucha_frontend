@@ -554,4 +554,18 @@ export const wishlistAPI = {
   clearWishlist: () => api.delete('/wishlist/clear')
 };
 
+export const navigationAPI = {
+  // Get navigation menu (public)
+  getNavigationMenu: (params?: { tree?: boolean }) => api.get('/navigation', { params }),
+  
+  // Admin functions
+  getAllNavigationMenus: (params?: any) => api.get('/navigation/admin', { params }),
+  getNavigationMenuById: (id: string) => api.get(`/navigation/admin/${id}`),
+  createNavigationMenu: (data: any) => api.post('/navigation/admin', data),
+  updateNavigationMenu: (id: string, data: any) => api.put(`/navigation/admin/${id}`, data),
+  deleteNavigationMenu: (id: string) => api.delete(`/navigation/admin/${id}`),
+  reorderNavigationMenus: (items: any[]) => api.post('/navigation/admin/reorder', { items }),
+  toggleNavigationMenuStatus: (id: string) => api.patch(`/navigation/admin/${id}/toggle`)
+};
+
 export default api;
