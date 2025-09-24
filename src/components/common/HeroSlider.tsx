@@ -34,7 +34,6 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   const { language } = useStore();
   const [announcement, setAnnouncement] = useState<any>(null);
   const [hideBanner, setHideBanner] = useState(false);
-  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -44,16 +43,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
     return () => { mounted = false; };
   }, []);
 
-  // Track viewport to decide image fit strategy
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const update = () => setIsDesktop(mq.matches);
-    update();
-    mq.addEventListener ? mq.addEventListener('change', update) : mq.addListener(update);
-    return () => {
-      mq.removeEventListener ? mq.removeEventListener('change', update) : mq.removeListener(update);
-    };
-  }, []);
+  // (Removed) viewport tracking not needed with blurred cover + contained image
 
   // Filter active items and sort by order
   const activeItems = items.filter(item => item.isActive).sort((a, b) => a.order - b.order);
@@ -82,7 +72,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   }
 
   return (
-    <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden"
+         style={{
+           // Ideal 16:9 container with clamped heights to keep good ratio
+           aspectRatio: '16 / 9',
+           maxHeight: '70vh',
+           minHeight: 220
+         }}>
       {announcement && !hideBanner && (
         <div className="absolute top-0 left-0 right-0 z-30">
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 flex items-center justify-between">
@@ -127,12 +123,26 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Background Image – contain on small screens (no crop), cover on desktop (no empty bars) */}
+              {/* Background layers: blurred cover fill + sharp contained image to avoid cropping */}
+              {/* Blurred fill to hide letterboxing while keeping full image visible */}
+              <div
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  backgroundImage: `url(${item.image.url})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center center',
+                  backgroundRepeat: 'no-repeat',
+                  filter: 'blur(12px)',
+                  transform: 'scale(1.08)',
+                  opacity: 0.35
+                }}
+              />
+              {/* Sharp contained image so nothing gets cropped */}
               <div 
                 className="absolute inset-0 w-full h-full"
                 style={{ 
                   backgroundImage: `url(${item.image.url})`,
-                  backgroundSize: isDesktop ? 'cover' : 'contain',
+                  backgroundSize: 'contain',
                   backgroundPosition: 'center center',
                   backgroundRepeat: 'no-repeat',
                   width: '100%',
