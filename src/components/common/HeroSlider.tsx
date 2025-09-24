@@ -48,7 +48,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
 
   if (activeItems.length === 0) {
     return (
-      <div className="relative h-[500px] md:h-[600px] w-full bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center">
+      <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-full bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="mb-8">
             <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center">
@@ -70,7 +70,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   }
 
   return (
-    <div className="relative h-[500px] md:h-[600px] w-full overflow-hidden">
+    <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-full overflow-hidden">
       {announcement && !hideBanner && (
         <div className="absolute top-0 left-0 right-0 z-30">
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 flex items-center justify-between">
@@ -104,21 +104,28 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         } : false}
         loop={activeItems.length > 1}
         className="hero-swiper h-full w-full"
+        breakpoints={{
+          0: { height: 220 },
+          640: { height: 300 },
+          768: { height: 420 },
+          1024: { height: 520 },
+          1280: { height: 640 }
+        }}
       >
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Background Image with better aspect ratio and cover positioning */}
+              {/* Background Image with contain to avoid cropping on any device */}
               <div 
                 className="absolute inset-0 w-full h-full"
                 style={{ 
                   backgroundImage: `url(${item.image.url})`,
-                  backgroundSize: 'cover',
+                  backgroundSize: 'contain',
                   backgroundPosition: 'center center',
                   backgroundRepeat: 'no-repeat',
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover'
+                  backgroundColor: '#ffffff'
                 }}
               />
               
