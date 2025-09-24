@@ -34,6 +34,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   const { language } = useStore();
   const [announcement, setAnnouncement] = useState<any>(null);
   const [hideBanner, setHideBanner] = useState(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -43,7 +44,16 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
     return () => { mounted = false; };
   }, []);
 
-  // (Removed) viewport tracking not needed with blurred cover + contained image
+  // Track viewport to decide image fit strategy
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener ? mq.addEventListener('change', update) : mq.addListener(update);
+    return () => {
+      mq.removeEventListener ? mq.removeEventListener('change', update) : mq.removeListener(update);
+    };
+  }, []);
 
   // Filter active items and sort by order
   const activeItems = items.filter(item => item.isActive).sort((a, b) => a.order - b.order);
@@ -72,13 +82,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   }
 
   return (
-    <div className="relative w-full overflow-hidden"
-         style={{
-           // Ideal 16:9 container with clamped heights to keep good ratio
-           aspectRatio: '16 / 9',
-           maxHeight: '70vh',
-           minHeight: 220
-         }}>
+    <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-full overflow-hidden">
       {announcement && !hideBanner && (
         <div className="absolute top-0 left-0 right-0 z-30">
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 flex items-center justify-between">
@@ -123,13 +127,18 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
             <div className="relative h-full w-full">
-              {/* Full-width contained image (no cropping) */}
-              <img
-                src={item.image.url}
-                alt={item.title[language] || 'slide'}
-                className="absolute inset-0 w-full h-full object-contain bg-white"
-                loading="eager"
-                decoding="async"
+              {/* Background Image – contain on small screens (no crop), cover on desktop (no empty bars) */}
+              <div 
+                className="absolute inset-0 w-full h-full"
+                style={{ 
+                  backgroundImage: `url(${item.image.url})`,
+                  backgroundSize: isDesktop ? 'cover' : 'contain',
+                  backgroundPosition: 'center center',
+                  backgroundRepeat: 'no-repeat',
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: '#ffffff'
+                }}
               />
               
               {/* Light overlay for better text readability without darkening the image */}
