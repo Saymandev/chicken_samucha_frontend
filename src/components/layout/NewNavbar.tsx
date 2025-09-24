@@ -434,34 +434,37 @@ const NewNavbar: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-wrap justify-center gap-2 xl:gap-4 2xl:gap-8">
+                <div className="flex flex-wrap justify-center gap-4 xl:gap-6 2xl:gap-8">
                   {menuItems.map((item) => (
-                    <div key={item.id} className="relative flex flex-col items-center">
-                      {/* Badge positioned above menu item */}
+                    <div key={item.id} className="relative pt-4">
+                      {/* Small pill badge centered above item */}
                       {item.badge && (
-                        <div className={`text-xs px-2 py-1 rounded-t-lg text-white font-semibold mb-1 ${
-                          item.badge.color === 'orange' 
-                            ? 'bg-orange-500' 
-                            : item.badge.color === 'green'
-                            ? 'bg-green-500'
-                            : item.badge.color === 'blue'
-                            ? 'bg-blue-500'
-                            : item.badge.color === 'purple'
-                            ? 'bg-purple-500'
-                            : 'bg-red-500'
-                        }`}>
+                        <div
+                          className={`absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded-full text-white shadow ${
+                            item.badge.color === 'orange'
+                              ? 'bg-orange-500'
+                              : item.badge.color === 'green'
+                              ? 'bg-green-500'
+                              : item.badge.color === 'blue'
+                              ? 'bg-blue-500'
+                              : item.badge.color === 'purple'
+                              ? 'bg-purple-500'
+                              : 'bg-red-500'
+                          }`}
+                        >
                           {item.badge.text}
                         </div>
                       )}
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() => handleMenuClick(item)}
-                        className={`px-1 xl:px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base ${
+                        className={`px-2 2xl:px-3 py-2 transition-colors text-sm xl:text-base leading-none ${
                           isMenuItemActive(item)
                             ? 'text-orange-600 font-semibold'
                             : 'text-gray-700 dark:text-gray-300 hover:text-orange-600 font-medium'
                         } ${item.cssClass || ''}`}
                       >
-                        <span className="whitespace-nowrap truncate max-w-[120px] sm:max-w-[150px] lg:max-w-none">
+                        <span className="whitespace-nowrap">
                           {language === 'bn' ? item.title.bn : item.title.en}
                         </span>
                       </button>
