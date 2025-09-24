@@ -172,10 +172,15 @@ const NavigationMenuPage: React.FC = () => {
     setSubmitting(true);
     
     try {
-      const submitData = {
+      const submitData: any = {
         ...formData,
         badge: formData.badge.text ? formData.badge : undefined
       };
+      
+      // Remove parentId if empty
+      if (!formData.parentId) {
+        delete submitData.parentId;
+      }
 
       if (editingItem) {
         await navigationAPI.updateNavigationMenu(editingItem.id, submitData);
