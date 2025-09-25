@@ -12,9 +12,9 @@ const PickplaceLogo: React.FC<PickplaceLogoProps> = ({
   className = '' 
 }) => {
   const sizeClasses = {
-    sm: 'w-10 h-10',
-    md: 'w-16 h-16',
-    lg: 'w-20 h-20'
+    sm: 'w-16 h-16',
+    md: 'w-24 h-24',
+    lg: 'w-28 h-28'
   };
 
   return (
