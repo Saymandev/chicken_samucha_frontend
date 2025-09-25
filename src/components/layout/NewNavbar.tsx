@@ -28,7 +28,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useNavigationMenu } from '../../hooks/useNavigationMenu';
 import { useStore } from '../../store/useStore';
-import { categoriesAPI, couponAPI, publicAPI } from '../../utils/api';
+import { categoriesAPI } from '../../utils/api';
 import PickplaceLogo from '../common/PickplaceLogo';
 import { Skeleton } from '../common/Skeleton';
 import UserNotificationDropdown from '../UserNotificationDropdown';
@@ -74,113 +74,6 @@ const NewNavbar: React.FC = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Coupon / Promotion expiry countdown state
-  const [offerEndTime, setOfferEndTime] = useState<Date | null>(null);
-  const [timeLeft, setTimeLeft] = useState<{ h: string; m: string; s: string }>({ h: '00', m: '00', s: '00' });
-  const [offerLabel, setOfferLabel] = useState<string>('Offer ends in');
-
-  // Prefer known fields from backend models; keep minimal fallbacks
-  const extractExpiry = (item: any): string | null => {
-    if (!item || typeof item !== 'object') return null;
-    return item.validUntil || item.expiresAt || item.endDate || null;
-  };
-
-  // Fetch nearest expiring coupon/promotion
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        // Helper to normalize list from API
-        const asList = (res: any) => {
-          const data = res?.data?.data ?? res?.data;
-          return Array.isArray(data) ? data : [];
-        };
-        let bestExpiry: number | null = null;
-        let foundType = '';
-
-        // 1) Prefer active promotions
-        try {
-          const promosRes = await publicAPI.getActivePromotions();
-          const promos = asList(promosRes);
-          console.log('Promotions found:', promos?.length || 0, promos);
-          
-          for (const p of promos) {
-            const exp = extractExpiry(p);
-            console.log('Promotion expiry:', exp, 'for promo:', p?.name || p?.title);
-            const ts = exp ? new Date(exp).getTime() : NaN;
-            if (!isNaN(ts) && ts > Date.now()) {
-              if (bestExpiry === null || ts < bestExpiry) {
-                bestExpiry = ts;
-                foundType = 'promo';
-              }
-            }
-          }
-        } catch (error) {
-          console.warn('Failed to fetch promotions:', error);
-        }
-
-        // 2) Fallback to currently valid coupons
-        if (bestExpiry === null) {
-          try {
-            const couponsRes = await couponAPI.getActiveCoupons();
-            const coupons = asList(couponsRes);
-            console.log('Coupons found:', coupons?.length || 0, coupons);
-            
-            const now = Date.now();
-            for (const c of coupons) {
-              const start = c?.validFrom ? new Date(c.validFrom).getTime() : NaN;
-              const end = c?.validUntil ? new Date(c.validUntil).getTime() : NaN;
-              console.log('Coupon validity:', c?.code, 'from:', c?.validFrom, 'until:', c?.validUntil, 'active:', c?.isActive);
-              
-              const isActive = (c?.isActive ?? true) && !isNaN(start) && !isNaN(end) && start <= now && end > now;
-              if (isActive) {
-                if (bestExpiry === null || end < bestExpiry) {
-                  bestExpiry = end;
-                  foundType = 'coupon';
-                }
-              }
-            }
-          } catch (error) {
-            console.warn('Failed to fetch coupons:', error);
-          }
-        }
-
-        if (isMounted && bestExpiry) {
-          console.log('Setting countdown for:', foundType, 'expires at:', new Date(bestExpiry));
-          setOfferEndTime(new Date(bestExpiry));
-          setOfferLabel(foundType === 'promo' ? 'Promo ends in' : 'Coupon ends in');
-        } else {
-          console.log('No active offers found with valid expiry');
-        }
-      } catch (error) {
-        console.warn('Countdown fetch error:', error);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Tick countdown every second
-  useEffect(() => {
-    if (!offerEndTime) return;
-    const tick = () => {
-      const now = Date.now();
-      const diff = offerEndTime.getTime() - now;
-      if (diff <= 0) {
-        setTimeLeft({ h: '00', m: '00', s: '00' });
-        return;
-      }
-      const hours = Math.floor(diff / 1000 / 3600);
-      const minutes = Math.floor((diff / 1000 / 60) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
-      setTimeLeft({ h: pad(hours), m: pad(minutes), s: pad(seconds) });
-    };
-    tick();
-    const iv = setInterval(tick, 1000);
-    return () => clearInterval(iv);
-  }, [offerEndTime]);
 
   useEffect(() => {
     // Simulate loading state
@@ -464,15 +357,10 @@ const NewNavbar: React.FC = () => {
             {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
               {/* User Section */}
-              <div className="hidden lg:flex items-center space-x-3">
+              <div className="hidden lg:flex items-center">
                 <div className="text-sm font-medium text-white">
                   {getGreeting()}, {isAuthenticated ? (user?.name?.split(' ')[0] || 'User') : 'User'}
                 </div>
-                {offerEndTime && (
-                  <div className="text-xs font-semibold text-orange-50 bg-white/20 px-2 py-1 rounded-md whitespace-nowrap">
-                    {offerLabel} {timeLeft.h}:{timeLeft.m}:{timeLeft.s}
-                  </div>
-                )}
               </div>
             </div>
           </div>
