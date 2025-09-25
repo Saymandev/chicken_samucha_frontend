@@ -342,48 +342,16 @@ const NewNavbar: React.FC = () => {
                   <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </form>
-            </div>
+                  </div>
 
             {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
               {/* User Section */}
-               {/* User Action Icons - Only on large screens */}
-               <div className="hidden lg:flex items-center space-x-2">
-                  {/* Shopping Cart */}
-                  <button
-                    onClick={openCart}
-                    className="relative p-2 text-white hover:text-orange-200 transition-colors"
-                    aria-label="Shopping Cart"
-                  >
-                    <ShoppingCart className="w-6 h-6" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* Wishlist */}
-                  <Link
-                    to="/wishlist"
-                    className="relative p-2 text-white hover:text-orange-200 transition-colors"
-                    aria-label="Wishlist"
-                  >
-                    <Heart className="w-6 h-6" />
-                    {wishlistCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {wishlistCount}
-                      </span>
-                    )}
-                  </Link>
-
-                  {/* Notifications */}
-                  {isAuthenticated && (
-                    <div className="relative">
-                      <UserNotificationDropdown />
-                    </div>
-                  )}
-                </div>
+              {isAuthenticated ? (
+                ''
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
