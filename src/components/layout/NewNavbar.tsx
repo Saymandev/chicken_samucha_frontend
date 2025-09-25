@@ -93,41 +93,65 @@ const NewNavbar: React.FC = () => {
         // Helper to normalize list from API
         const asList = (res: any) => (res?.data?.data ?? res?.data ?? []);
         let bestExpiry: number | null = null;
+        let foundType = '';
 
         // 1) Prefer active promotions
         try {
           const promosRes = await publicAPI.getActivePromotions();
           const promos = asList(promosRes);
+          console.log('Promotions found:', promos?.length || 0, promos);
+          
           for (const p of promos) {
             const exp = extractExpiry(p);
+            console.log('Promotion expiry:', exp, 'for promo:', p?.name || p?.title);
             const ts = exp ? new Date(exp).getTime() : NaN;
             if (!isNaN(ts) && ts > Date.now()) {
-              if (bestExpiry === null || ts < bestExpiry) bestExpiry = ts;
+              if (bestExpiry === null || ts < bestExpiry) {
+                bestExpiry = ts;
+                foundType = 'promo';
+              }
             }
           }
-          if (isMounted && bestExpiry !== null) setOfferLabel('Promo ends in');
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to fetch promotions:', error);
+        }
 
         // 2) Fallback to currently valid coupons
         if (bestExpiry === null) {
           try {
             const couponsRes = await couponAPI.getActiveCoupons();
             const coupons = asList(couponsRes);
+            console.log('Coupons found:', coupons?.length || 0, coupons);
+            
             const now = Date.now();
             for (const c of coupons) {
               const start = c?.validFrom ? new Date(c.validFrom).getTime() : NaN;
               const end = c?.validUntil ? new Date(c.validUntil).getTime() : NaN;
+              console.log('Coupon validity:', c?.code, 'from:', c?.validFrom, 'until:', c?.validUntil, 'active:', c?.isActive);
+              
               const isActive = (c?.isActive ?? true) && !isNaN(start) && !isNaN(end) && start <= now && end > now;
               if (isActive) {
-                if (bestExpiry === null || end < bestExpiry) bestExpiry = end;
+                if (bestExpiry === null || end < bestExpiry) {
+                  bestExpiry = end;
+                  foundType = 'coupon';
+                }
               }
             }
-            if (isMounted && bestExpiry !== null) setOfferLabel('Coupon ends in');
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to fetch coupons:', error);
+          }
         }
 
-        if (isMounted && bestExpiry) setOfferEndTime(new Date(bestExpiry));
-      } catch {}
+        if (isMounted && bestExpiry) {
+          console.log('Setting countdown for:', foundType, 'expires at:', new Date(bestExpiry));
+          setOfferEndTime(new Date(bestExpiry));
+          setOfferLabel(foundType === 'promo' ? 'Promo ends in' : 'Coupon ends in');
+        } else {
+          console.log('No active offers found with valid expiry');
+        }
+      } catch (error) {
+        console.warn('Countdown fetch error:', error);
+      }
     })();
     return () => {
       isMounted = false;
