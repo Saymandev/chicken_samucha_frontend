@@ -77,20 +77,12 @@ const NewNavbar: React.FC = () => {
   // Coupon / Promotion expiry countdown state
   const [offerEndTime, setOfferEndTime] = useState<Date | null>(null);
   const [timeLeft, setTimeLeft] = useState<{ h: string; m: string; s: string }>({ h: '00', m: '00', s: '00' });
+  const [offerLabel, setOfferLabel] = useState<string>('Offer ends in');
 
-  // Parse various possible expiry fields safely
+  // Prefer known fields from backend models; keep minimal fallbacks
   const extractExpiry = (item: any): string | null => {
     if (!item || typeof item !== 'object') return null;
-    return (
-      item.expiresAt ||
-      item.expiryAt ||
-      item.expiryDate ||
-      item.validTill ||
-      item.validUntil ||
-      item.endDate ||
-      item.endsAt ||
-      null
-    );
+    return item.validUntil || item.expiresAt || item.endDate || null;
   };
 
   // Fetch nearest expiring coupon/promotion
@@ -102,31 +94,35 @@ const NewNavbar: React.FC = () => {
         const asList = (res: any) => (res?.data?.data ?? res?.data ?? []);
         let bestExpiry: number | null = null;
 
-        // 1) Try active coupons
+        // 1) Prefer active promotions
         try {
-          const couponsRes = await couponAPI.getActiveCoupons();
-          const coupons = asList(couponsRes);
-          for (const c of coupons) {
-            const exp = extractExpiry(c);
+          const promosRes = await publicAPI.getActivePromotions();
+          const promos = asList(promosRes);
+          for (const p of promos) {
+            const exp = extractExpiry(p);
             const ts = exp ? new Date(exp).getTime() : NaN;
             if (!isNaN(ts) && ts > Date.now()) {
               if (bestExpiry === null || ts < bestExpiry) bestExpiry = ts;
             }
           }
+          if (isMounted && bestExpiry !== null) setOfferLabel('Promo ends in');
         } catch {}
 
-        // 2) Fallback to active promotions
+        // 2) Fallback to currently valid coupons
         if (bestExpiry === null) {
           try {
-            const promosRes = await publicAPI.getActivePromotions();
-            const promos = asList(promosRes);
-            for (const p of promos) {
-              const exp = extractExpiry(p);
-              const ts = exp ? new Date(exp).getTime() : NaN;
-              if (!isNaN(ts) && ts > Date.now()) {
-                if (bestExpiry === null || ts < bestExpiry) bestExpiry = ts;
+            const couponsRes = await couponAPI.getActiveCoupons();
+            const coupons = asList(couponsRes);
+            const now = Date.now();
+            for (const c of coupons) {
+              const start = c?.validFrom ? new Date(c.validFrom).getTime() : NaN;
+              const end = c?.validUntil ? new Date(c.validUntil).getTime() : NaN;
+              const isActive = (c?.isActive ?? true) && !isNaN(start) && !isNaN(end) && start <= now && end > now;
+              if (isActive) {
+                if (bestExpiry === null || end < bestExpiry) bestExpiry = end;
               }
             }
+            if (isMounted && bestExpiry !== null) setOfferLabel('Coupon ends in');
           } catch {}
         }
 
@@ -447,7 +443,7 @@ const NewNavbar: React.FC = () => {
                 </div>
                 {offerEndTime && (
                   <div className="text-xs font-semibold text-orange-50 bg-white/20 px-2 py-1 rounded-md whitespace-nowrap">
-                    Offer ends in {timeLeft.h}:{timeLeft.m}:{timeLeft.s}
+                    {offerLabel} {timeLeft.h}:{timeLeft.m}:{timeLeft.s}
                   </div>
                 )}
               </div>
