@@ -325,24 +325,65 @@ const NewNavbar: React.FC = () => {
               <PickplaceLogo size="lg" />
             </Link>
 
-            {/* Search Bar */}
-            <div className="w-full lg:flex-1 lg:max-w-2xl lg:mx-8 order-3 lg:order-2 min-w-0">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search entire store here..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm"
-                />
-                <button 
-                  type="submit"
-                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors"
-                >
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </form>
-                  </div>
+            {/* Search Bar with Icons */}
+            <div className="w-full lg:flex-1 lg:max-w-4xl lg:mx-8 order-3 lg:order-2 min-w-0">
+              <div className="flex items-center space-x-2 lg:space-x-4">
+                {/* Search Bar */}
+                <form onSubmit={handleSearch} className="flex-1 relative">
+                  <input
+                    type="text"
+                    placeholder="Search entire store here..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm"
+                  />
+                  <button 
+                    type="submit"
+                    className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors"
+                  >
+                    <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
+                </form>
+
+                {/* User Action Icons - Only on large screens */}
+                <div className="hidden lg:flex items-center space-x-2">
+                  {/* Shopping Cart */}
+                  <button
+                    onClick={openCart}
+                    className="relative p-2 text-white hover:text-orange-200 transition-colors"
+                    aria-label="Shopping Cart"
+                  >
+                    <ShoppingCart className="w-6 h-6" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {cartCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Wishlist */}
+                  <Link
+                    to="/wishlist"
+                    className="relative p-2 text-white hover:text-orange-200 transition-colors"
+                    aria-label="Wishlist"
+                  >
+                    <Heart className="w-6 h-6" />
+                    {wishlistCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* Notifications */}
+                  {isAuthenticated && (
+                    <div className="relative">
+                      <UserNotificationDropdown />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
@@ -463,10 +504,10 @@ const NewNavbar: React.FC = () => {
 
             {/* Right Side - Additional Actions */}
             <div className="flex items-center space-x-2">
-            {/* Cart */}
+            {/* Cart - Hidden on large screens (moved to orange header) */}
             <button
               onClick={openCart}
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center lg:hidden"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {cartCount > 0 && (
@@ -476,10 +517,10 @@ const NewNavbar: React.FC = () => {
               )}
             </button>
 
-            {/* Wishlist */}
+            {/* Wishlist - Hidden on large screens (moved to orange header) */}
             <Link
               to="/wishlist"
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center lg:hidden"
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {wishlistCount > 0 && (
@@ -489,8 +530,8 @@ const NewNavbar: React.FC = () => {
               )}
             </Link>
 
-            {/* Notifications */}
-            {isAuthenticated && <UserNotificationDropdown />}
+            {/* Notifications - Hidden on large screens (moved to orange header) */}
+            {isAuthenticated && <div className="lg:hidden"><UserNotificationDropdown /></div>}
 
             {/* User Menu */}
             {isAuthenticated ? (
