@@ -29,7 +29,7 @@ const transformData = (data: any): any => {
   return data;
 };
 // changes made here
-const API_BASE_URL =  process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api';
+const API_BASE_URL =  process.env.API_URL || 'https://rest.ourb.live/api';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
