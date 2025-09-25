@@ -98,11 +98,14 @@ const NewNavbar: React.FC = () => {
     let isMounted = true;
     (async () => {
       try {
-        // 1) Try active coupons
+        // Helper to normalize list from API
+        const asList = (res: any) => (res?.data?.data ?? res?.data ?? []);
         let bestExpiry: number | null = null;
+
+        // 1) Try active coupons
         try {
           const couponsRes = await couponAPI.getActiveCoupons();
-          const coupons = couponsRes?.data || [];
+          const coupons = asList(couponsRes);
           for (const c of coupons) {
             const exp = extractExpiry(c);
             const ts = exp ? new Date(exp).getTime() : NaN;
@@ -116,7 +119,7 @@ const NewNavbar: React.FC = () => {
         if (bestExpiry === null) {
           try {
             const promosRes = await publicAPI.getActivePromotions();
-            const promos = promosRes?.data || [];
+            const promos = asList(promosRes);
             for (const p of promos) {
               const exp = extractExpiry(p);
               const ts = exp ? new Date(exp).getTime() : NaN;

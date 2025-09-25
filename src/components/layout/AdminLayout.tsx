@@ -1,23 +1,23 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    BarChart3,
-    ChevronLeft,
-    FileText,
-    Home,
-    LogOut,
-    Menu,
-    MessageCircle,
-    Moon,
-    Navigation,
-    Package,
-    RefreshCw,
-    Settings,
-    ShoppingBag,
-    Star,
-    Sun,
-    TicketPercent,
-    Users,
-    X
+  BarChart3,
+  ChevronLeft,
+  FileText,
+  Home,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Moon,
+  Navigation,
+  Package,
+  RefreshCw,
+  Settings,
+  ShoppingBag,
+  Star,
+  Sun,
+  TicketPercent,
+  Users,
+  X
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -169,13 +169,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex flex-col h-full">
       {/* Logo & Brand */}
       <div className="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-        <PickplaceLogo size="md" />
-        {sidebarOpen && (
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white">Admin Panel</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Pickplace</p>
-          </div>
-        )}
+        <PickplaceLogo size="md" variant='black' />
+        
         {/* Mobile Close Button */}
         <button
           onClick={() => setMobileMenuOpen(false)}
