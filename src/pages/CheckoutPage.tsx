@@ -425,10 +425,14 @@ const CheckoutPage: React.FC = () => {
           for (const item of cart) {
             const productId = (item.product as any).id || (item.product as any)._id;
             if (productId) {
-              productsAPI.trackPurchase(productId, item.quantity).catch(() => {});
+              productsAPI.trackPurchase(productId, item.quantity).catch((error) => {
+                console.warn('Purchase tracking failed:', error?.response?.status, error?.response?.data);
+              });
             }
           }
-        } catch {}
+        } catch (error) {
+          console.warn('Purchase tracking error:', error);
+        }
 
         clearCart();
         toast.success('Order placed successfully!');
@@ -916,3 +920,4 @@ const CheckoutPage: React.FC = () => {
 };
 
 export default CheckoutPage; 
+ 
