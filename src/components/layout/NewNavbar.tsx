@@ -91,7 +91,10 @@ const NewNavbar: React.FC = () => {
     (async () => {
       try {
         // Helper to normalize list from API
-        const asList = (res: any) => (res?.data?.data ?? res?.data ?? []);
+        const asList = (res: any) => {
+          const data = res?.data?.data ?? res?.data;
+          return Array.isArray(data) ? data : [];
+        };
         let bestExpiry: number | null = null;
         let foundType = '';
 
