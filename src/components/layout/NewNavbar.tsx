@@ -345,8 +345,10 @@ const NewNavbar: React.FC = () => {
             </div>
 
             {/* Right Side - User Only */}
-             {/* User Action Icons - Only on large screens */}
-             <div className="hidden lg:flex items-center space-x-2">
+            <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
+              {/* User Section */}
+               {/* User Action Icons - Only on large screens */}
+               <div className="hidden lg:flex items-center space-x-2">
                   {/* Shopping Cart */}
                   <button
                     onClick={openCart}
@@ -382,6 +384,7 @@ const NewNavbar: React.FC = () => {
                     </div>
                   )}
                 </div>
+            </div>
           </div>
         </div>
       </div>
