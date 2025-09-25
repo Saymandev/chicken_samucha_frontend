@@ -245,6 +245,14 @@ const NewNavbar: React.FC = () => {
     i18n.changeLanguage(lang);
   };
 
+  // Time-based greeting helper
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   if (isLoading) {
     return (
       <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
@@ -349,7 +357,11 @@ const NewNavbar: React.FC = () => {
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
               {/* User Section */}
               {isAuthenticated ? (
-                ''
+                <div className="hidden lg:block text-right">
+                  <div className="text-sm font-medium text-white">
+                    {getGreeting()}, {user?.name?.split(' ')[0] || 'User'}
+                  </div>
+                </div>
               ) : (
                 ""
               )}
