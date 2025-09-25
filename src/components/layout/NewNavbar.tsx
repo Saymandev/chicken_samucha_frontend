@@ -325,28 +325,28 @@ const NewNavbar: React.FC = () => {
               <PickplaceLogo size="lg" />
             </Link>
 
-            {/* Search Bar with Icons */}
-            <div className="w-full lg:flex-1 lg:max-w-4xl lg:mx-8 order-3 lg:order-2 min-w-0">
-              <div className="flex items-center space-x-2 lg:space-x-4">
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="flex-1 relative">
-                  <input
-                    type="text"
-                    placeholder="Search entire store here..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm"
-                  />
-                  <button 
-                    type="submit"
-                    className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors"
-                  >
-                    <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                </form>
+            {/* Search Bar */}
+            <div className="w-full lg:flex-1 lg:max-w-2xl lg:mx-8 order-3 lg:order-2 min-w-0">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search entire store here..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm"
+                />
+                <button 
+                  type="submit"
+                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors"
+                >
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </form>
+            </div>
 
-                {/* User Action Icons - Only on large screens */}
-                <div className="hidden lg:flex items-center space-x-2">
+            {/* Right Side - User Only */}
+             {/* User Action Icons - Only on large screens */}
+             <div className="hidden lg:flex items-center space-x-2">
                   {/* Shopping Cart */}
                   <button
                     onClick={openCart}
@@ -382,18 +382,6 @@ const NewNavbar: React.FC = () => {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-
-            {/* Right Side - User Only */}
-            <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
-              {/* User Section */}
-              {isAuthenticated ? (
-                ''
-              ) : (
-                ""
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -504,10 +492,10 @@ const NewNavbar: React.FC = () => {
 
             {/* Right Side - Additional Actions */}
             <div className="flex items-center space-x-2">
-            {/* Cart - Hidden on large screens (moved to orange header) */}
+            {/* Cart */}
             <button
               onClick={openCart}
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center lg:hidden"
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {cartCount > 0 && (
@@ -517,10 +505,10 @@ const NewNavbar: React.FC = () => {
               )}
             </button>
 
-            {/* Wishlist - Hidden on large screens (moved to orange header) */}
+            {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center lg:hidden"
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {wishlistCount > 0 && (
@@ -530,8 +518,8 @@ const NewNavbar: React.FC = () => {
               )}
             </Link>
 
-            {/* Notifications - Hidden on large screens (moved to orange header) */}
-            {isAuthenticated && <div className="lg:hidden"><UserNotificationDropdown /></div>}
+            {/* Notifications */}
+            {isAuthenticated && <UserNotificationDropdown />}
 
             {/* User Menu */}
             {isAuthenticated ? (
