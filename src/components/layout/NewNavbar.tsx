@@ -363,7 +363,9 @@ const NewNavbar: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                ""
+                <div className="text-sm font-medium text-white">
+                    {getGreeting()}, {'User'}
+                  </div>
               )}
             </div>
           </div>
