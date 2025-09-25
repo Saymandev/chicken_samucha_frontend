@@ -17,11 +17,8 @@ import { contentAPI, productsAPI, reviewsAPI } from '../utils/api';
 
 interface SliderItem {
   id: string;
-  title: { en: string; bn: string };
-  description: { en: string; bn: string };
   image: { url: string; public_id: string };
   linkUrl: string;
-  buttonText: { en: string; bn: string };
   isActive: boolean;
   order: number;
 }

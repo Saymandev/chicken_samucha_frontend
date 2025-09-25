@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import 'swiper/css';
@@ -11,11 +10,8 @@ import { publicAPI } from '../../utils/api';
 
 interface SliderItem {
   id: string;
-  title: { en: string; bn: string };
-  description: { en: string; bn: string };
   image: { url: string; public_id: string };
   linkUrl: string;
-  buttonText: { en: string; bn: string };
   isActive: boolean;
   order: number;
 }
@@ -116,93 +112,22 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
       >
         {activeItems.map((item, index) => (
           <SwiperSlide key={item.id}>
-            <div className="relative h-full w-full">
+            <Link
+              to={item.linkUrl || '#'}
+              className="block relative h-full w-full overflow-hidden group cursor-pointer"
+            >
               {/* Full-bleed image: fill container width & height */}
               <img
                 src={item.image.url}
-                alt={item.title[language] || 'slide'}
-                className="absolute inset-0 w-full h-full object-cover"
+                alt={`Slider item ${index + 1}`}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 loading="eager"
                 decoding="async"
               />
               
-              {/* Light overlay for better text readability without darkening the image */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-              
-              {/* Floating cosmetic elements */}
-              <div className="absolute top-20 right-20 w-16 h-16 bg-pink-400/20 rounded-full blur-xl animate-pulse"></div>
-              <div className="absolute bottom-32 left-16 w-12 h-12 bg-purple-400/20 rounded-full blur-lg animate-pulse delay-1000"></div>
-              <div className="absolute top-1/3 right-1/4 w-8 h-8 bg-indigo-400/20 rounded-full blur-md animate-pulse delay-500"></div>
-              
-              {/* Content */}
-              <div className="relative z-10 h-full flex items-center">
-                <div className="text-left text-white max-w-4xl mx-auto px-4 md:px-8">
-                  {item.title[language] && (
-                    <motion.div
-                      initial={{ y: 30, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.8 }}
-                      className="relative"
-                    >
-                      <h1
-                        className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
-                          language === 'bn' ? 'font-bengali' : 'font-serif'
-                        }`}
-                        style={{ 
-                          textShadow: '2px 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)',
-                          background: 'linear-gradient(135deg, #ffffff 0%, #f8f4ff 50%, #e8d5ff 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          backgroundClip: 'text'
-                        }}
-                      >
-                        {item.title[language]}
-                      </h1>
-                      {/* Sparkle effect */}
-                      <div className="absolute -top-2 -right-2 text-2xl animate-pulse">✨</div>
-                      <div className="absolute -bottom-1 -left-2 text-lg animate-pulse delay-300">💫</div>
-                    </motion.div>
-                  )}
-                  
-                  {item.description[language] && (
-                    <motion.p
-                      initial={{ y: 30, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.4, duration: 0.8 }}
-                      className={`text-xl md:text-2xl mb-8 opacity-95 max-w-2xl leading-relaxed ${
-                        language === 'bn' ? 'font-bengali' : ''
-                      }`}
-                      style={{ 
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5)',
-                        color: 'white'
-                      }}
-                    >
-                      {item.description[language]}
-                    </motion.p>
-                  )}
-                  
-                  {item.linkUrl && (
-                    <motion.div
-                      initial={{ y: 30, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.6, duration: 0.8 }}
-                      className="flex flex-col sm:flex-row gap-4"
-                    >
-                      <Link
-                        to={item.linkUrl}
-                        className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-full hover:from-pink-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                      >
-                        {item.buttonText[language]}
-                        <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
-                      </Link>
-                    </motion.div>
-                  )}
-                </div>
-              </div>
-            </div>
+              {/* Subtle overlay for hover effect */}
+              <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors duration-300" />
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

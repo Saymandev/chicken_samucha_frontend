@@ -15,11 +15,8 @@ interface HeroContent {
 
 interface SliderItem {
   _id: string;
-  title: { en: string; bn: string };
-  description: { en: string; bn: string };
   image: { url: string; public_id: string };
   linkUrl: string;
-  buttonText: { en: string; bn: string };
   isActive: boolean;
   order: number;
 }
@@ -158,11 +155,8 @@ const AdminContent: React.FC = () => {
   const openSliderModal = () => {
     setNewSliderItem({
       _id: '',
-      title: { en: '', bn: '' },
-      description: { en: '', bn: '' },
       image: { url: '', public_id: '' },
       linkUrl: '',
-      buttonText: { en: '', bn: '' },
       isActive: true,
       order: sliderItems.length + 1
     });
@@ -218,13 +212,7 @@ const AdminContent: React.FC = () => {
     try {
       setSavingSettings(true);
       const formData = new FormData();
-      formData.append('title[en]', newSliderItem.title.en);
-      formData.append('title[bn]', newSliderItem.title.bn || newSliderItem.title.en);
-      formData.append('description[en]', newSliderItem.description.en);
-      formData.append('description[bn]', newSliderItem.description.bn || newSliderItem.description.en);
       formData.append('linkUrl', newSliderItem.linkUrl);
-      formData.append('buttonText[en]', newSliderItem.buttonText.en);
-      formData.append('buttonText[bn]', newSliderItem.buttonText.bn || newSliderItem.buttonText.en);
       formData.append('isActive', String(newSliderItem.isActive));
       formData.append('order', String(newSliderItem.order));
       
@@ -595,14 +583,14 @@ const AdminContent: React.FC = () => {
 
             {sliderItems.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sliderItems.map((item) => (
+                {sliderItems.map((item, index) => (
                   <div key={item._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                     {/* Slider Image */}
                     <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
                       {item.image?.url ? (
                         <img
                           src={item.image.url}
-                          alt={item.title.en}
+                          alt={`Slider item ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -633,10 +621,10 @@ const AdminContent: React.FC = () => {
                     {/* Slider Content */}
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">
-                        {item.title.en}
+                        Slider Item {index + 1}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
-                        {item.description.en}
+                        {item.linkUrl || 'No link URL'}
                       </p>
                       
                       {item.linkUrl && (
@@ -665,7 +653,7 @@ const AdminContent: React.FC = () => {
                           {item.isActive ? 'Disable' : 'Enable'}
                         </button>
                         <button
-                          onClick={() => handleDeleteSlider(item._id, item.title.en)}
+                          onClick={() => handleDeleteSlider(item._id, `Slider Item ${index + 1}`)}
                           className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -738,112 +726,10 @@ const AdminContent: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-              {/* Title Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Title (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={newSliderItem.title.en}
-                    onChange={(e) => setNewSliderItem({
-                      ...newSliderItem,
-                      title: { ...newSliderItem.title, en: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter English title (optional)"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Title (Bengali)
-                  </label>
-                  <input
-                    type="text"
-                    value={newSliderItem.title.bn}
-                    onChange={(e) => setNewSliderItem({
-                      ...newSliderItem,
-                      title: { ...newSliderItem.title, bn: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="বাংলা শিরোনাম লিখুন"
-                  />
-                </div>
-              </div>
-
-              {/* Description Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Description (English)
-                  </label>
-                  <textarea
-                    value={newSliderItem.description.en}
-                    onChange={(e) => setNewSliderItem({
-                      ...newSliderItem,
-                      description: { ...newSliderItem.description, en: e.target.value }
-                    })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter English description (optional)"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Description (Bengali)
-                  </label>
-                  <textarea
-                    value={newSliderItem.description.bn}
-                    onChange={(e) => setNewSliderItem({
-                      ...newSliderItem,
-                      description: { ...newSliderItem.description, bn: e.target.value }
-                    })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="বাংলা বিবরণ লিখুন"
-                  />
-                </div>
-              </div>
-
-              {/* Button Text Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Button Text (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={newSliderItem.buttonText.en}
-                    onChange={(e) => setNewSliderItem({
-                      ...newSliderItem,
-                      buttonText: { ...newSliderItem.buttonText, en: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="e.g., Order Now"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Button Text (Bengali)
-                  </label>
-                  <input
-                    type="text"
-                    value={newSliderItem.buttonText.bn}
-                    onChange={(e) => setNewSliderItem({
-                      ...newSliderItem,
-                      buttonText: { ...newSliderItem.buttonText, bn: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="যেমন, এখনই অর্ডার করুন"
-                  />
-                </div>
-              </div>
-
               {/* Link URL */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Link URL
+                  Link URL (optional)
                 </label>
                 <input
                   type="text"
