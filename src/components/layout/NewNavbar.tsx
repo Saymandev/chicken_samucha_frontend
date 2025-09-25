@@ -348,17 +348,7 @@ const NewNavbar: React.FC = () => {
               {isAuthenticated ? (
                 ''
               ) : (
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <User className="w-5 h-5" />
-                  <div className="hidden md:block text-sm">
-                     <Link to="/login" className="underline hover:text-orange-200">Login</Link> / <Link to="/register" className="underline hover:text-orange-200">Register</Link>
-                  </div>
-                  <div className="md:hidden flex space-x-1 text-xs">
-                    <Link to="/login" className="underline hover:text-orange-200">Login</Link>
-                    <span>/</span>
-                    <Link to="/register" className="underline hover:text-orange-200">Register</Link>
-                  </div>
-                </div>
+                ""
               )}
             </div>
           </div>
@@ -586,7 +576,20 @@ const NewNavbar: React.FC = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              ""
+              <div className="flex items-center space-x-2">
+              <Link
+                to="/login"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                  className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                Register
+              </Link>
+            </div>
             )}
 
               {/* Mobile Menu Button */}
