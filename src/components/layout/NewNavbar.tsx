@@ -275,9 +275,7 @@ const NewNavbar: React.FC = () => {
             {/* Left Side - Logo and Contact Info */}
             <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-6">
               {/* Small Logo */}
-              <div className="flex items-center space-x-2">
-                <PickplaceLogo size="sm" />
-              </div>
+              
               <div className="flex items-center space-x-2">
                 <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">support@pickplace.com.bd</span>
@@ -319,7 +317,7 @@ const NewNavbar: React.FC = () => {
       </div>
 
       {/* Main Header */}
-      <div className="bg-orange-600 text-white py-3 sm:py-4">
+      <div className="bg-orange-600 text-white py-4 sm:py-6">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0">
             {/* Logo - Hidden on mobile and tablet */}
