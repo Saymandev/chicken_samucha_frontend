@@ -29,6 +29,7 @@ import { useWishlist } from '../../contexts/WishlistContext';
 import { useNavigationMenu } from '../../hooks/useNavigationMenu';
 import { useStore } from '../../store/useStore';
 import { categoriesAPI } from '../../utils/api';
+import PickplaceLogo from '../common/PickplaceLogo';
 import { Skeleton } from '../common/Skeleton';
 import UserNotificationDropdown from '../UserNotificationDropdown';
 
@@ -318,15 +319,9 @@ const NewNavbar: React.FC = () => {
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0 md:space-y-3">
             {/* Logo - Hidden on mobile and tablet */}
-            <Link to="/" className="hidden md:flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg flex items-center justify-center">
-                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
-              </div>
-              <div>
-                <div className="text-sm xs:text-lg sm:text-xl font-bold truncate">www.pickplace.com.bd</div>
-                <div className="text-xs opacity-90 hidden sm:block">PROUDLY BANGLADESHI</div>
-            </div>
-          </Link>
+            <Link to="/" className="hidden md:flex items-center">
+              <PickplaceLogo size="md" showText={true} />
+            </Link>
 
             {/* Search Bar */}
             <div className="w-full lg:flex-1 lg:max-w-2xl lg:mx-8 order-3 lg:order-2 min-w-0">
@@ -637,15 +632,9 @@ const NewNavbar: React.FC = () => {
                   <Link
                     to="/" 
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <Package className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-gray-900 dark:text-white">www.pickplace.com.bd</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">PROUDLY BANGLADESHI</div>
-                    </div>
+                    <PickplaceLogo size="sm" showText={true} />
                   </Link>
 
                   {/* Mobile primary actions intentionally hidden per requirements */}

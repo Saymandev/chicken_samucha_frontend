@@ -24,6 +24,7 @@ import toast from 'react-hot-toast';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import NotificationDropdown from '../NotificationDropdown';
+import PickplaceLogo from '../common/PickplaceLogo';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -168,9 +169,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex flex-col h-full">
       {/* Logo & Brand */}
       <div className="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-        <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-sm">🥟</span>
-        </div>
+        <PickplaceLogo size="sm" showText={false} />
         {sidebarOpen && (
           <div className="flex-1">
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">Admin Panel</h1>
