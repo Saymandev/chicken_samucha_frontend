@@ -476,7 +476,7 @@ const NewNavbar: React.FC = () => {
             {/* Cart */}
             <button
               onClick={openCart}
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {cartCount > 0 && (
@@ -489,7 +489,7 @@ const NewNavbar: React.FC = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation flex items-center justify-center"
+              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {wishlistCount > 0 && (
@@ -607,7 +607,7 @@ const NewNavbar: React.FC = () => {
               {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] touch-manipulation"
+                className="lg:hidden p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation"
             >
               {isMobileMenuOpen ? (
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
