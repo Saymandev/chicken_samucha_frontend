@@ -28,7 +28,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useNavigationMenu } from '../../hooks/useNavigationMenu';
 import { useStore } from '../../store/useStore';
-import { categoriesAPI } from '../../utils/api';
+import { categoriesAPI, couponAPI, publicAPI } from '../../utils/api';
 import PickplaceLogo from '../common/PickplaceLogo';
 import { Skeleton } from '../common/Skeleton';
 import UserNotificationDropdown from '../UserNotificationDropdown';
@@ -73,6 +73,88 @@ const NewNavbar: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Coupon / Promotion expiry countdown state
+  const [offerEndTime, setOfferEndTime] = useState<Date | null>(null);
+  const [timeLeft, setTimeLeft] = useState<{ h: string; m: string; s: string }>({ h: '00', m: '00', s: '00' });
+
+  // Parse various possible expiry fields safely
+  const extractExpiry = (item: any): string | null => {
+    if (!item || typeof item !== 'object') return null;
+    return (
+      item.expiresAt ||
+      item.expiryAt ||
+      item.expiryDate ||
+      item.validTill ||
+      item.validUntil ||
+      item.endDate ||
+      item.endsAt ||
+      null
+    );
+  };
+
+  // Fetch nearest expiring coupon/promotion
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        // 1) Try active coupons
+        let bestExpiry: number | null = null;
+        try {
+          const couponsRes = await couponAPI.getActiveCoupons();
+          const coupons = couponsRes?.data || [];
+          for (const c of coupons) {
+            const exp = extractExpiry(c);
+            const ts = exp ? new Date(exp).getTime() : NaN;
+            if (!isNaN(ts) && ts > Date.now()) {
+              if (bestExpiry === null || ts < bestExpiry) bestExpiry = ts;
+            }
+          }
+        } catch {}
+
+        // 2) Fallback to active promotions
+        if (bestExpiry === null) {
+          try {
+            const promosRes = await publicAPI.getActivePromotions();
+            const promos = promosRes?.data || [];
+            for (const p of promos) {
+              const exp = extractExpiry(p);
+              const ts = exp ? new Date(exp).getTime() : NaN;
+              if (!isNaN(ts) && ts > Date.now()) {
+                if (bestExpiry === null || ts < bestExpiry) bestExpiry = ts;
+              }
+            }
+          } catch {}
+        }
+
+        if (isMounted && bestExpiry) setOfferEndTime(new Date(bestExpiry));
+      } catch {}
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Tick countdown every second
+  useEffect(() => {
+    if (!offerEndTime) return;
+    const tick = () => {
+      const now = Date.now();
+      const diff = offerEndTime.getTime() - now;
+      if (diff <= 0) {
+        setTimeLeft({ h: '00', m: '00', s: '00' });
+        return;
+      }
+      const hours = Math.floor(diff / 1000 / 3600);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+      setTimeLeft({ h: pad(hours), m: pad(minutes), s: pad(seconds) });
+    };
+    tick();
+    const iv = setInterval(tick, 1000);
+    return () => clearInterval(iv);
+  }, [offerEndTime]);
 
   useEffect(() => {
     // Simulate loading state
@@ -356,17 +438,16 @@ const NewNavbar: React.FC = () => {
             {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
               {/* User Section */}
-              {isAuthenticated ? (
-                <div className="hidden lg:block text-right">
-                  <div className="text-sm font-medium text-white">
-                    {getGreeting()}, {user?.name?.split(' ')[0] || 'User'}
-                  </div>
-                </div>
-              ) : (
+              <div className="hidden lg:flex items-center space-x-3">
                 <div className="text-sm font-medium text-white">
-                    {getGreeting()}, {'User'}
+                  {getGreeting()}, {isAuthenticated ? (user?.name?.split(' ')[0] || 'User') : 'User'}
+                </div>
+                {offerEndTime && (
+                  <div className="text-xs font-semibold text-orange-50 bg-white/20 px-2 py-1 rounded-md whitespace-nowrap">
+                    Offer ends in {timeLeft.h}:{timeLeft.m}:{timeLeft.s}
                   </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
