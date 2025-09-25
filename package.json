@@ -1,5 +1,5 @@
 {
-  "name": "chicken-samosa-frontend",
+  "name": "pickplace-frontend",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -64,5 +64,5 @@
     "@types/jest": "^29.5.8",
     "cross-env": "^7.0.3"
   },
-  "proxy": "https://chicken-samucha-backend.onrender.com"
+  "proxy": "https://pickplace-backend.onrender.com"
 }

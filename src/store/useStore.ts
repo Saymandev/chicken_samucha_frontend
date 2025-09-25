@@ -271,7 +271,7 @@ export const useStore = create<AppStore>()(
       setMobileMenuOpen: (isMobileMenuOpen) => set({ isMobileMenuOpen }),
     }),
     {
-      name: 'chicken-samosa-store',
+      name: 'pickplace-store',
       partialize: (state) => ({
         user: state.user,
         token: state.token,

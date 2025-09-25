@@ -275,8 +275,8 @@ const NewNavbar: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-6">
               <div className="flex items-center space-x-2">
                 <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">support@chickensamosa.com</span>
-                <span className="xs:hidden">support@chickensamosa.com</span>
+                <span className="hidden xs:inline">support@pickplace.com.bd</span>
+                <span className="xs:hidden">support@pickplace.com.bd</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -323,7 +323,7 @@ const NewNavbar: React.FC = () => {
                 <Package className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div>
-                <div className="text-sm xs:text-lg sm:text-xl font-bold truncate">chickensamosa.com</div>
+                <div className="text-sm xs:text-lg sm:text-xl font-bold truncate">www.pickplace.com.bd</div>
                 <div className="text-xs opacity-90 hidden sm:block">PROUDLY BANGLADESHI</div>
             </div>
           </Link>
@@ -643,7 +643,7 @@ const NewNavbar: React.FC = () => {
                       <Package className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-gray-900 dark:text-white">chickensamosa.com</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">www.pickplace.com.bd</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">PROUDLY BANGLADESHI</div>
                     </div>
                   </Link>

@@ -174,7 +174,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         {sidebarOpen && (
           <div className="flex-1">
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">Admin Panel</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Chicken Samosa</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Pickplace</p>
           </div>
         )}
         {/* Mobile Close Button */}
@@ -248,7 +248,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   </div>
                 </div>
                 <p className="text-orange-100 text-xs truncate">
-                  {user?.email || 'admin@chickensamosa.com'}
+                  {user?.email || 'admin@pickplace.com.bd'}
                 </p>
               </div>
             </div>
