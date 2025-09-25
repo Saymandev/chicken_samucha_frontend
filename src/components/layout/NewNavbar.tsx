@@ -320,7 +320,7 @@ const NewNavbar: React.FC = () => {
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0 md:space-y-3">
             {/* Logo - Hidden on mobile and tablet */}
             <Link to="/" className="hidden md:flex items-center">
-              <PickplaceLogo size="md" showText={true} />
+              <PickplaceLogo size="md" />
             </Link>
 
             {/* Search Bar */}
@@ -586,20 +586,7 @@ const NewNavbar: React.FC = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/login"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                    className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  Register
-                </Link>
-              </div>
+              ""
             )}
 
               {/* Mobile Menu Button */}
@@ -634,7 +621,7 @@ const NewNavbar: React.FC = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <PickplaceLogo size="sm" showText={true} />
+                    <PickplaceLogo size="sm" />
                   </Link>
 
                   {/* Mobile primary actions intentionally hidden per requirements */}
