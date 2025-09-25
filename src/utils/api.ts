@@ -411,8 +411,6 @@ export const publicAPI = {
   getActivePromotions: (params?: any) => api.get('/promotions', { params }),
   trackPromotionView: (id: string) => api.post(`/promotions/${id}/view`),
   trackPromotionClick: (id: string) => api.post(`/promotions/${id}/click`),
-  // Announcements
-  getAnnouncement: () => api.get('/content/announcement'),
   
   // Refunds (Customer)
   createRefundRequest: (data: any) => api.post('/refunds', data),

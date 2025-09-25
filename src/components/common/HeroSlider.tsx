@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -6,7 +6,6 @@ import 'swiper/css/pagination';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useStore } from '../../store/useStore';
-import { publicAPI } from '../../utils/api';
 
 interface SliderItem {
   id: string;
@@ -28,16 +27,6 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
   interval = 5000 
 }) => {
   const { language } = useStore();
-  const [announcement, setAnnouncement] = useState<any>(null);
-  const [hideBanner, setHideBanner] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    publicAPI.getAnnouncement().then(res => {
-      if (mounted) setAnnouncement(res.data?.announcement || null);
-    }).catch(() => {});
-    return () => { mounted = false; };
-  }, []);
 
   // No viewport switching needed – always contain to show full image on all devices
 
@@ -69,20 +58,6 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
 
   return (
     <div className="relative h-[220px] sm:h-[300px] md:h-[420px] lg:h-[520px] xl:h-[640px] w-screen overflow-hidden left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-      {announcement && !hideBanner && (
-        <div className="absolute top-0 left-0 right-0 z-30">
-          <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 flex items-center justify-between">
-            <div className="truncate mr-4">
-              <span className="font-semibold mr-2">{announcement.title}</span>
-              <span className="opacity-90">{announcement.message}</span>
-              {announcement.linkUrl && (
-                <a href={announcement.linkUrl} className="ml-3 underline" target="_blank" rel="noreferrer">Learn more</a>
-              )}
-            </div>
-            <button onClick={() => setHideBanner(true)} className="text-white/90 hover:text-white">✕</button>
-          </div>
-        </div>
-      )}
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={0}
@@ -120,7 +95,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
               <img
                 src={item.image.url}
                 alt={`Slider item ${index + 1}`}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
                 loading="eager"
                 decoding="async"
               />
