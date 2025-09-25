@@ -272,8 +272,12 @@ const NewNavbar: React.FC = () => {
       <div className="hidden md:block bg-orange-600 text-white py-2 text-xs sm:text-sm">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-            {/* Left Side - Contact Info */}
+            {/* Left Side - Logo and Contact Info */}
             <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-6">
+              {/* Small Logo */}
+              <div className="flex items-center space-x-2">
+                <PickplaceLogo size="sm" />
+              </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">support@pickplace.com.bd</span>
@@ -317,10 +321,10 @@ const NewNavbar: React.FC = () => {
       {/* Main Header */}
       <div className="bg-orange-600 text-white py-3 sm:py-4">
         <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0 md:space-y-3">
+          <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0">
             {/* Logo - Hidden on mobile and tablet */}
-            <Link to="/" className="hidden md:flex items-center">
-              <PickplaceLogo size="md" />
+            <Link to="/" className="hidden lg:flex items-center">
+              <PickplaceLogo size="lg" />
             </Link>
 
             {/* Search Bar */}
@@ -624,7 +628,7 @@ const NewNavbar: React.FC = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <PickplaceLogo size="sm" />
+                    <PickplaceLogo size="md" variant="black" />
                   </Link>
 
                   {/* Mobile primary actions intentionally hidden per requirements */}
