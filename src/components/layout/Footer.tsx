@@ -11,6 +11,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
+import PickplaceLogo from '../common/PickplaceLogo';
 // import { subscriptionsAPI } from '../../utils/api';
 
 const Footer: React.FC = () => {
@@ -60,19 +61,18 @@ const Footer: React.FC = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="text-2xl">🥟</div>
-              <span className={`font-bold text-xl text-white ${
-                language === 'bn' ? 'font-bengali' : ''
-              }`}>
-                {language === 'bn' ? 'চিকেন সমুচা' : 'Chicken Samosa'}
-              </span>
+            <Link to="/" className="hidden lg:flex flex-col items-start">
+              <PickplaceLogo size="lg" />
+              <span className="mt-1 text-white text-sm">www.pickplace.com.bd</span>
+            </Link>
+              
             </div>
             <p className={`text-gray-300 text-sm leading-relaxed ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn' 
-                ? 'রংপুরের সবচেয়ে সুস্বাদু চিকেন সমুচা। তাজা উপাদান এবং ঐতিহ্যবাহী রেসিপি দিয়ে তৈরি।'
-                : 'Rangpur\'s most delicious chicken samosa. Made with fresh ingredients and traditional recipes.'
+                ? 'বাংলাদেশের বিশ্বস্ত ই-কমার্স প্ল্যাটফর্ম। মানসম্পন্ন পণ্য, দ্রুত ডেলিভারি এবং চমৎকার সেবা।'
+                : 'Your trusted e-commerce platform in Bangladesh. Quality products, fast delivery, and excellent service.'
               }
             </p>
             
@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <Mail className="w-4 h-4 text-primary-400" />
-                <span>info@chickensamosa.com</span>
+                <span>info@pickplace.com.bd</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <MapPin className="w-4 h-4 text-primary-400" />

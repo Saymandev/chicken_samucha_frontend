@@ -244,7 +244,7 @@ const FAQPage: React.FC = () => {
                 {t('faq.callUs')}
               </a>
               <a
-                href="mailto:support@chickensamosa.com"
+                href="mailto:support@pickplace.com.bd"
                 className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400"
               >
                 {t('faq.emailUs')}

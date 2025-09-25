@@ -228,7 +228,7 @@ const TermsOfServicePage: React.FC = () => {
             <p className="text-slate-100 mb-6">{t('terms.contact.description')}</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="mailto:legal@chickensamosa.com"
+                href="mailto:legal@pickplace.com.bd"
                 className="bg-white text-slate-600 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition-colors"
               >
                 {t('terms.contact.email')}

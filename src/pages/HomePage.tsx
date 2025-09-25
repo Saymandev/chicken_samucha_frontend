@@ -412,8 +412,8 @@ const HomePage: React.FC = () => {
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn'
-                ? 'রংপুরের সেরা চিকেন সমুচার স্বাদ নিন। ফ্রি ডেলিভারি ৫০০ টাকার উপরে!'
-                : 'Taste the best chicken samosa in Rangpur. Free delivery on orders above ৳500!'
+                ? 'বাংলাদেশ জুড়ে দ্রুত ডেলিভারি সহ অসাধারণ পণ্য আবিষ্কার করুন। ৫০০ টাকার উপরে ফ্রি শিপিং!'
+                : 'Discover amazing products with fast delivery across Bangladesh. Free shipping on orders above ৳500!'
               }
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

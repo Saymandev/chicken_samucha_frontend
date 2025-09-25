@@ -463,7 +463,7 @@ const CheckoutPage: React.FC = () => {
               Your cart is empty
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Add some delicious chicken samosas to your cart before checkout
+              Add some products to your cart before checkout
             </p>
             <button
               onClick={() => navigate('/products')}

@@ -129,7 +129,7 @@
     "verified": "Verified",
     "adminResponse": "Restaurant Response",
     "comingSoon": "Reviews Coming Soon",
-    "description": "Share your experience and read what others say about our delicious chicken samosas.",
+    "description": "Share your experience and read what others say about our amazing products.",
     "features": {
       "ratings": "Star Ratings",
       "ratingsDesc": "Rate products from 1 to 5 stars",
@@ -183,7 +183,7 @@
   },
   "register": {
     "comingSoon": "Registration Coming Soon",
-    "description": "Create your account to start ordering delicious chicken samosas.",
+    "description": "Create your account to start shopping amazing products.",
     "features": {
       "secure": "Secure Registration",
       "secureDesc": "Safe and protected account creation",
@@ -295,7 +295,7 @@
   },
   "faq": {
     "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to common questions about our chicken samosas and services.",
+    "subtitle": "Find answers to common questions about our products and services.",
     "searchPlaceholder": "Search questions...",
     "categories": {
       "all": "All",
@@ -325,9 +325,9 @@
     },
     "product": {
       "q1": "Are your samosas halal?",
-      "a1": "Yes, all our chicken samosas are 100% halal. We use only halal-certified chicken and ingredients.",
+      "a1": "Yes, we ensure all our products meet halal standards. We work with certified suppliers and maintain strict quality control.",
       "q2": "Do you have vegetarian options?",
-      "a2": "Currently, we specialize in chicken samosas, but we're working on adding vegetarian options soon."
+      "a2": "We offer a wide range of products including electronics, fashion, home goods, and more. Check our categories for the full selection."
     },
     "account": {
       "q1": "How do I create an account?",

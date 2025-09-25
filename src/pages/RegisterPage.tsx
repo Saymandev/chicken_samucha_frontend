@@ -139,7 +139,7 @@ const RegisterPage: React.FC = () => {
               {t('auth.createAccount')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Join us and start ordering delicious chicken samosas!
+              Join us and start shopping amazing products!
             </p>
           </div>
 

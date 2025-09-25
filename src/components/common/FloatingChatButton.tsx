@@ -46,7 +46,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
     if (type === 'phone') {
       window.open('tel:+8801234567890', '_self');
     } else {
-      window.open('mailto:support@chickensamosa.com', '_self');
+      window.open('mailto:support@pickplace.com.bd', '_self');
     }
     setIsOpen(false);
   };
@@ -134,7 +134,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
                     {language === 'bn' ? 'ইমেইল করুন' : 'Email Us'}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    support@chickensamosa.com
+                    support@pickplace.com.bd
                   </div>
                 </div>
               </button>

@@ -222,7 +222,7 @@ const ReturnPolicyPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
                   {t('returnPolicy.contact.email')}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">returns@chickensamosa.com</p>
+                <p className="text-gray-600 dark:text-gray-300">returns@pickplace.com.bd</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {t('returnPolicy.contact.emailResponse')}
                 </p>

@@ -140,7 +140,7 @@ const RefundPolicyPage: React.FC = () => {
             <p className="text-emerald-100 mb-6">Contact our support team for quick assistance</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="mailto:refunds@chickensamosa.com"
+                href="mailto:refunds@pickplace.com.bd"
                 className="bg-white text-emerald-600 px-6 py-3 rounded-lg font-semibold hover:bg-emerald-50 transition-colors"
               >
                 Email Support
