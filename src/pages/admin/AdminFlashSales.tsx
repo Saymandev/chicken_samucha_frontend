@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import FlashSaleFormModal from '../../components/admin/FlashSaleFormModal';
 import { AdminOrderCardSkeleton } from '../../components/common/Skeleton';
 import { adminAPI } from '../../utils/api';
 
@@ -409,34 +410,19 @@ const AdminFlashSales: React.FC = () => {
         )}
       </div>
 
-      {/* Modals would go here - Create/Edit and Details modals */}
-      {/* For now, just showing placeholder */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6">
-            <h2 className="text-xl font-bold mb-4">
-              {selectedFlashSale ? 'Edit Flash Sale' : 'Create Flash Sale'}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Flash sale creation form will be implemented here.
-            </p>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => {
-                  setShowCreateModal(false);
-                  setSelectedFlashSale(null);
-                }}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
-                {selectedFlashSale ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Flash Sale Form Modal */}
+      <FlashSaleFormModal
+        isOpen={showCreateModal}
+        onClose={() => {
+          setShowCreateModal(false);
+          setSelectedFlashSale(null);
+        }}
+        onSuccess={() => {
+          fetchFlashSales();
+          setSelectedFlashSale(null);
+        }}
+        editingFlashSale={selectedFlashSale}
+      />
 
       {showDetailsModal && selectedFlashSale && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
