@@ -117,9 +117,18 @@ const [loadingCategory, setLoadingCategory] = useState(false);
     
     try {
       setLoadingCategory(true);
-      const res = await categoriesAPI.getAllCategories({ includeInactive: false });
+      const res = await categoriesAPI.getAllCategories({ 
+        includeInactive: false, 
+        withProductCount: true 
+      });
       if (res.data.success) {
-        const category = (res.data.data || []).find((c: any) => c.slug === categorySlug);
+        const category = (res.data.data || []).find((c: any) => 
+          c.slug === categorySlug || 
+          c.slug === decodeURIComponent(categorySlug) ||
+          c.slug.toLowerCase() === categorySlug.toLowerCase()
+        );
+        console.log('Found category for slug:', categorySlug, category);
+        console.log('All categories:', res.data.data);
         setCurrentCategory(category || null);
       }
     } catch (error) {
