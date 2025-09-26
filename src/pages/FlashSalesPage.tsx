@@ -3,20 +3,12 @@ import { Clock, ShoppingCart, Star, Tag } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { GridSkeleton } from '../components/common/Skeleton';
-import { useCart } from '../contexts/CartContext';
-import { useStore } from '../store/useStore';
+import { GridSkeleton, ProductCardSkeleton } from '../components/common/Skeleton';
+import { Product, useStore } from '../store/useStore';
 import { flashSaleAPI } from '../utils/api';
 
 interface FlashSaleProduct {
-  product: {
-    _id: string;
-    name: { en: string; bn: string };
-    slug: string;
-    images: Array<{ url: string; public_id: string }>;
-    rating: number;
-    reviewCount: number;
-  };
+  product: Product;
   originalPrice: number;
   flashSalePrice: number;
   stockLimit?: number;
@@ -42,8 +34,7 @@ interface FlashSale {
 }
 
 const FlashSalesPage: React.FC = () => {
-  const { language } = useStore();
-  const { addToCart } = useCart();
+  const { language, addToCart } = useStore();
   const [flashSales, setFlashSales] = useState<FlashSale[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState<{[key: string]: {hours: number; minutes: number; seconds: number}}>({});
@@ -102,7 +93,7 @@ const FlashSalesPage: React.FC = () => {
 
   const handleAddToCart = async (product: FlashSaleProduct) => {
     try {
-      await addToCart(product.product._id, 1);
+      addToCart(product.product, 1);
       toast.success(`${language === 'bn' ? product.product.name.bn : product.product.name.en} added to cart!`);
     } catch (error) {
       console.error('Add to cart error:', error);
@@ -127,7 +118,11 @@ const FlashSalesPage: React.FC = () => {
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto mb-4 animate-pulse"></div>
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96 mx-auto animate-pulse"></div>
           </div>
-          <GridSkeleton count={8} />
+          <GridSkeleton 
+            items={8} 
+            ItemComponent={ProductCardSkeleton}
+            columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          />
         </div>
       </div>
     );
@@ -256,7 +251,7 @@ const FlashSalesPage: React.FC = () => {
                     >
                       {/* Product Image */}
                       <div className="relative aspect-square bg-white dark:bg-gray-600">
-                        <Link to={`/products/${item.product.slug}`}>
+                        <Link to={`/products/${item.product.id}`}>
                           <img
                             src={item.product.images[0]?.url || '/placeholder.png'}
                             alt={language === 'bn' ? item.product.name.bn : item.product.name.en}
@@ -279,7 +274,7 @@ const FlashSalesPage: React.FC = () => {
 
                       {/* Product Info */}
                       <div className="p-4">
-                        <Link to={`/products/${item.product.slug}`}>
+                        <Link to={`/products/${item.product.id}`}>
                           <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 hover:text-orange-600 transition-colors">
                             {language === 'bn' ? item.product.name.bn : item.product.name.en}
                           </h3>
@@ -292,7 +287,7 @@ const FlashSalesPage: React.FC = () => {
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i < Math.floor(item.product.rating)
+                                  i < Math.floor(item.product.ratings?.average || 0)
                                     ? 'text-yellow-400 fill-current'
                                     : 'text-gray-300'
                                 }`}
@@ -300,7 +295,7 @@ const FlashSalesPage: React.FC = () => {
                             ))}
                           </div>
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            ({item.product.reviewCount})
+                            ({item.product.ratings?.count || 0})
                           </span>
                         </div>
 
