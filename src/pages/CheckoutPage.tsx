@@ -687,8 +687,8 @@ const CheckoutPage: React.FC = () => {
                 </div>
               </div>
               )}
-{/* Delivery Zones (place-based) */}
-{deliveryMethod === 'delivery' && Array.isArray(deliverySettings?.zones) && (deliverySettings!.zones.length > 0) && (
+              {/* Delivery Zones (place-based) - Only show when delivery has charges */}
+              {deliveryMethod === 'delivery' && Array.isArray(deliverySettings?.zones) && (deliverySettings!.zones.length > 0) && cartTotal < freeThreshold && (
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Delivery Area</h3>
                   <div className="space-y-2">

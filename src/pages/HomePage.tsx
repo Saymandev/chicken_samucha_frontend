@@ -39,6 +39,7 @@ const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [featuredReviews, setFeaturedReviews] = useState<Review[]>([]);
+  const [deliverySettings, setDeliverySettings] = useState<{ freeDeliveryThreshold: number } | null>(null);
   
   const [loadingSlider, setLoadingSlider] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -49,6 +50,7 @@ const HomePage: React.FC = () => {
     fetchFeaturedProducts();
     fetchBestSellers();
     fetchFeaturedReviews();
+    fetchDeliverySettings();
   }, []);
 
   const fetchSliderItems = async () => {
@@ -121,6 +123,17 @@ const HomePage: React.FC = () => {
     } catch (error) {
       console.error('❌ Best sellers error:', error);
       setBestSellers([]);
+    }
+  };
+
+  const fetchDeliverySettings = async () => {
+    try {
+      const response = await contentAPI.getDeliverySettings();
+      if (response.data.success) {
+        setDeliverySettings(response.data.settings);
+      }
+    } catch (error) {
+      console.error('Error fetching delivery settings:', error);
     }
   };
 
@@ -296,21 +309,21 @@ const HomePage: React.FC = () => {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {[
               {
-                icon: '🍗',
-                title: language === 'bn' ? 'তাজা উপাদান' : 'Fresh Ingredients',
+                icon: '✨',
+                title: language === 'bn' ? 'প্রিমিয়াম কোয়ালিটি' : 'Premium Quality',
                 description: language === 'bn' 
-                  ? 'প্রতিদিন তাজা এবং উন্নত মানের উপাদান ব্যবহার করা হয়'
-                  : 'We use fresh and high-quality ingredients daily'
+                  ? 'শুধুমাত্র সেরা ব্র্যান্ডের প্রিমিয়াম বিউটি প্রোডাক্ট'
+                  : 'Only the finest premium beauty products from top brands'
               },
               {
                 icon: '🚚',
                 title: language === 'bn' ? 'দ্রুত ডেলিভারি' : 'Fast Delivery',
                 description: language === 'bn'
-                  ? 'রংপুরের যেকোনো জায়গায় দ্রুত এবং নিরাপদ ডেলিভারি'
-                  : 'Quick and safe delivery anywhere in Rangpur'
+                  ? 'বাংলাদেশের যেকোনো জায়গায় দ্রুত এবং নিরাপদ ডেলিভারি'
+                  : 'Quick and safe delivery anywhere in Bangladesh'
               },
               {
                 icon: '💳',
@@ -318,6 +331,27 @@ const HomePage: React.FC = () => {
                 description: language === 'bn'
                   ? 'বিকাশ, নগদ, রকেট সহ সব ধরনের মোবাইল পেমেন্ট'
                   : 'All types of mobile payments including bKash, Nagad, Rocket'
+              },
+              {
+                icon: '🛡️',
+                title: language === 'bn' ? 'নিরাপদ পণ্য' : 'Safe Products',
+                description: language === 'bn'
+                  ? 'সব পণ্য FDA অনুমোদিত এবং ত্বকের জন্য নিরাপদ'
+                  : 'All products are FDA approved and safe for your skin'
+              },
+              {
+                icon: '🎁',
+                title: language === 'bn' ? 'বিশেষ অফার' : 'Special Offers',
+                description: language === 'bn'
+                  ? 'নিয়মিত ডিসকাউন্ট এবং বিশেষ প্যাকেজ অফার'
+                  : 'Regular discounts and special package offers'
+              },
+              {
+                icon: '💬',
+                title: language === 'bn' ? '২৪/৭ সাপোর্ট' : '24/7 Support',
+                description: language === 'bn'
+                  ? 'যেকোনো সময় আমাদের সাথে যোগাযোগ করুন'
+                  : 'Contact us anytime for any assistance'
               }
             ].map((feature, index) => (
               <motion.div
@@ -404,16 +438,16 @@ const HomePage: React.FC = () => {
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn' 
-                ? 'আজই অর্ডার করুন এবং স্বাদ নিন!'
-                : 'Order Today and Taste the Difference!'
+                ? 'আজই অর্ডার করুন এবং সুন্দর হয়ে উঠুন!'
+                : 'Order Today and Discover Your Beauty!'
               }
             </h2>
             <p className={`text-xl text-white opacity-90 mb-8 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn'
-                ? 'বাংলাদেশ জুড়ে দ্রুত ডেলিভারি সহ অসাধারণ পণ্য আবিষ্কার করুন। ৫০০ টাকার উপরে ফ্রি শিপিং!'
-                : 'Discover amazing products with fast delivery across Bangladesh. Free shipping on orders above ৳500!'
+                ? `বাংলাদেশ জুড়ে দ্রুত ডেলিভারি সহ প্রিমিয়াম বিউটি প্রোডাক্ট আবিষ্কার করুন। ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'} টাকার উপরে ফ্রি শিপিং!`
+                : `Discover premium beauty products with fast delivery across Bangladesh. Free shipping on orders above ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'}!`
               }
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

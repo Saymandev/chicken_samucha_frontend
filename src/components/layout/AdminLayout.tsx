@@ -169,7 +169,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex flex-col h-full">
       {/* Logo & Brand */}
       <div className="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-        <PickplaceLogo size="md" variant='black' />
+        <PickplaceLogo size="md" variant={
+          theme === 'light' ? 'default' : 'black'
+        } />
         
         {/* Mobile Close Button */}
         <button

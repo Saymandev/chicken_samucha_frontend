@@ -607,7 +607,7 @@ const NewNavbar: React.FC = () => {
               {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation"
+                className="lg:hidden p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation dark:text-white text-gray-700"
             >
               {isMobileMenuOpen ? (
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -637,8 +637,10 @@ const NewNavbar: React.FC = () => {
                     className="flex items-start p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <div className="flex flex-col items-start">
-                      <PickplaceLogo size="md" variant="black" />
-                      <span className="mt-1 text-black text-sm">www.pickplace.com.bd</span>
+                      <PickplaceLogo size="md" variant={
+                        theme === 'light' ? 'default' : 'black'
+                      } />
+                      <span className="mt-1 dark:text-white text-black text-sm">www.pickplace.com.bd</span>
                     </div>
                   </Link>
 
