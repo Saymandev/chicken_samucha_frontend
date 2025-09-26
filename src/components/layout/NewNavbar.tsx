@@ -239,12 +239,58 @@ const NewNavbar: React.FC = () => {
     i18n.changeLanguage(lang);
   };
 
-  // Time-based greeting helper
+  // Time-based greeting helper with more meaningful messages
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    const greetings = {
+      morning: language === 'bn' ? [
+        'সুপ্রভাত',
+        'ভালো সকাল',
+        'সকালের শুভেচ্ছা',
+        'আলোর সাথে জেগে উঠুন',
+        'আবারো স্বাগতম'
+      ] : [
+        'Good morning',
+        'Rise and shine',
+        'Start your day',
+        'Morning sunshine',
+        'Welcome back'
+      ],
+      afternoon: language === 'bn' ? [
+        'শুভ দুপুর',
+        'ভালো দুপুর',
+        'দুপুরের শুভেচ্ছা',
+        'আপনার দিনটি ভালো যাচ্ছে',
+        'দুপুরের শুভেচ্ছা'
+      ] : [
+        'Good afternoon',
+        'Hope you\'re having a great day',
+        'Afternoon vibes',
+        'Lovely afternoon',
+        'Hope your day is going well'
+      ],
+      evening: language === 'bn' ? [
+        'শুভ সন্ধ্যা',
+        'ভালো সন্ধ্যা',
+        'সন্ধ্যার শুভেচ্ছা',
+        'আপনার দিনটি ভালো কাটুক',
+        'সুন্দর সন্ধ্যা'
+      ] : [
+        'Good evening',
+        'Evening beauty',
+        'Hope you had a wonderful day',
+        'Good evening',
+        'End your day beautifully'
+      ]
+    };
+
+    let timeOfDay: 'morning' | 'afternoon' | 'evening';
+    if (hour < 12) timeOfDay = 'morning';
+    else if (hour < 17) timeOfDay = 'afternoon';
+    else timeOfDay = 'evening';
+
+    const timeGreetings = greetings[timeOfDay];
+    return timeGreetings[Math.floor(Math.random() * timeGreetings.length)];
   };
 
   if (isLoading) {
@@ -272,7 +318,7 @@ const NewNavbar: React.FC = () => {
     <>
     
       {/* Main Header */}
-      <div className="bg-orange-600 text-white sm:pb-6 pb-4">
+      <div className="bg-orange-600 text-white py-3">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0">
             {/* Logo - Hidden on mobile and tablet */}
