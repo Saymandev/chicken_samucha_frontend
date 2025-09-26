@@ -541,8 +541,20 @@ export const categoriesAPI = {
   getNavbarCategories: () => api.get('/categories/navbar'),
   getTopCategories: (params?: any) => api.get('/categories/top', { params }),
   getCategoryById: (id: string) => api.get(`/categories/${id}`),
-  createCategory: (data: any) => api.post('/categories', data),
-  updateCategory: (id: string, data: any) => api.put(`/categories/${id}`, data),
+  createCategory: (data: any) => {
+    // Handle FormData for file uploads
+    if (data instanceof FormData) {
+      return api.post('/categories', data);
+    }
+    return api.post('/categories', data);
+  },
+  updateCategory: (id: string, data: any) => {
+    // Handle FormData for file uploads
+    if (data instanceof FormData) {
+      return api.put(`/categories/${id}`, data);
+    }
+    return api.put(`/categories/${id}`, data);
+  },
   deleteCategory: (id: string) => api.delete(`/categories/${id}`),
   toggleCategoryStatus: (id: string) => api.patch(`/categories/${id}/toggle`),
   updateCategoryOrder: (categories: any[]) => api.patch('/categories/order', { categories }),

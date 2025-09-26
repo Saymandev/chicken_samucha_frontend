@@ -10,9 +10,9 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
-  GridSkeleton,
-  ListSkeleton,
-  ProductCardSkeleton
+    GridSkeleton,
+    ListSkeleton,
+    ProductCardSkeleton
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
@@ -43,6 +43,8 @@ const ProductsPage: React.FC = () => {
 
 // Categories fetched from API
 const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: { en: string; bn: string } }>>([]);
+const [currentCategory, setCurrentCategory] = useState<any>(null);
+const [loadingCategory, setLoadingCategory] = useState(false);
 
   const sortOptions = [
     { value: 'featured', label: { en: 'Featured', bn: 'বৈশিষ্ট্য' } },
@@ -106,6 +108,28 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
     }
   };
 
+  // Fetch current category details
+  const fetchCategoryDetails = async (categorySlug: string) => {
+    if (!categorySlug) {
+      setCurrentCategory(null);
+      return;
+    }
+    
+    try {
+      setLoadingCategory(true);
+      const res = await categoriesAPI.getAllCategories({ includeInactive: false });
+      if (res.data.success) {
+        const category = (res.data.data || []).find((c: any) => c.slug === categorySlug);
+        setCurrentCategory(category || null);
+      }
+    } catch (error) {
+      console.error('Error fetching category details:', error);
+      setCurrentCategory(null);
+    } finally {
+      setLoadingCategory(false);
+    }
+  };
+
   // Load recently viewed and best sellers on mount
   useEffect(() => {
     fetchRecentlyViewed();
@@ -120,6 +144,11 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
       } catch {}
     })();
   }, []);
+
+  // Fetch category details when category changes
+  useEffect(() => {
+    fetchCategoryDetails(selectedCategory);
+  }, [selectedCategory]);
 
   const fetchProducts = async (page = 1, isNewSearch = false) => {
     if (isNewSearch) {
@@ -251,15 +280,55 @@ const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: {
           <h1 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
             language === 'bn' ? 'font-bengali' : ''
           }`}>
-            {t('products.title')}
+            {currentCategory ? (currentCategory.name[language] || currentCategory.name.en) : t('products.title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
-            {language === 'bn' 
-              ? 'আমাদের সুস্বাদু সমুচার কালেকশন আবিষ্কার করুন'
-              : 'Discover our delicious samosa collection'
+            {currentCategory && currentCategory.description 
+              ? (currentCategory.description[language] || currentCategory.description.en)
+              : language === 'bn' 
+                ? 'আমাদের সুস্বাদু সমুচার কালেকশন আবিষ্কার করুন'
+                : 'Discover our delicious samosa collection'
             }
           </p>
         </div>
+
+        {/* Category Banner */}
+        {currentCategory && currentCategory.image?.url && (
+          <div className="mb-8 relative overflow-hidden rounded-lg shadow-lg">
+            <div 
+              className="h-48 md:h-64 bg-cover bg-center relative"
+              style={{ 
+                backgroundImage: `url(${currentCategory.image.url})`,
+                backgroundColor: currentCategory.color || '#3B82F6'
+              }}
+            >
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+              
+              {/* Content */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <div className="text-4xl md:text-6xl mb-4">
+                    {currentCategory.icon}
+                  </div>
+                  <h2 className={`text-2xl md:text-4xl font-bold mb-2 ${
+                    language === 'bn' ? 'font-bengali' : ''
+                  }`}>
+                    {currentCategory.name[language] || currentCategory.name.en}
+                  </h2>
+                  {currentCategory.description && (
+                    <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto px-4">
+                      {currentCategory.description[language] || currentCategory.description.en}
+                    </p>
+                  )}
+                  <div className="mt-4 text-sm opacity-75">
+                    {currentCategory.productCount} {language === 'bn' ? 'পণ্য উপলব্ধ' : 'products available'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Search and Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
