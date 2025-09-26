@@ -666,7 +666,7 @@ const NewNavbar: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden border-t border-gray-200 dark:border-gray-700"
+              className="lg:hidden border-t border-gray-200 dark:border-gray-700 relative z-40"
             >
               <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4">
                 {/* Mobile Header with Logo and Cart/Wishlist */}
@@ -695,7 +695,10 @@ const NewNavbar: React.FC = () => {
                     <div key={item.id}>
                       <button type="button"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => handleMenuClick(item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMenuClick(item);
+                        }}
                         className={`flex items-center justify-between w-full space-x-2 transition-colors p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
                           isMenuItemActive(item)
                             ? 'text-orange-600 font-semibold bg-orange-50 dark:bg-orange-900/20'
@@ -736,7 +739,7 @@ const NewNavbar: React.FC = () => {
       {/* Click outside to close menus */}
       {(isMobileMenuOpen || isUserMenuOpen || isProductsMenuOpen) && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-30"
           onClick={() => {
             setIsMobileMenuOpen(false);
             setIsUserMenuOpen(false);

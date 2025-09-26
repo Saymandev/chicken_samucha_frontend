@@ -86,26 +86,12 @@ const FlashSaleFormModal: React.FC<FlashSaleFormModalProps> = ({
       fetchProducts();
       
       if (editingFlashSale) {
-        // Convert UTC times back to local datetime-local format
-        const startDate = new Date(editingFlashSale.startTime);
-        const endDate = new Date(editingFlashSale.endTime);
-        
-        // Format for datetime-local input (YYYY-MM-DDTHH:mm)
-        const formatForDateTimeLocal = (date: Date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          return `${year}-${month}-${day}T${hours}:${minutes}`;
-        };
-        
         // Populate form with existing data
         setFormData({
           title: editingFlashSale.title,
           description: editingFlashSale.description,
-          startTime: formatForDateTimeLocal(startDate),
-          endTime: formatForDateTimeLocal(endDate),
+          startTime: new Date(editingFlashSale.startTime).toISOString().slice(0, 16),
+          endTime: new Date(editingFlashSale.endTime).toISOString().slice(0, 16),
           discountType: editingFlashSale.discountType,
           discountValue: editingFlashSale.discountValue,
           maxDiscountAmount: editingFlashSale.maxDiscountAmount,
@@ -148,14 +134,8 @@ const FlashSaleFormModal: React.FC<FlashSaleFormModalProps> = ({
     try {
       setLoading(true);
       
-      // Convert local datetime-local values to proper ISO strings
-      const startTimeISO = new Date(formData.startTime).toISOString();
-      const endTimeISO = new Date(formData.endTime).toISOString();
-      
       const submitData = {
         ...formData,
-        startTime: startTimeISO,
-        endTime: endTimeISO,
         products: Array.from(selectedProducts).map(productId => ({
           productId,
           stockLimit: productStockLimits[productId] || undefined
