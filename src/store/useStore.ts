@@ -25,6 +25,7 @@ export interface User {
 
 export interface Product {
   id: string;
+  _id?: string; // MongoDB ID field
   name: {
     en: string;
     bn: string;
