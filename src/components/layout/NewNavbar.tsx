@@ -1,25 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronDown,
-  Facebook,
   Globe,
   Heart,
-  Instagram,
-  Linkedin,
   LogOut,
-  Mail,
   Menu,
   Moon,
   Package,
-  Phone,
   Search,
   Settings,
   ShoppingCart,
   Sun,
-  Twitter,
   User,
-  X,
-  Youtube
+  X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -277,56 +270,9 @@ const NewNavbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Header Bar - Hidden on mobile and tablet */}
-      <div className="hidden md:block bg-orange-600 text-white py-2 text-xs sm:text-sm">
-        <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-            {/* Left Side - Logo and Contact Info */}
-            <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-6">
-              {/* Small Logo */}
-              
-              <div className="flex items-center space-x-2">
-                <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">support@pickplace.com.bd</span>
-                <span className="xs:hidden">support@pickplace.com.bd</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Hotline: 01879 222 444</span>
-                <span className="sm:hidden">01879 222 444</span>
-              </div>
-            </div>
-            
-            {/* Right Side - Social Links */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <Link to="/contact" className="hover:text-orange-200 transition-colors text-xs sm:text-sm">
-                <span className="hidden sm:inline">Contact Us</span>
-                <span className="sm:hidden">Contact</span>
-              </Link>
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors p-1">
-                  <Facebook className="w-3 h-3 sm:w-4 sm:h-4" />
-                </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors p-1">
-                  <Youtube className="w-3 h-3 sm:w-4 sm:h-4" />
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors p-1">
-                  <Twitter className="w-3 h-3 sm:w-4 sm:h-4" />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors p-1">
-                  <Instagram className="w-3 h-3 sm:w-4 sm:h-4" />
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-orange-200 transition-colors p-1">
-                  <Linkedin className="w-3 h-3 sm:w-4 sm:h-4" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    
       {/* Main Header */}
-      <div className="bg-orange-600 text-white py-4 sm:py-6">
+      <div className="bg-orange-600 text-white sm:pb-6 pb-4">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0">
             {/* Logo - Hidden on mobile and tablet */}

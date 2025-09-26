@@ -315,8 +315,8 @@ const HomePage: React.FC = () => {
                 icon: '✨',
                 title: language === 'bn' ? 'প্রিমিয়াম কোয়ালিটি' : 'Premium Quality',
                 description: language === 'bn' 
-                  ? 'শুধুমাত্র সেরা ব্র্যান্ডের প্রিমিয়াম বিউটি প্রোডাক্ট'
-                  : 'Only the finest premium beauty products from top brands'
+                  ? 'শুধুমাত্র সেরা ব্র্যান্ডের প্রিমিয়াম পণ্য'
+                  : 'Only the finest premium products from top brands'
               },
               {
                 icon: '🚚',
@@ -336,8 +336,8 @@ const HomePage: React.FC = () => {
                 icon: '🛡️',
                 title: language === 'bn' ? 'নিরাপদ পণ্য' : 'Safe Products',
                 description: language === 'bn'
-                  ? 'সব পণ্য FDA অনুমোদিত এবং ত্বকের জন্য নিরাপদ'
-                  : 'All products are FDA approved and safe for your skin'
+                  ? 'সব পণ্য গুণগত মান নিশ্চিত এবং নিরাপদ'
+                  : 'All products are quality assured and safe to use'
               },
               {
                 icon: '🎁',
@@ -438,19 +438,19 @@ const HomePage: React.FC = () => {
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn' 
-                ? 'আজই অর্ডার করুন এবং সুন্দর হয়ে উঠুন!'
-                : 'Order Today and Discover Your Beauty!'
+                ? 'আজই অর্ডার করুন এবং সেরা পণ্য পাবেন!'
+                : 'Order Today and Get the Best Products!'
               }
             </h2>
             <p className={`text-xl text-white opacity-90 mb-8 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
               {language === 'bn'
-                ? `বাংলাদেশ জুড়ে দ্রুত ডেলিভারি সহ প্রিমিয়াম বিউটি প্রোডাক্ট আবিষ্কার করুন। ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'} টাকার উপরে ফ্রি শিপিং!`
-                : `Discover premium beauty products with fast delivery across Bangladesh. Free shipping on orders above ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'}!`
+                ? `বাংলাদেশ জুড়ে দ্রুত ডেলিভারি সহ বিভিন্ন ধরনের প্রিমিয়াম পণ্য আবিষ্কার করুন। ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'} টাকার উপরে ফ্রি শিপিং!`
+                : `Discover various premium products with fast delivery across Bangladesh. Free shipping on orders above ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'}!`
               }
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center ">
               <Link
                 to="/products"
                 className="bg-white text-primary-600 hover:bg-gray-100 font-medium py-3 px-8 rounded-lg transition-colors text-lg hover:scale-105 transform duration-200"
