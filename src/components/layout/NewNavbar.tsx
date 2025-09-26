@@ -259,6 +259,7 @@ const NewNavbar: React.FC = () => {
   // Time-based greeting helper with more meaningful messages
   // Flash Sale Countdown (dynamic)
   const [timeLeft, setTimeLeft] = useState({
+    days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0
@@ -276,8 +277,13 @@ const NewNavbar: React.FC = () => {
       const distance = endTime - now;
 
       if (distance > 0) {
+        const totalHours = Math.floor(distance / (1000 * 60 * 60));
+        const days = Math.floor(totalHours / 24);
+        const hours = totalHours % 24;
+        
         setTimeLeft({
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          days: days,
+          hours: hours,
           minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((distance % (1000 * 60)) / 1000)
         });
@@ -345,6 +351,11 @@ const NewNavbar: React.FC = () => {
                 {language === 'bn' ? 'শেষ হবে:' : 'ENDS IN:'}
               </span>
               <div className="flex items-center space-x-1">
+                {timeLeft.days > 0 && (
+                  <div className="bg-white/20 px-2 py-1 rounded text-xs font-bold">
+                    {timeLeft.days}d
+                  </div>
+                )}
                 <div className="bg-white/20 px-2 py-1 rounded text-xs font-bold">
                   {String(timeLeft.hours).padStart(2, '0')}h
                 </div>
