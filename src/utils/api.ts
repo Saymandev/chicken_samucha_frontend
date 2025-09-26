@@ -304,9 +304,23 @@ export const notificationAPI = {
 };
 
 // Admin APIs
+// Flash Sales API
+export const flashSaleAPI = {
+  getCurrentFlashSales: () => api.get('/flash-sales/current'),
+  getUpcomingFlashSales: () => api.get('/flash-sales/upcoming'),
+  getFlashSaleById: (id: string) => api.get(`/flash-sales/${id}`),
+};
+
 export const adminAPI = {
   // Dashboard statistics
   getDashboardStats: () => api.get('/admin/dashboard/stats'),
+  
+  // Flash Sales Management
+  getAllFlashSales: (params?: any) => api.get('/flash-sales', { params }),
+  createFlashSale: (data: any) => api.post('/flash-sales', data),
+  updateFlashSale: (id: string, data: any) => api.put(`/flash-sales/${id}`, data),
+  deleteFlashSale: (id: string) => api.delete(`/flash-sales/${id}`),
+  toggleFlashSaleStatus: (id: string) => api.patch(`/flash-sales/${id}/toggle`),
   
   // Product management
   getAllProducts: (params?: any) => api.get('/admin/products', { params }),

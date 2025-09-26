@@ -20,6 +20,7 @@ import ChatPage from './pages/ChatPage';
 import ContactUsPage from './pages/ContactUsPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import FAQPage from './pages/FAQPage';
+import FlashSalesPage from './pages/FlashSalesPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -50,6 +51,7 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminChat from './pages/admin/AdminChat';
 import AdminContent from './pages/admin/AdminContent';
 import AdminCoupons from './pages/admin/AdminCoupons';
+import AdminFlashSales from './pages/admin/AdminFlashSales';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminPromotions from './pages/admin/AdminPromotions';
@@ -133,6 +135,7 @@ function AppContent() {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route path="/flash-sales" element={<FlashSalesPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
@@ -260,6 +263,16 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <AdminCoupons />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/flash-sales"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminFlashSales />
                 </AdminLayout>
               </ProtectedRoute>
             }

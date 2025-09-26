@@ -21,7 +21,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useNavigationMenu } from '../../hooks/useNavigationMenu';
 import { useStore } from '../../store/useStore';
-import { categoriesAPI } from '../../utils/api';
+import { categoriesAPI, flashSaleAPI } from '../../utils/api';
 import PickplaceLogo from '../common/PickplaceLogo';
 import { Skeleton } from '../common/Skeleton';
 import UserNotificationDropdown from '../UserNotificationDropdown';
@@ -66,6 +66,8 @@ const NewNavbar: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [flashSales, setFlashSales] = useState<any[]>([]);
+  const [loadingFlashSales, setLoadingFlashSales] = useState(true);
 
 
   useEffect(() => {
@@ -76,6 +78,7 @@ const NewNavbar: React.FC = () => {
 
   useEffect(() => {
     fetchCategories();
+    fetchFlashSales();
   }, []);
 
   // Debug menu items
@@ -124,6 +127,20 @@ const NewNavbar: React.FC = () => {
       console.error('Fetch categories error:', error);
     } finally {
       setLoadingCategories(false);
+    }
+  };
+
+  const fetchFlashSales = async () => {
+    try {
+      setLoadingFlashSales(true);
+      const response = await flashSaleAPI.getCurrentFlashSales();
+      if (response.data.success) {
+        setFlashSales(response.data.flashSales || []);
+      }
+    } catch (error) {
+      console.error('Fetch flash sales error:', error);
+    } finally {
+      setLoadingFlashSales(false);
     }
   };
 
@@ -240,6 +257,42 @@ const NewNavbar: React.FC = () => {
   };
 
   // Time-based greeting helper with more meaningful messages
+  // Flash Sale Countdown (dynamic)
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    if (flashSales.length === 0) return;
+
+    const updateCountdown = () => {
+      const activeSale = flashSales[0]; // Get the first active flash sale
+      if (!activeSale?.endTime) return;
+
+      const now = new Date().getTime();
+      const endTime = new Date(activeSale.endTime).getTime();
+      const distance = endTime - now;
+
+      if (distance > 0) {
+        setTimeLeft({
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000)
+        });
+      } else {
+        // Flash sale ended, refresh the list
+        fetchFlashSales();
+      }
+    };
+
+    updateCountdown(); // Initial call
+    const timer = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(timer);
+  }, [flashSales]);
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     const greetings = {
@@ -316,6 +369,43 @@ const NewNavbar: React.FC = () => {
 
   return (
     <>
+      {/* Flash Sale Banner - Only show when there's an active flash sale */}
+      {!loadingFlashSales && flashSales.length > 0 && (
+        <div 
+          className="text-white py-2 text-center text-sm"
+          style={{ 
+            background: flashSales[0].backgroundColor || 'linear-gradient(to right, #dc2626, #db2777)' 
+          }}
+        >
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-4 px-4">
+            <span className="font-semibold">
+              🔥 {language === 'bn' ? flashSales[0].title.bn : flashSales[0].title.en}
+            </span>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-medium">
+                {language === 'bn' ? 'শেষ হবে:' : 'ENDS IN:'}
+              </span>
+              <div className="flex items-center space-x-1">
+                <div className="bg-white/20 px-2 py-1 rounded text-xs font-bold">
+                  {String(timeLeft.hours).padStart(2, '0')}h
+                </div>
+                <div className="bg-white/20 px-2 py-1 rounded text-xs font-bold">
+                  {String(timeLeft.minutes).padStart(2, '0')}m
+                </div>
+                <div className="bg-white/20 px-2 py-1 rounded text-xs font-bold">
+                  {String(timeLeft.seconds).padStart(2, '0')}s
+                </div>
+              </div>
+            </div>
+            <Link 
+              to="/flash-sales" 
+              className="font-semibold hover:underline cursor-pointer"
+            >
+              ⚡ {language === 'bn' ? 'এখনই কিনুন!' : 'SHOP NOW!'}
+            </Link>
+          </div>
+        </div>
+      )}
     
       {/* Main Header */}
       <div className="bg-orange-600 text-white py-3">
@@ -630,7 +720,7 @@ const NewNavbar: React.FC = () => {
                   >
                     <div className="flex flex-col items-start">
                       <PickplaceLogo size="md" variant={
-                        theme === 'light' ? 'default' : 'black'
+                        theme === 'light' ? 'black' : 'default'
                       } />
                       <span className="mt-1 dark:text-white text-black text-sm">www.pickplace.com.bd</span>
                     </div>

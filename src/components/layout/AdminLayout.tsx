@@ -17,7 +17,8 @@ import {
   Sun,
   TicketPercent,
   Users,
-  X
+  X,
+  Zap
 } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -113,6 +114,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       path: '/admin/coupons'
     },
     {
+      id: 'flash-sales',
+      label: 'Flash Sales',
+      icon: <Zap className="w-5 h-5" />,
+      path: '/admin/flash-sales'
+    },
+    {
       id: 'promotions',
       label: 'Promotions',
       icon: <Star className="w-5 h-5" />,
@@ -170,7 +177,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* Logo & Brand */}
       <div className="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <PickplaceLogo size="md" variant={
-          theme === 'light' ? 'default' : 'black'
+          theme === 'light' ? 'black' : 'default'
         } />
         
         {/* Mobile Close Button */}

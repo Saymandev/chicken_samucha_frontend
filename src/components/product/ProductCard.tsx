@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { useFlashSalePrice } from '../../hooks/useFlashSalePrice';
 import { Product, useStore } from '../../store/useStore';
 import { productsAPI } from '../../utils/api';
 
@@ -26,6 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { language, addToCart, cart } = useStore();
   const { openCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const flashSalePrice = useFlashSalePrice(product._id || product.id);
   // Safe defaults for min/max to ensure quick actions always work
   const minOrderQty = product.minOrderQuantity || 1;
   const maxOrderQty = product.maxOrderQuantity || 9999;
@@ -168,8 +170,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
-  const currentPrice = product.discountPrice || product.price;
-  const hasDiscount = !!product.discountPrice;
+  // Flash sale price takes priority over regular discount
+  const currentPrice = flashSalePrice?.isOnFlashSale 
+    ? flashSalePrice.flashSalePrice 
+    : (product.discountPrice || product.price);
+  const originalPrice = flashSalePrice?.isOnFlashSale 
+    ? flashSalePrice.originalPrice 
+    : product.price;
+  const hasDiscount = flashSalePrice?.isOnFlashSale || !!product.discountPrice;
+  const isFlashSale = flashSalePrice?.isOnFlashSale || false;
+  const flashSaleStock = flashSalePrice?.remainingStock;
 
   // Horizontal layout for list view (like the image)
   if (viewMode === 'list' && !compact) {
@@ -192,9 +202,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
               
               {/* Badges */}
               <div className="absolute top-1 left-1 flex flex-col gap-1">
+                {isFlashSale && (
+                  <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px] animate-pulse">
+                    ⚡ FLASH SALE
+                  </span>
+                )}
                 {hasDiscount && (
                   <span className="bg-red-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px]">
-                    {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
+                    {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}% OFF
                   </span>
                 )}
                 {typeof totalSold === 'number' && totalSold >= 50 && (
@@ -241,9 +256,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     ৳{currentPrice}
                   </span>
                   {hasDiscount && (
-                    <span className="text-gray-500 line-through text-sm">
-                      ৳{product.price}
-                    </span>
+                  <span className="text-gray-500 line-through text-sm">
+                      ৳{originalPrice}
+                  </span>
                   )}
                 </div>
 
@@ -350,9 +365,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           
           {/* Badges */}
           <div className={`absolute top-2 left-2 flex flex-col ${compact ? 'gap-1' : 'gap-2'}`}>
+            {isFlashSale && (
+              <span className={`bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold px-2 py-1 rounded-full animate-pulse ${compact ? 'text-[10px]' : 'text-xs'}`}>
+                ⚡ FLASH
+              </span>
+            )}
             {hasDiscount && (
               <span className={`bg-red-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
-                {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
+                {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}% OFF
               </span>
             )}
             {typeof totalSold === 'number' && totalSold >= 50 && (
@@ -367,7 +387,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {hasDiscount && (
             <div className={`absolute top-2 right-2`}>
               <span className={`bg-red-500 text-white font-bold px-2 py-1 rounded-full ${compact ? 'text-[10px]' : 'text-xs'}`}>
-                ৳{Math.round(product.price - currentPrice)} DISCOUNT
+                ৳{Math.round(originalPrice - currentPrice)} DISCOUNT
               </span>
             </div>
           )}
@@ -460,10 +480,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </span>
             {hasDiscount && (
               <span className={`text-gray-500 line-through ${compact ? 'text-sm' : 'text-sm'}`}>
-                ৳{product.price}
+                ৳{originalPrice}
               </span>
             )}
           </div>
+
+          {/* Flash Sale Stock Progress */}
+          {isFlashSale && flashSalePrice?.stockLimit && (
+            <div className="mb-2">
+              <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <span>Flash Sale: {flashSalePrice.soldCount} sold</span>
+                <span>{flashSaleStock} left</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
+                <div 
+                  className="bg-gradient-to-r from-red-500 to-pink-500 h-1.5 rounded-full transition-all duration-300"
+                  style={{ width: `${(flashSalePrice.soldCount / flashSalePrice.stockLimit) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
 
           {/* Additional Info: Category, Stock, Sold count */}
           <div className="space-y-1">
