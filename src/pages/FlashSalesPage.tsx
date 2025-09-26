@@ -37,7 +37,7 @@ const FlashSalesPage: React.FC = () => {
   const { language, addToCart } = useStore();
   const [flashSales, setFlashSales] = useState<FlashSale[]>([]);
   const [loading, setLoading] = useState(true);
-  const [timeLeft, setTimeLeft] = useState<{[key: string]: {hours: number; minutes: number; seconds: number}}>({});
+  const [timeLeft, setTimeLeft] = useState<{[key: string]: {days: number; hours: number; minutes: number; seconds: number}}>({});
 
   const fetchFlashSales = useCallback(async () => {
     try {
@@ -63,7 +63,7 @@ const FlashSalesPage: React.FC = () => {
     if (flashSales.length === 0) return;
 
     const updateCountdowns = () => {
-      const newTimeLeft: {[key: string]: {hours: number; minutes: number; seconds: number}} = {};
+      const newTimeLeft: {[key: string]: {days: number; hours: number; minutes: number; seconds: number}} = {};
       
       flashSales.forEach(sale => {
         const now = new Date().getTime();
@@ -71,8 +71,13 @@ const FlashSalesPage: React.FC = () => {
         const distance = endTime - now;
 
         if (distance > 0) {
+          const totalHours = Math.floor(distance / (1000 * 60 * 60));
+          const days = Math.floor(totalHours / 24);
+          const hours = totalHours % 24;
+          
           newTimeLeft[sale.id] = {
-            hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+            days: days,
+            hours: hours,
             minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
             seconds: Math.floor((distance % (1000 * 60)) / 1000)
           };
@@ -213,6 +218,15 @@ const FlashSalesPage: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <Clock className="w-5 h-5" />
                         <div className="flex items-center space-x-1">
+                          {timeLeft[sale.id].days > 0 && (
+                            <>
+                              <div className="bg-white/20 px-3 py-2 rounded-lg text-center min-w-[50px]">
+                                <div className="text-lg font-bold">{timeLeft[sale.id].days}</div>
+                                <div className="text-xs opacity-80">{language === 'bn' ? 'দিন' : 'DAYS'}</div>
+                              </div>
+                              <div className="text-xl">:</div>
+                            </>
+                          )}
                           <div className="bg-white/20 px-3 py-2 rounded-lg text-center min-w-[50px]">
                             <div className="text-lg font-bold">{String(timeLeft[sale.id].hours).padStart(2, '0')}</div>
                             <div className="text-xs opacity-80">{language === 'bn' ? 'ঘণ্টা' : 'HRS'}</div>
