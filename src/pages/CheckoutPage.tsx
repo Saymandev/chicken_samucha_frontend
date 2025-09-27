@@ -558,7 +558,7 @@ const CheckoutPage: React.FC = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <MapPin className="w-6 h-6 text-orange-500" />
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Delivery Method
+                    {t('checkout.deliveryMethod')}
                   </h2>
                 </div>
 
@@ -576,13 +576,13 @@ const CheckoutPage: React.FC = () => {
                       <div className="text-2xl">🏪</div>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          Pickup from Restaurant
+                          {t('checkout.pickupFromRestaurant')}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Collect your order from our location
+                          {t('checkout.pickupDescription')}
                         </p>
                         <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                          Free - No delivery charge
+                          {t('checkout.freeDelivery')}
                         </p>
                       </div>
                     </div>
@@ -601,18 +601,18 @@ const CheckoutPage: React.FC = () => {
                       <div className="text-2xl">🚚</div>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          Home Delivery
+                          {t('checkout.homeDelivery')}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          We'll deliver to your address
+                          {t('checkout.homeDeliveryDescription')}
                         </p>
                         {cartTotal >= freeThreshold ? (
                           <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                            🎉 FREE Delivery (Order ≥ ৳{freeThreshold})
+                            {t('checkout.freeDeliveryThreshold', { amount: freeThreshold })}
                           </p>
                         ) : (
                           <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                            ৳{baseDeliveryCharge} delivery charge
+                            {t('checkout.deliveryChargeAmount', { amount: baseDeliveryCharge })}
                           </p>
                         )}
                       </div>
@@ -627,14 +627,14 @@ const CheckoutPage: React.FC = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <MapPin className="w-6 h-6 text-orange-500" />
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Delivery Address
+                    {t('checkout.address')}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Street Address *
+                      {t('checkout.street')} *
                     </label>
                     <input
                       type="text"
@@ -647,7 +647,7 @@ const CheckoutPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Area *
+                      {t('checkout.area')} *
                     </label>
                     <input
                       type="text"
@@ -660,7 +660,7 @@ const CheckoutPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      City
+                      {t('checkout.city')}
                     </label>
                     <select
                       value={customerInfo.address.city}
@@ -682,7 +682,7 @@ const CheckoutPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      District
+                      {t('checkout.district')}
                     </label>
                     <input
                       type="text"
@@ -749,7 +749,7 @@ const CheckoutPage: React.FC = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <CreditCard className="w-6 h-6 text-orange-500" />
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Payment Method
+                    {t('checkout.paymentMethod')}
                   </h2>
                 </div>
 
@@ -828,7 +828,7 @@ const CheckoutPage: React.FC = () => {
             <div className="lg:col-span-1">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sticky top-8">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                  Order Summary
+                  {t('checkout.orderSummary')}
                 </h2>
 
                 <div className="space-y-4 mb-6">
@@ -852,7 +852,7 @@ const CheckoutPage: React.FC = () => {
                 {/* Coupon Section */}
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-4">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                    Coupon Code
+                    {t('checkout.couponCode')}
                   </h3>
                   
                   {!appliedCoupon ? (
@@ -862,7 +862,7 @@ const CheckoutPage: React.FC = () => {
                           type="text"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                          placeholder="Enter coupon code"
+                          placeholder={t('checkout.couponCode')}
                           className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                           disabled={isValidatingCoupon}
                         />
@@ -871,7 +871,7 @@ const CheckoutPage: React.FC = () => {
                           disabled={isValidatingCoupon || !couponCode.trim()}
                           className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {isValidatingCoupon ? 'Applying...' : 'Apply'}
+                          {isValidatingCoupon ? t('checkout.processing') : t('checkout.applyCoupon')}
                         </button>
                       </div>
                       {couponError && (
@@ -895,7 +895,7 @@ const CheckoutPage: React.FC = () => {
                           onClick={handleRemoveCoupon}
                           className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
                         >
-                          Remove
+                          {t('checkout.removeCoupon')}
                         </button>
                       </div>
                     </div>
@@ -904,7 +904,7 @@ const CheckoutPage: React.FC = () => {
 
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
                   <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                    <span>Subtotal</span>
+                    <span>{t('checkout.subtotal')}</span>
                     <span>৳{cartTotal}</span>
                   </div>
                   {appliedCoupon && (
@@ -914,16 +914,16 @@ const CheckoutPage: React.FC = () => {
                     </div>
                   )}
                   <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                    <span>
-                      {deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery Charge'}
-                    </span>
+                      <span>
+                        {deliveryMethod === 'pickup' ? t('checkout.pickup') : t('checkout.deliveryCharge')}
+                      </span>
                     <span className={deliveryCharge === 0 && deliveryMethod === 'delivery' ? 'text-green-600 dark:text-green-400 font-medium' : ''}>
                       {deliveryMethod === 'pickup' ? 'Free' : 
                        deliveryCharge === 0 ? 'FREE 🎉' : `৳${deliveryCharge}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">
-                    <span>Total</span>
+                    <span>{t('checkout.total')}</span>
                     <span>৳{finalTotal}</span>
                   </div>
                 </div>
@@ -933,7 +933,7 @@ const CheckoutPage: React.FC = () => {
                   disabled={loading}
                   className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                 >
-                  {loading ? 'Placing Order...' : 'Place Order'}
+                  {loading ? t('checkout.processing') : t('checkout.placeOrder')}
                 </button>
 
                 <div className="mt-4 text-center">
