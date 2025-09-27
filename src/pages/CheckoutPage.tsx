@@ -64,7 +64,7 @@ const CheckoutPage: React.FC = () => {
     method: 'sslcommerz'
   });
 
-  const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('delivery');
+  const [deliveryMethod] = useState<'pickup' | 'delivery'>('delivery');
   const [orderNote, setOrderNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false);
@@ -553,76 +553,7 @@ const CheckoutPage: React.FC = () => {
 
               
 
-              {/* Delivery Method Selection */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <MapPin className="w-6 h-6 text-orange-500" />
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {t('checkout.deliveryMethod')}
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setDeliveryMethod('pickup')}
-                    className={`p-4 border-2 rounded-lg transition-all text-left ${
-                      deliveryMethod === 'pickup'
-                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-orange-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl">🏪</div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {t('checkout.pickupFromShop')}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {t('checkout.pickupDescription')}
-                        </p>
-                        <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                          {t('checkout.freeDelivery')}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setDeliveryMethod('delivery')}
-                    className={`p-4 border-2 rounded-lg transition-all text-left ${
-                      deliveryMethod === 'delivery'
-                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-orange-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl">🚚</div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {t('checkout.homeDelivery')}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {t('checkout.homeDeliveryDescription')}
-                        </p>
-                        {cartTotal >= freeThreshold ? (
-                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                            {t('checkout.freeDeliveryThreshold', { amount: freeThreshold })}
-                          </p>
-                        ) : (
-                          <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                            {t('checkout.deliveryChargeAmount', { amount: baseDeliveryCharge })}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Delivery Address */}
-              {deliveryMethod === 'delivery' && (
+               {/* Delivery Address */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <MapPin className="w-6 h-6 text-orange-500" />
@@ -694,7 +625,6 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              )}
 
               {/* Order Note */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
