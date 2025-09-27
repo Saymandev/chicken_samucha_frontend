@@ -109,6 +109,35 @@
       "contactUs": "Contact our support team"
     }
   },
+  "checkout": {
+    "title": "Checkout",
+    "customerInfo": "Customer Information",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "address": "Delivery Address",
+    "street": "Street Address",
+    "area": "Area",
+    "city": "City",
+    "district": "District",
+    "postalCode": "Postal Code",
+    "orderNote": "Order Note",
+    "orderNotePlaceholder": "Any special instructions for your order...",
+    "deliveryMethod": "Delivery Method",
+    "pickup": "Pickup",
+    "delivery": "Delivery",
+    "paymentMethod": "Payment Method",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "deliveryCharge": "Delivery Charge",
+    "discount": "Discount",
+    "total": "Total",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "couponCode": "Coupon Code",
+    "applyCoupon": "Apply",
+    "removeCoupon": "Remove"
+  },
   "products": {
     "title": "Our Products",
     "featured": "Featured Products",
@@ -126,7 +155,11 @@
     "category": "Category",
     "priceRange": "Price Range",
     "clearFilters": "Clear Filters",
-    "noResults": "No Products Found"
+    "noResults": "No Products Found",
+    "inStock": "In Stock",
+    "stock": "Stock",
+    "sold": "Sold",
+    "onlyLeft": "Only {{count}} left in stock"
   },
   "productDetail": {
     "back": "Back",
@@ -172,24 +205,7 @@
     "remove": "Remove",
     "update": "Update"
   },
-  "checkout": {
-    "title": "Checkout",
-    "customerInfo": "Customer Information",
-    "deliveryAddress": "Delivery Address",
-    "paymentMethod": "Payment Method",
-    "orderSummary": "Order Summary",
-    "placeOrder": "Place Order",
-    "name": "Full Name",
-    "phone": "Phone Number",
-    "email": "Email (Optional)",
-    "street": "Street Address",
-    "area": "Area",
-    "city": "City",
-    "district": "District",
-    "postalCode": "Postal Code (Optional)",
-    "paymentInstructions": "Payment Instructions",
-    "uploadScreenshot": "Upload Payment Screenshot"
-  },
+  
   "orders": {
     "title": "My Orders",
     "orderNumber": "Order Number",

@@ -515,7 +515,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             
             {/* Stock Status */}
             <div className="flex items-center gap-1 text-xs">
-              <span className="text-gray-500 dark:text-gray-400">Stock:</span>
+              <span className="text-gray-500 dark:text-gray-400">{t('products.stock')}:</span>
               <span className={`font-medium ${
                 inStock 
                   ? 'text-green-600 dark:text-green-400' 
@@ -523,16 +523,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
               }`}>
                 {inStock 
                   ? (typeof product.stock === 'number' && product.stock >= 0 
-                      ? `${product.stock} available` 
-                      : 'In Stock')
-                  : 'Out of Stock'
+                      ? `${product.stock} ${t('products.available')}` 
+                      : t('products.inStock'))
+                  : t('products.outOfStock')
                 }
               </span>
             </div>
 
             {/* Sold count */}
             <div className="flex items-center gap-1 text-xs">
-              <span className="text-gray-500 dark:text-gray-400">Sold:</span>
+              <span className="text-gray-500 dark:text-gray-400">{t('products.sold')}:</span>
               <span className="font-medium text-gray-700 dark:text-gray-300">
                 {(product as any).analytics?.purchaseCount || 0}
               </span>
@@ -623,10 +623,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Stock Info */}
           {inStock && typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5 && (
             <p className="text-xs text-orange-600 text-center">
-              {language === 'bn' 
-                ? `শুধু ${product.stock}টি অবশিষ্ট`
-                : `Only ${product.stock} left in stock`
-              }
+              {t('products.onlyLeft', { count: product.stock })}
             </p>
           )}
         </div>

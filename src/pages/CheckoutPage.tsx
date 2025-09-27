@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
 import {
-  CreditCard,
-  MapPin,
-  Phone,
-  ShoppingCart,
-  User
+    CreditCard,
+    MapPin,
+    Phone,
+    ShoppingCart,
+    User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { contentAPI, couponAPI, ordersAPI, paymentsAPI, productsAPI } from '../utils/api';
@@ -43,6 +44,7 @@ interface AppliedCoupon {
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { cart, cartTotal, clearCart, user, language } = useStore();
   
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
@@ -63,6 +65,7 @@ const CheckoutPage: React.FC = () => {
   });
 
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('delivery');
+  const [orderNote, setOrderNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState<any>(null);
@@ -412,6 +415,11 @@ const CheckoutPage: React.FC = () => {
       }
       formData.append('deliveryInfo[phone]', customerInfo.phone);
       formData.append('deliveryInfo[deliveryCharge]', deliveryCharge.toString());
+      
+      // Add order note if provided
+      if (orderNote.trim()) {
+        formData.append('notes', orderNote.trim());
+      }
       
       // Payment screenshot not needed for SSLCommerz or COD
 
