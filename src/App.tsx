@@ -66,6 +66,7 @@ import NavigationMenuPage from './pages/admin/NavigationMenuPage';
 import FloatingChatButton from './components/common/FloatingChatButton';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ScrollToTop from './components/common/ScrollToTop';
 import ShoppingCartSidebar from './components/common/ShoppingCartSidebar';
 import PromotionModal from './components/promotion/PromotionModal';
 
@@ -424,6 +425,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <CartProvider>
         <WishlistProvider>
           <AppContent />
