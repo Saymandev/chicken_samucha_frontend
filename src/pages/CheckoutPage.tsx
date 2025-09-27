@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import {
-    CreditCard,
-    MapPin,
-    Phone,
-    ShoppingCart,
-    User
+  CreditCard,
+  MapPin,
+  Phone,
+  ShoppingCart,
+  User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -494,7 +494,7 @@ const CheckoutPage: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-            Checkout
+            {t('checkout.title')}
           </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -505,27 +505,27 @@ const CheckoutPage: React.FC = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <User className="w-6 h-6 text-orange-500" />
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Customer Information
+                    {t('checkout.customerInfo')}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Full Name *
+                      {t('checkout.name')} *
                     </label>
                     <input
                       type="text"
                       value={customerInfo.name}
                       onChange={(e) => handleCustomerInfoChange('name', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                      placeholder="Enter your full name"
+                      placeholder={t('checkout.name')}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Phone Number *
+                      {t('checkout.phone')} *
                     </label>
                     <input
                       type="tel"
@@ -538,7 +538,7 @@ const CheckoutPage: React.FC = () => {
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email (Optional)
+                      {t('checkout.email')} (Optional)
                     </label>
                     <input
                       type="email"
@@ -695,6 +695,30 @@ const CheckoutPage: React.FC = () => {
                 </div>
               </div>
               )}
+
+              {/* Order Note */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <User className="w-6 h-6 text-orange-500" />
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {t('checkout.orderNote')}
+                  </h2>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('checkout.orderNote')}
+                  </label>
+                  <textarea
+                    value={orderNote}
+                    onChange={(e) => setOrderNote(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    placeholder={t('checkout.orderNotePlaceholder')}
+                    rows={3}
+                  />
+                </div>
+              </div>
+
               {/* Delivery Zones (place-based) - Only show when delivery has charges */}
               {deliveryMethod === 'delivery' && Array.isArray(deliverySettings?.zones) && (deliverySettings!.zones.length > 0) && cartTotal < freeThreshold && (
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
