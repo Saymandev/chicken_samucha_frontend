@@ -170,7 +170,7 @@
     "inStock": "স্টকে আছে",
     "stock": "স্টক",
     "sold": "বিক্রি",
-    "available": "উপলব্ধ",
+    "available": "স্টক",
     "onlyLeft": "শুধু {{count}}টি অবশিষ্ট"
   },
   "productDetail": {
