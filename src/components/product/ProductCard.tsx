@@ -51,8 +51,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   // Determine stock availability robustly (API may omit stock on some lists)
-  const inStock = (product as any).isAvailable !== false && (
-    (product as any).stock == null ? true : (product as any).stock > 0
+  const inStock = product.isAvailable !== false && (
+    product.stock == null ? true : product.stock > 0
   );
   const totalSold: number | undefined = (product as any).analytics?.purchaseCount;
   
@@ -521,7 +521,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   ? 'text-green-600 dark:text-green-400' 
                   : 'text-red-600 dark:text-red-400'
               }`}>
-                {inStock ? `${product.stock} available` : 'Out of Stock'}
+                {inStock 
+                  ? (typeof product.stock === 'number' && product.stock >= 0 
+                      ? `${product.stock} available` 
+                      : 'In Stock')
+                  : 'Out of Stock'
+                }
               </span>
             </div>
 
@@ -616,11 +621,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </motion.button>
 
           {/* Stock Info */}
-          {inStock && typeof (product as any).stock === 'number' && (product as any).stock <= 5 && (
+          {inStock && typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5 && (
             <p className="text-xs text-orange-600 text-center">
               {language === 'bn' 
-                ? `শুধু ${(product as any).stock}টি অবশিষ্ট`
-                : `Only ${(product as any).stock} left in stock`
+                ? `শুধু ${product.stock}টি অবশিষ্ট`
+                : `Only ${product.stock} left in stock`
               }
             </p>
           )}

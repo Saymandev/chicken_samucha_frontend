@@ -453,7 +453,12 @@ const ProductDetailPage: React.FC = () => {
                 <div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">Stock</span>
                   <p className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
+                    {product.stock > 0 
+                      ? (typeof product.stock === 'number' && product.stock >= 0 
+                          ? `${product.stock} available` 
+                          : 'In Stock')
+                      : 'Out of stock'
+                    }
                   </p>
                 </div>
               </div>
