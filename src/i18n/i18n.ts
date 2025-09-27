@@ -28,8 +28,9 @@ i18n
     },
     
     detection: {
-      order: ['localStorage', 'cookie', 'htmlTag', 'path', 'subdomain'],
-      caches: ['localStorage', 'cookie']
+      order: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng',
+      caches: ['localStorage']
     }
   });
 

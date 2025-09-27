@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import io, { Socket } from 'socket.io-client';
 import './index.css';
@@ -79,9 +80,10 @@ import { usePromotions } from './hooks/usePromotions';
 
 // Component to handle layout based on route
 function AppContent() {
-  const { theme, user } = useStore();
+  const { theme, user, language, setLanguage } = useStore();
   const { isCartOpen, closeCart } = useCart();
   const location = useLocation();
+  const { i18n } = useTranslation();
   
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -89,6 +91,27 @@ function AppContent() {
   // Promotion modal logic (only for non-admin routes)
   const { currentPromotion, closePromotion, handlePromotionClick } = usePromotions();
   
+  // Synchronize language between Zustand store and react-i18next
+  useEffect(() => {
+    if (language && i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language, i18n]);
+
+  // Listen for i18n language changes and update Zustand store
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      if (lng !== language && (lng === 'en' || lng === 'bn')) {
+        setLanguage(lng as 'en' | 'bn');
+      }
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [language, setLanguage, i18n]);
 
   // Socket connection for real-time notifications
   useEffect(() => {
