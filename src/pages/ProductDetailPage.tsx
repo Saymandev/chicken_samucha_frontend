@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
+import { useWishlist } from '../contexts/WishlistContext';
 import { useStore } from '../store/useStore';
 import { productsAPI, reviewsAPI } from '../utils/api';
 
@@ -59,6 +60,7 @@ const ProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
   // const { t } = useTranslation(); // Unused variable
   const { language, addToCart } = useStore();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   // Extract YouTube video ID from URL
   const getYouTubeVideoId = (url: string): string | null => {
@@ -76,7 +78,7 @@ const ProductDetailPage: React.FC = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [relatedLoading, setRelatedLoading] = useState(false);
- 
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   useEffect(() => {
@@ -280,8 +282,8 @@ const ProductDetailPage: React.FC = () => {
   const currentPrice = product.discountPrice || product.price;
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
 
-  // Truncate description to 120 words
-  const truncateDescription = (text: string, maxWords: number = 120) => {
+  // Truncate description to 60 words
+  const truncateDescription = (text: string, maxWords: number = 60) => {
     const words = text.trim().split(/\s+/);
     if (words.length <= maxWords) return text;
     return words.slice(0, maxWords).join(' ') + '...';
@@ -290,6 +292,31 @@ const ProductDetailPage: React.FC = () => {
   const getDescription = () => {
     const desc = language === 'bn' ? product.description.bn : product.description.en;
     return showFullDescription ? desc : truncateDescription(desc);
+  };
+
+  const handleWishlistToggle = async () => {
+    if (isWishlistLoading || !product) return;
+    
+    const productId = product.id || (product as any)._id;
+    if (!productId) {
+      console.error('Product ID is undefined');
+      return;
+    }
+    
+    setIsWishlistLoading(true);
+    try {
+      if (isInWishlist(productId)) {
+        await removeFromWishlist(productId);
+        toast.success(language === 'bn' ? 'পছন্দের তালিকা থেকে সরানো হয়েছে' : 'Removed from wishlist');
+      } else {
+        await addToWishlist(productId);
+        toast.success(language === 'bn' ? 'পছন্দের তালিকায় যোগ করা হয়েছে' : 'Added to wishlist');
+      }
+    } catch (error) {
+      toast.error(language === 'bn' ? 'কিছু ভুল হয়েছে' : 'Something went wrong');
+    } finally {
+      setIsWishlistLoading(false);
+    }
   };
 
   return (
@@ -428,10 +455,10 @@ const ProductDetailPage: React.FC = () => {
                 {(() => {
                   const desc = language === 'bn' ? product.description.bn : product.description.en;
                   const wordCount = desc.trim().split(/\s+/).length;
-                  return wordCount > 120 && (
+                  return wordCount > 60 && (
                     <button
                       onClick={() => setShowFullDescription(!showFullDescription)}
-                      className="mt-2 text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
+                      className="mt-2 text-orange-600 hover:text-orange-700 font-medium text-sm transition-colors"
                     >
                       {showFullDescription 
                         ? (language === 'bn' ? 'কম দেখান' : 'Show Less')
@@ -502,8 +529,18 @@ const ProductDetailPage: React.FC = () => {
                   <ShoppingCart className="w-5 h-5" />
                   {isAddingToCart ? 'Adding...' : 'Add to Cart'}
                 </button>
-                <button className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
-                  <Heart className="w-5 h-5" />
+                <button 
+                  onClick={handleWishlistToggle}
+                  disabled={isWishlistLoading}
+                  className={`p-3 border rounded-lg transition-colors ${
+                    isInWishlist(product.id || (product as any)._id)
+                      ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+                      : 'border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700'
+                  } ${isWishlistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <Heart className={`w-5 h-5 ${
+                    isInWishlist(product.id || (product as any)._id) ? 'fill-current' : ''
+                  }`} />
                 </button>
               </div>
 
