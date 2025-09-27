@@ -12,22 +12,17 @@ const PaymentFailPage: React.FC = () => {
   const { language } = useStore();
   
   const [orderNumber, setOrderNumber] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const order = searchParams.get('order');
-    const statusParam = searchParams.get('status');
     const reasonParam = searchParams.get('reason');
     
     if (order) {
       setOrderNumber(order);
       // Cleanup any stored checkout payload for this provisional order
       try { localStorage.removeItem(`checkout:${order}`); } catch {}
-    }
-    if (statusParam) {
-      setStatus(statusParam);
     }
     if (reasonParam) {
       setReason(decodeURIComponent(reasonParam));

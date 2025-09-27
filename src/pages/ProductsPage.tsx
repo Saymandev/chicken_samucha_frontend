@@ -44,7 +44,6 @@ const ProductsPage: React.FC = () => {
 // Categories fetched from API
 const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: { en: string; bn: string } }>>([]);
 const [currentCategory, setCurrentCategory] = useState<any>(null);
-const [loadingCategory, setLoadingCategory] = useState(false);
 
   const sortOptions = [
     { value: 'featured', label: { en: 'Featured', bn: 'বৈশিষ্ট্য' } },
@@ -116,7 +115,6 @@ const [loadingCategory, setLoadingCategory] = useState(false);
     }
     
     try {
-      setLoadingCategory(true);
       const res = await categoriesAPI.getAllCategories({ 
         includeInactive: false, 
         withProductCount: true 
@@ -135,7 +133,7 @@ const [loadingCategory, setLoadingCategory] = useState(false);
       console.error('Error fetching category details:', error);
       setCurrentCategory(null);
     } finally {
-      setLoadingCategory(false);
+      // Category loading completed
     }
   };
 
