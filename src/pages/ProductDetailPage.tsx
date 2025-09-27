@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -58,7 +59,7 @@ interface Review {
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  // const { t } = useTranslation(); // Unused variable
+  const { t } = useTranslation();
   const { language, addToCart } = useStore();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
@@ -209,16 +210,16 @@ const ProductDetailPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Invalid Product
+              {t('productDetail.invalidProduct')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              No product ID provided
+              {t('productDetail.noProductId')}
             </p>
             <button
               onClick={() => navigate('/products')}
               className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
             >
-              Browse Products
+              {t('productDetail.browseProducts')}
             </button>
           </div>
         </div>
@@ -259,19 +260,19 @@ const ProductDetailPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Product Not Found
+              {t('productDetail.productNotFound')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Product ID: {id}
             </p>
             <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
-              The product you're looking for doesn't exist or has been removed.
+              {t('productDetail.productDoesntExist')}
             </p>
             <button
               onClick={() => navigate('/products')}
               className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
             >
-              Browse Products
+              {t('productDetail.browseProducts')}
             </button>
           </div>
         </div>
@@ -282,8 +283,8 @@ const ProductDetailPage: React.FC = () => {
   const currentPrice = product.discountPrice || product.price;
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
 
-  // Truncate description to 60 words
-  const truncateDescription = (text: string, maxWords: number = 60) => {
+  // Truncate description to 20 words
+  const truncateDescription = (text: string, maxWords: number = 20) => {
     const words = text.trim().split(/\s+/);
     if (words.length <= maxWords) return text;
     return words.slice(0, maxWords).join(' ') + '...';
@@ -307,13 +308,13 @@ const ProductDetailPage: React.FC = () => {
     try {
       if (isInWishlist(productId)) {
         await removeFromWishlist(productId);
-        toast.success(language === 'bn' ? 'পছন্দের তালিকা থেকে সরানো হয়েছে' : 'Removed from wishlist');
+        toast.success(t('productDetail.removedFromWishlist'));
       } else {
         await addToWishlist(productId);
-        toast.success(language === 'bn' ? 'পছন্দের তালিকায় যোগ করা হয়েছে' : 'Added to wishlist');
+        toast.success(t('productDetail.addedToWishlist'));
       }
     } catch (error) {
-      toast.error(language === 'bn' ? 'কিছু ভুল হয়েছে' : 'Something went wrong');
+      toast.error(t('productDetail.somethingWentWrong'));
     } finally {
       setIsWishlistLoading(false);
     }
@@ -333,7 +334,7 @@ const ProductDetailPage: React.FC = () => {
             className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back
+            {t('productDetail.back')}
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -447,7 +448,7 @@ const ProductDetailPage: React.FC = () => {
               {/* Description */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Description
+                  {t('productDetail.description')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {getDescription()}
@@ -455,14 +456,14 @@ const ProductDetailPage: React.FC = () => {
                 {(() => {
                   const desc = language === 'bn' ? product.description.bn : product.description.en;
                   const wordCount = desc.trim().split(/\s+/).length;
-                  return wordCount > 60 && (
+                  return wordCount > 20 && (
                     <button
                       onClick={() => setShowFullDescription(!showFullDescription)}
                       className="mt-2 text-orange-600 hover:text-orange-700 font-medium text-sm transition-colors"
                     >
                       {showFullDescription 
-                        ? (language === 'bn' ? 'কম দেখান' : 'Show Less')
-                        : (language === 'bn' ? 'আরো দেখান' : 'Read More')
+                        ? t('productDetail.showLess')
+                        : t('productDetail.readMore')
                       }
                     </button>
                   );
@@ -472,19 +473,19 @@ const ProductDetailPage: React.FC = () => {
               {/* Product Details */}
               <div className="mb-6 grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Category</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('productDetail.category')}</span>
                   <p className="font-medium text-gray-900 dark:text-white">
                     {language === 'bn' ? product.category.name.bn : product.category.name.en}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Stock</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('productDetail.stock')}</span>
                   <p className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {product.stock > 0 
                       ? (typeof product.stock === 'number' && product.stock >= 0 
-                          ? `${product.stock} available` 
-                          : 'In Stock')
-                      : 'Out of stock'
+                          ? `${product.stock} ${t('productDetail.available')}` 
+                          : t('productDetail.inStock'))
+                      : t('productDetail.outOfStock')
                     }
                   </p>
                 </div>
@@ -493,7 +494,7 @@ const ProductDetailPage: React.FC = () => {
               {/* Quantity Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Quantity
+                  {t('productDetail.quantity')}
                 </label>
                 <div className="flex items-center gap-3">
                   <button
@@ -515,7 +516,7 @@ const ProductDetailPage: React.FC = () => {
                   </button>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Min: {product.minOrderQuantity}, Max: {product.maxOrderQuantity}
+                  {t('productDetail.min')}: {product.minOrderQuantity}, {t('productDetail.max')}: {product.maxOrderQuantity}
                 </p>
               </div>
 
@@ -527,7 +528,7 @@ const ProductDetailPage: React.FC = () => {
                   className="flex-1 bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+                  {isAddingToCart ? t('productDetail.adding') : t('productDetail.addToCart')}
                 </button>
                 <button 
                   onClick={handleWishlistToggle}
@@ -548,7 +549,7 @@ const ProductDetailPage: React.FC = () => {
               {!product.isAvailable && (
                 <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <p className="text-red-800 dark:text-red-200 text-sm">
-                    This product is currently unavailable
+                    {t('productDetail.unavailable')}
                   </p>
                 </div>
               )}
@@ -560,7 +561,7 @@ const ProductDetailPage: React.FC = () => {
           {relatedProducts.length > 0 && (
             <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                Related Products
+                {t('productDetail.relatedProducts')}
               </h3>
               
               {relatedLoading ? (
@@ -585,7 +586,7 @@ const ProductDetailPage: React.FC = () => {
           {/* Reviews Section */}
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-              Customer Reviews ({product.ratings.count})
+              {t('productDetail.customerReviews')} ({product.ratings.count})
             </h3>
             
             {reviewsLoading ? (
@@ -620,7 +621,7 @@ const ProductDetailPage: React.FC = () => {
                           </h4>
                           {review.isVerified && (
                             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                              Verified
+                              {t('productDetail.verified')}
                             </span>
                           )}
                         </div>
@@ -651,7 +652,7 @@ const ProductDetailPage: React.FC = () => {
                           <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                                Admin Response
+                                {t('productDetail.adminResponse')}
                               </span>
                               <span className="text-xs text-blue-600 dark:text-blue-400">
                                 {new Date(review.adminResponse.respondedAt).toLocaleDateString()}
@@ -673,7 +674,7 @@ const ProductDetailPage: React.FC = () => {
               <div className="text-center py-8">
                 <Star className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                 <p className="text-gray-500 dark:text-gray-400">
-                  No reviews yet. Be the first to review this product!
+                  {t('productDetail.noReviews')}
                 </p>
               </div>
             )}

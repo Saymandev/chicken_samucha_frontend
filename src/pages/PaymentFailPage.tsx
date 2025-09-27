@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, CreditCard, Home, RefreshCw, XCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 
 const PaymentFailPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const { language } = useStore();
   
   const [orderNumber, setOrderNumber] = useState<string>('');
@@ -66,25 +68,22 @@ const PaymentFailPage: React.FC = () => {
             </motion.div>
             
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              {language === 'bn' ? 'পেমেন্ট ব্যর্থ' : 'Payment Failed'}
+              {t('payment.failed')}
             </h1>
             
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
-              {language === 'bn' 
-                ? 'দুঃখিত, আপনার পেমেন্ট প্রসেস করতে পারিনি' 
-                : 'Sorry, we could not process your payment'
-              }
+              {t('payment.failedMessage')}
             </p>
             
             {orderNumber && (
               <p className="text-lg font-medium text-orange-600 dark:text-orange-400">
-                {language === 'bn' ? 'অর্ডার নম্বর:' : 'Order Number:'} {orderNumber}
+                {t('payment.orderNumber')} {orderNumber}
               </p>
             )}
             
             {reason && (
               <p className="text-sm text-red-600 dark:text-red-400 mt-2">
-                {language === 'bn' ? 'কারণ:' : 'Reason:'} {reason}
+                {t('payment.reason')} {reason}
               </p>
             )}
           </div>
@@ -92,7 +91,7 @@ const PaymentFailPage: React.FC = () => {
           {/* Failure Details */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
-              {language === 'bn' ? 'কী করতে পারেন?' : 'What can you do?'}
+              {t('payment.troubleshooting.title')}
             </h2>
             
             <div className="space-y-6">

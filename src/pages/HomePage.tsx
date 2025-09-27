@@ -7,8 +7,8 @@ import DynamicCategorySections from '../components/common/DynamicCategorySection
 import HeroSlider from '../components/common/HeroSlider';
 import ReviewSlider from '../components/common/ReviewSlider';
 import {
-  GridSkeleton,
-  ProductCardSkeleton
+    GridSkeleton,
+    ProductCardSkeleton
 } from '../components/common/Skeleton';
 import TopCategories from '../components/common/TopCategories';
 import ProductCard from '../components/product/ProductCard';
@@ -171,13 +171,10 @@ const HomePage: React.FC = () => {
             <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
-              {language === 'bn' ? 'শীর্ষ ক্যাটাগরি' : 'Top Categories'}
+              {t('homepage.topCategories')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-              {language === 'bn' 
-                ? 'সবচেয়ে জনপ্রিয় ক্যাটাগরিগুলো দেখুন'
-                : 'Discover our most popular categories'
-              }
+              {t('homepage.topCategoriesDesc')}
             </p>
           </motion.div>
 
@@ -207,10 +204,7 @@ const HomePage: React.FC = () => {
               {t('products.featured')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-              {language === 'bn' 
-                ? 'আমাদের সবচেয়ে জনপ্রিয় এবং স্বাদযুক্ত পণ্যগুলি আবিষ্কার করুন'
-                : 'Discover our most popular and delicious products'
-              }
+              {t('homepage.featuredProductsDesc')}
             </p>
           </motion.div>
 
@@ -252,7 +246,7 @@ const HomePage: React.FC = () => {
               to="/products"
               className="btn-primary text-lg px-8 py-3 hover:scale-105 transition-transform"
             >
-              {language === 'bn' ? 'সব পণ্য দেখুন' : 'View All Products'}
+              {t('homepage.viewAllProducts')}
             </Link>
           </motion.div>
         </div>
@@ -271,7 +265,7 @@ const HomePage: React.FC = () => {
               <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
                 language === 'bn' ? 'font-bengali' : ''
               }`}>
-                {language === 'bn' ? 'সর্বাধিক বিক্রিত' : 'Best Sellers'}
+                {t('homepage.bestSellers')}
               </h2>
             </motion.div>
 
@@ -305,7 +299,7 @@ const HomePage: React.FC = () => {
             <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
-              {language === 'bn' ? 'কেন আমাদের বেছে নিবেন?' : 'Why Choose Us?'}
+              {t('homepage.whyChooseUs')}
             </h2>
           </motion.div>
 
@@ -313,45 +307,33 @@ const HomePage: React.FC = () => {
             {[
               {
                 icon: '✨',
-                title: language === 'bn' ? 'প্রিমিয়াম কোয়ালিটি' : 'Premium Quality',
-                description: language === 'bn' 
-                  ? 'শুধুমাত্র সেরা ব্র্যান্ডের প্রিমিয়াম পণ্য'
-                  : 'Only the finest premium products from top brands'
+                title: t('homepage.features.premiumQuality'),
+                description: t('homepage.features.premiumQualityDesc')
               },
               {
                 icon: '🚚',
-                title: language === 'bn' ? 'দ্রুত ডেলিভারি' : 'Fast Delivery',
-                description: language === 'bn'
-                  ? 'বাংলাদেশের যেকোনো জায়গায় দ্রুত এবং নিরাপদ ডেলিভারি'
-                  : 'Quick and safe delivery anywhere in Bangladesh'
+                title: t('homepage.features.fastDelivery'),
+                description: t('homepage.features.fastDeliveryDesc')
               },
               {
                 icon: '💳',
-                title: language === 'bn' ? 'সহজ পেমেন্ট' : 'Easy Payment',
-                description: language === 'bn'
-                  ? 'বিকাশ, নগদ, রকেট সহ সব ধরনের মোবাইল পেমেন্ট'
-                  : 'All types of mobile payments including bKash, Nagad, Rocket'
+                title: t('homepage.features.easyPayment'),
+                description: t('homepage.features.easyPaymentDesc')
               },
               {
                 icon: '🛡️',
-                title: language === 'bn' ? 'নিরাপদ পণ্য' : 'Safe Products',
-                description: language === 'bn'
-                  ? 'সব পণ্য গুণগত মান নিশ্চিত এবং নিরাপদ'
-                  : 'All products are quality assured and safe to use'
+                title: t('homepage.features.safeProducts'),
+                description: t('homepage.features.safeProductsDesc')
               },
               {
                 icon: '🎁',
-                title: language === 'bn' ? 'বিশেষ অফার' : 'Special Offers',
-                description: language === 'bn'
-                  ? 'নিয়মিত ডিসকাউন্ট এবং বিশেষ প্যাকেজ অফার'
-                  : 'Regular discounts and special package offers'
+                title: t('homepage.features.specialOffers'),
+                description: t('homepage.features.specialOffersDesc')
               },
               {
                 icon: '💬',
-                title: language === 'bn' ? '২৪/৭ সাপোর্ট' : '24/7 Support',
-                description: language === 'bn'
-                  ? 'যেকোনো সময় আমাদের সাথে যোগাযোগ করুন'
-                  : 'Contact us anytime for any assistance'
+                title: t('homepage.features.support24x7'),
+                description: t('homepage.features.support24x7Desc')
               }
             ].map((feature, index) => (
               <motion.div
@@ -394,10 +376,7 @@ const HomePage: React.FC = () => {
               {t('reviews.title')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-              {language === 'bn'
-                ? 'আমাদের সন্তুষ্ট গ্রাহকরা কী বলছেন দেখুন'
-                : 'See what our satisfied customers are saying'
-              }
+              {t('homepage.customerReviewsDesc')}
             </p>
           </motion.div>
 
@@ -437,31 +416,25 @@ const HomePage: React.FC = () => {
             <h2 className={`text-3xl md:text-4xl font-bold text-white mb-6 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
-              {language === 'bn' 
-                ? 'আজই অর্ডার করুন এবং সেরা পণ্য পাবেন!'
-                : 'Order Today and Get the Best Products!'
-              }
+              {t('homepage.ctaTitle')}
             </h2>
             <p className={`text-xl text-white opacity-90 mb-8 ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
-              {language === 'bn'
-                ? `বাংলাদেশ জুড়ে দ্রুত ডেলিভারি সহ বিভিন্ন ধরনের প্রিমিয়াম পণ্য আবিষ্কার করুন। ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'} টাকার উপরে ফ্রি শিপিং!`
-                : `Discover various premium products with fast delivery across Bangladesh. Free shipping on orders above ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'}!`
-              }
+              {t('homepage.ctaDescription')} ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'}!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center ">
               <Link
                 to="/products"
                 className="bg-white text-primary-600 hover:bg-gray-100 font-medium py-3 px-8 rounded-lg transition-colors text-lg hover:scale-105 transform duration-200"
               >
-                {language === 'bn' ? 'এখনই অর্ডার করুন' : 'Order Now'}
+                {t('homepage.orderNow')}
               </Link>
               <Link
                 to="/chat"
                 className="border-2 border-white text-white hover:bg-white hover:text-primary-600 font-medium py-3 px-8 rounded-lg transition-colors text-lg hover:scale-105 transform duration-200"
               >
-                {language === 'bn' ? 'লাইভ চ্যাট' : 'Live Chat'}
+                {t('homepage.liveChat')}
               </Link>
             </div>
           </motion.div>
