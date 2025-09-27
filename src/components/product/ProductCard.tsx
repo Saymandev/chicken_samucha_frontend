@@ -187,7 +187,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <motion.div
         whileHover={{ y: -2, scale: 1.01 }}
         transition={{ duration: 0.3 }}
-        className="group card p-2  hover:shadow-xl transition-all duration-300 h-full min-w-0"
+        className="group card   hover:shadow-xl transition-all duration-300 h-full min-w-0"
       >
         <Link to={`/products/${product.id || (product as any)._id}`} className="block">
           <div className="flex min-h-44">
