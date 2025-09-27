@@ -159,7 +159,8 @@
     "inStock": "In Stock",
     "stock": "Stock",
     "sold": "Sold",
-    "onlyLeft": "Only {{count}} left in stock"
+    "onlyLeft": "Only {{count}} left in stock",
+    "available":"Available"
   },
   "productDetail": {
     "back": "Back",
