@@ -282,7 +282,7 @@ export const usePromotions = () => {
 
   // Socket.IO connection for real-time updates
   useEffect(() => {
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api';
     const newSocket = io(API_BASE_URL, {
       transports: ['websocket', 'polling']
     });

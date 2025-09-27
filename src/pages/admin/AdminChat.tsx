@@ -86,7 +86,7 @@ const AdminChat: React.FC = () => {
 
     useEffect(() => {
     const initializeSocket = () => {
-      const API_BASE_URL = 'https://chicken-samucha-backend.onrender.com/api';
+      const API_BASE_URL = 'https://rest.ourb.live/api';
       const socketURL = API_BASE_URL.replace('/api', '');
       
       socketRef.current = io(socketURL, {

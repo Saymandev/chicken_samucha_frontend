@@ -146,7 +146,7 @@ const OrdersPage: React.FC = () => {
   useEffect(() => {
     if (!user) return;
 
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api';
     const socket = io(API_BASE_URL, {
       transports: ['websocket', 'polling']
     });

@@ -144,7 +144,7 @@ const Navbar: React.FC = () => {
             <span className={`font-bold text-xl text-primary-600  ${
               language === 'bn' ? 'font-bengali' : ''
             }`}>
-              {language === 'bn' ? 'চিকেন সমুচা' : 'Chicken Samosa'}
+              {language === 'bn' ? 'পিকপ্লেস' : 'Pickplace'}
             </span>
           </Link>
 

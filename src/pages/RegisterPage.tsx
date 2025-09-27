@@ -104,7 +104,7 @@ const RegisterPage: React.FC = () => {
       // Update store using login function
       login(user, token);
       
-      toast.success('Registration successful! Welcome to Chicken Samosa!');
+      toast.success('Registration successful! Welcome to Pickplace!');
       
       // Redirect to home
       navigate('/', { replace: true });

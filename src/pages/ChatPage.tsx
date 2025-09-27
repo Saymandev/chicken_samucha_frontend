@@ -172,7 +172,7 @@ const ChatPage: React.FC = () => {
   };
 
   const initializeSocket = (chatId: string) => {
-    const API_BASE_URL =  'https://chicken-samucha-backend.onrender.com/api';
+    const API_BASE_URL =  'https://rest.ourb.live/api';
     const socketURL = API_BASE_URL.replace('/api', '');
     
     

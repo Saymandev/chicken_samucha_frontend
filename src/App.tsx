@@ -118,7 +118,7 @@ function AppContent() {
     let socket: Socket | null = null;
 
     if (user?.id) {
-      const API_BASE_URL = process.env.API_URL || 'https://chicken-samucha-backend.onrender.com/api';
+      const API_BASE_URL = process.env.API_URL || 'https://rest.ourb.live/api';
       const socketURL = API_BASE_URL.replace('/api', '');
       
       socket = io(socketURL, {

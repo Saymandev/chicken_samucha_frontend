@@ -1,16 +1,16 @@
 import { motion } from 'framer-motion';
 import {
-    AlertCircle,
-    Banknote,
-    CheckCircle,
-    Clock,
-    CreditCard,
-    Eye,
-    Gift,
-    RefreshCw,
-    Search,
-    Smartphone,
-    XCircle
+  AlertCircle,
+  Banknote,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Eye,
+  Gift,
+  RefreshCw,
+  Search,
+  Smartphone,
+  XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -103,7 +103,7 @@ const AdminRefunds: React.FC = () => {
 
   // Real-time updates for refund status changes
   useEffect(() => {
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://chicken-samucha-backend.onrender.com';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api';
     const socket = io(API_BASE_URL, {
       transports: ['websocket', 'polling']
     });

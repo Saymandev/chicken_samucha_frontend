@@ -41,9 +41,9 @@
     "adminDashboard": "Admin Dashboard"
   },
   "hero": {
-    "title": "Delicious Chicken Samosa",
-    "subtitle": "Fresh, crispy, and made with love",
-    "description": "Order now and experience the authentic taste of Bangladesh",
+    "title": "Pickplace",
+    "subtitle": "Your trusted online marketplace",
+    "description": "Order now and experience the best products in Bangladesh",
     "orderNow": "Order Now",
     "learnMore": "Learn More"
   },
@@ -801,7 +801,7 @@
     "followUs": "Follow Us",
     "newsletter": "Newsletter",
     "subscribe": "Subscribe",
-    "copyright": "© 2024 Chicken Samosa Business. All rights reserved.",
+    "copyright": "© 2024 Pickplace. All rights reserved.",
     "quickLinks": "Quick Links",
     "customerService": "Customer Service",
     "legal": "Legal",
