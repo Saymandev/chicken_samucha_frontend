@@ -576,7 +576,7 @@ const CheckoutPage: React.FC = () => {
                       <div className="text-2xl">🏪</div>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {t('checkout.pickupFromRestaurant')}
+                          {t('checkout.pickupFromShop')}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {t('checkout.pickupDescription')}

@@ -126,7 +126,7 @@
     "deliveryMethod": "Delivery Method",
     "pickup": "Pickup",
     "delivery": "Delivery",
-    "pickupFromRestaurant": "Pickup from Restaurant",
+    "pickupFromShop": "Pickup from Shop",
     "pickupDescription": "Collect your order from our location",
     "homeDelivery": "Home Delivery",
     "homeDeliveryDescription": "We'll deliver to your address",

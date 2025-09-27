@@ -1,7 +1,6 @@
 import {
   Clock,
   Facebook,
-  Heart,
   Mail,
   MapPin,
   Phone
@@ -165,14 +164,10 @@ const Footer: React.FC = () => {
                 language === 'bn' ? 'font-bengali' : ''
               }`}>
                 {language === 'bn' 
-                  ? `© ${currentYear} চিকেন সমুচা। সব অধিকার সংরক্ষিত।`
-                  : `© ${currentYear} Chicken Samosa. All rights reserved.`
+                  ? `© ${currentYear} পিকপ্লেস। সব অধিকার সংরক্ষিত।`
+                  : `© ${currentYear} Pickplace. All rights reserved.`
                 }
-                <Heart className="w-3 h-3 mx-1 text-red-400" />
-                {language === 'bn' 
-                  ? 'ভালোবাসা দিয়ে তৈরি'
-                  : 'Made with love'
-                }
+                
               </p>
               <p className="text-gray-500 text-xs mt-2">
                 {language === 'bn' 

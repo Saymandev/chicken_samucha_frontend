@@ -227,6 +227,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   </span>
                 </div>
               )}
+
+              {/* Wishlist Button */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const productId = product.id || (product as any)._id;
+                  if (isInWishlist(productId)) {
+                    removeFromWishlist(productId);
+                  } else {
+                    addToWishlist(productId);
+                  }
+                }}
+                className="absolute top-1 right-1 p-1 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <Heart className={`w-3 h-3 ${isInWishlist(product.id || (product as any)._id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+              </button>
             </div>
 
             {/* Product Info - Right Side */}
@@ -278,19 +295,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
                   {/* Stock Status */}
                   <div className="flex items-center gap-1">
-                    <span>Stock:</span>
+                    <span>{t('products.stock')}:</span>
                     <span className={`font-medium ${
                       inStock 
                         ? 'text-green-600 dark:text-green-400' 
                         : 'text-red-600 dark:text-red-400'
                     }`}>
-                      {inStock ? product.stock : 'Out'}
+                      {inStock 
+                        ? (typeof product.stock === 'number' && product.stock >= 0 
+                            ? `${product.stock} ${t('products.available')}` 
+                            : t('products.inStock'))
+                        : t('products.outOfStock')
+                      }
                     </span>
                   </div>
 
                   {/* Sold count */}
                   <div className="flex items-center gap-1">
-                    <span>Sold:</span>
+                    <span>{t('products.sold')}:</span>
                     <span className="font-medium text-gray-700 dark:text-gray-300">
                       {(product as any).analytics?.purchaseCount || 0}
                     </span>
@@ -333,9 +355,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   ) : isInCart ? (
                     'In Cart'
                   ) : inStock ? (
-                    'Quick Add'
+                    t('products.addToCart')
                   ) : (
-                    'Out of Stock'
+                    t('products.outOfStock')
                   )}
                 </button>
               </div>
