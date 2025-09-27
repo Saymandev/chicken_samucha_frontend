@@ -190,7 +190,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         className="group card overflow-hidden hover:shadow-xl transition-all duration-300 h-full min-w-0"
       >
         <Link to={`/products/${product.id || (product as any)._id}`} className="block">
-          <div className="flex h-32">
+          <div className="flex h-44">
             {/* Product Image - Left Side */}
             <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
               <img
