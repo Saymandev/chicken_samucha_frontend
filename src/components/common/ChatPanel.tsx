@@ -2,8 +2,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
     Check,
     CheckCheck,
+    Download,
+    FileText,
+    Image,
     Minimize2,
+    Paperclip,
     Send,
+    Smile,
     User,
     X
 } from 'lucide-react';
@@ -69,6 +74,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   });
   const [showGuestForm, setShowGuestForm] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(true);
+  
+  // File attachment and emoji states
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -229,40 +240,77 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !chatSession || !socketRef.current) return;
-
-    const messageData = {
-      chatId: chatSession.chatId,
-      message: newMessage.trim(),
-      messageType: 'text'
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
     };
 
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
+  const sendMessage = async () => {
+    if ((!newMessage.trim() && !selectedFile) || !chatSession) return;
+
     try {
-      // Emit through socket for real-time delivery
-      socketRef.current.emit('send_message', messageData);
+      const formData = new FormData();
+      formData.append('chatId', chatSession.chatId);
+      
+      if (newMessage.trim()) {
+        formData.append('message', newMessage.trim());
+      }
+      
+      if (selectedFile) {
+        formData.append('attachment', selectedFile);
+      }
+
+      // Send message via API (not socket for file uploads)
+      const response = await chatAPI.sendMessage(formData);
       
       // Add message to local state immediately
       const tempMessage: Message = {
-        id: `temp-${Date.now()}`,
+        id: response.data.chatMessage?.id || `temp-${Date.now()}`,
         senderId: user?.id || 'anonymous',
         senderName: user?.name || 'You',
         senderType: 'user',
-        message: newMessage.trim(),
-        messageType: 'text',
+        message: newMessage.trim() || `Sent ${selectedFile ? selectedFile.name : 'a file'}`,
+        messageType: selectedFile ? (selectedFile.type.startsWith('image/') ? 'image' : 'file') : 'text',
+        attachments: selectedFile ? [{
+          type: selectedFile.type.startsWith('image/') ? 'image' : 'document',
+          url: URL.createObjectURL(selectedFile),
+          filename: selectedFile.name,
+          size: selectedFile.size
+        }] : [],
         timestamp: new Date().toISOString(),
         isRead: false
       };
       
       setMessages(prev => [...prev, tempMessage]);
       setNewMessage('');
+      setSelectedFile(null);
       
-      // Stop typing indicator
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
+      // Emit real-time notification through socket
+      if (socketRef.current) {
+        socketRef.current.emit('new_message', {
+          chatId: chatSession.chatId,
+          message: tempMessage
+        });
+        
+        // Stop typing indicator
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        socketRef.current.emit('stop_typing', { chatId: chatSession.chatId });
+        setIsTyping(false);
       }
-      socketRef.current.emit('stop_typing', { chatId: chatSession.chatId });
-      setIsTyping(false);
       
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -344,6 +392,39 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      setSelectedFile(file);
+      toast.success(`File selected: ${file.name}`);
+    }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setNewMessage(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   if (!isOpen) return null;
@@ -500,7 +581,53 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                               : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'
                           }`}
                         >
-                          <p className="text-sm">{message.message}</p>
+                          {/* Message text */}
+                          {message.message && (
+                            <p className="text-sm mb-2">{message.message}</p>
+                          )}
+                          
+                          {/* Attachments */}
+                          {message.attachments && message.attachments.length > 0 && (
+                            <div className="space-y-2">
+                              {message.attachments.map((attachment, idx) => (
+                                <div key={idx} className="border border-gray-200 dark:border-gray-600 rounded-lg p-2">
+                                  {attachment.type === 'image' ? (
+                                    <div>
+                                      <img 
+                                        src={attachment.url} 
+                                        alt={attachment.filename}
+                                        className="max-w-full h-auto rounded cursor-pointer"
+                                        onClick={() => window.open(attachment.url, '_blank')}
+                                      />
+                                      <p className="text-xs mt-1 flex items-center">
+                                        <Image className="w-3 h-3 mr-1" />
+                                        {attachment.filename}
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center">
+                                        <FileText className="w-4 h-4 mr-2" />
+                                        <div>
+                                          <p className="text-xs font-medium">{attachment.filename}</p>
+                                          {attachment.size && (
+                                            <p className="text-xs opacity-70">{formatFileSize(attachment.size)}</p>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={() => window.open(attachment.url, '_blank')}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
+                                      >
+                                        <Download className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
                           <div className={`flex items-center justify-between mt-1 ${
                             message.senderType === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
                           }`}>
@@ -585,35 +712,110 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
             ) : (
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-2">
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => {
-                        setNewMessage(e.target.value);
-                        handleTyping();
-                      }}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          sendMessage();
-                        }
-                      }}
-                      placeholder={language === 'bn' ? 'একটি বার্তা লিখুন...' : 'Type a message...'}
-                      className="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      disabled={!chatSession}
-                    />
+              <div className="border-t border-gray-200 dark:border-gray-700">
+                {/* Selected File Preview */}
+                {selectedFile && (
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {selectedFile.type.startsWith('image/') ? (
+                          <Image className="w-4 h-4 text-blue-500" />
+                        ) : (
+                          <FileText className="w-4 h-4 text-blue-500" />
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedFile.name}</p>
+                          <p className="text-xs text-gray-500">{formatFileSize(selectedFile.size)}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={removeSelectedFile}
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                      >
+                        <X className="w-4 h-4 text-gray-500" />
+                      </button>
+                    </div>
                   </div>
-                  
-                  <button
-                    onClick={sendMessage}
-                    disabled={!newMessage.trim() || !chatSession}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-full transition-colors disabled:cursor-not-allowed"
-                  >
-                    <Send className="w-5 h-5" />
-                  </button>
+                )}
+
+                {/* Input Area */}
+                <div className="p-4">
+                  <div className="flex items-end space-x-2">
+                    {/* Emoji Picker */}
+                    <div className="relative" ref={emojiPickerRef}>
+                      <button
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                        disabled={!chatSession}
+                      >
+                        <Smile className="w-5 h-5 text-gray-500" />
+                      </button>
+                      
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3 z-10">
+                          <div className="grid grid-cols-8 gap-1 w-64">
+                            {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕'].map((emoji, index) => (
+                              <button
+                                key={index}
+                                onClick={() => handleEmojiSelect(emoji)}
+                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-lg"
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* File Upload */}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                      disabled={!chatSession}
+                    >
+                      <Paperclip className="w-5 h-5 text-gray-500" />
+                    </button>
+                    
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      onChange={handleFileSelect}
+                      accept="image/*,.pdf,.doc,.docx,.txt"
+                      className="hidden"
+                    />
+
+                    {/* Message Input */}
+                    <div className="flex-1 relative">
+                      <textarea
+                        value={newMessage}
+                        onChange={(e) => {
+                          setNewMessage(e.target.value);
+                          handleTyping();
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                          }
+                        }}
+                        placeholder={language === 'bn' ? 'একটি বার্তা লিখুন...' : 'Type a message...'}
+                        className="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                        rows={1}
+                        style={{ maxHeight: '120px' }}
+                        disabled={!chatSession}
+                      />
+                    </div>
+                    
+                    {/* Send Button */}
+                    <button
+                      onClick={sendMessage}
+                      disabled={(!newMessage.trim() && !selectedFile) || !chatSession}
+                      className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-full transition-colors disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
