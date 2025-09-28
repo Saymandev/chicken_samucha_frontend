@@ -158,13 +158,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         email: '',
         isAnonymous: true
       } : {
-        name: guestForm.name,
-        phone: guestForm.phone,
-        email: guestForm.email
+        name: guestForm.name || 'Guest User',
+        phone: guestForm.phone || '',
+        email: guestForm.email || ''
       };
 
       console.log('Sending customerInfo:', customerInfo);
       console.log('isAnonymous flag:', isAnonymous);
+      console.log('isAuthenticated:', isAuthenticated);
 
       const response = await chatAPI.startChatSession({
         customerInfo,
@@ -194,7 +195,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       }
     } catch (error: any) {
       console.error('Error initializing chat:', error);
-      toast.error('Failed to start chat session. Please try again.');
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      const errorMessage = error.response?.data?.message || 'Failed to start chat session. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
