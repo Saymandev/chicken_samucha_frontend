@@ -161,43 +161,37 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
         )}
       </AnimatePresence>
 
-      {/* Floating Chat Button */}
-      <motion.button
-        onClick={handleChatClick}
-        className={`relative w-16 h-16 ${
-          showChatPanel 
-            ? 'bg-green-500 hover:bg-green-600' 
-            : 'bg-orange-500 hover:bg-orange-600'
-        } text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        {/* Toggle icon: Message when closed, X when open */}
-        {isOpen ? (
-          <X className="w-8 h-8 font-bold" />
-        ) : showChatPanel ? (
-          <MessageCircle className="w-8 h-8 font-bold animate-pulse" />
-        ) : (
-          <MessageCircle className="w-8 h-8 font-bold" />
-        )}
+      {/* Floating Chat Button - Hide when chat panel is open */}
+      {!showChatPanel && (
+        <motion.button
+          onClick={handleChatClick}
+          className="relative w-16 h-16 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {/* Toggle icon: Message when closed, X when open */}
+          {isOpen ? (
+            <X className="w-8 h-8 font-bold" />
+          ) : (
+            <MessageCircle className="w-8 h-8 font-bold" />
+          )}
 
-        {/* Notification Badge - show only when closed and no chat panel */}
-        {!isOpen && !showChatPanel && (
-          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full" />
+          {/* Notification Badge - show only when closed */}
+          {!isOpen && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full" />
+            </div>
+          )}
+
+          {/* Tooltip */}
+          <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            {isOpen
+              ? (language === 'bn' ? 'বন্ধ করুন' : 'Close')
+              : (language === 'bn' ? 'সহায়তা পান' : 'Get Help')}
+            <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
           </div>
-        )}
-
-        {/* Tooltip */}
-        <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-          {isOpen
-            ? (language === 'bn' ? 'বন্ধ করুন' : 'Close')
-            : showChatPanel
-            ? (language === 'bn' ? 'চ্যাট খোলা' : 'Chat Open')
-            : (language === 'bn' ? 'সহায়তা পান' : 'Get Help')}
-          <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
-        </div>
-      </motion.button>
+        </motion.button>
+      )}
     </div>
     </>
   );

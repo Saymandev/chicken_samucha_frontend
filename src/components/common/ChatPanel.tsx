@@ -439,7 +439,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         className={`fixed bottom-20 right-6 bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-2xl z-50 flex flex-col ${
           isMinimized ? 'w-80 h-16' : 'w-96 h-96'
         }`}
-        style={{ maxHeight: isMinimized ? '64px' : '500px' }}
+        style={{ maxHeight: isMinimized ? '64px' : '700px' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-2xl">
