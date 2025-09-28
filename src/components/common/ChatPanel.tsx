@@ -49,16 +49,14 @@ interface ChatSession {
 interface ChatPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  onUnreadMessageCount?: (count: number) => void;
 }
 
-const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose, onUnreadMessageCount }) => {
+const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   const { user, isAuthenticated, language } = useStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [adminTyping, setAdminTyping] = useState(false);
@@ -113,14 +111,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose, onUnreadMessageC
     socketRef.current.on('new_message', (message: Message) => {
       setMessages(prev => [...prev, message]);
       
-      // Update unread count for admin messages when panel is closed
-      if (message.senderType === 'admin') {
-        if (!isOpen) {
-          setUnreadCount(prev => prev + 1);
-        } else {
-          // Mark message as read if panel is open
-          markMessageAsRead(message.id);
-        }
+      // Mark message as read if panel is open
+      if (isOpen && message.senderType === 'admin') {
+        markMessageAsRead(message.id);
       }
     });
 
@@ -263,20 +256,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose, onUnreadMessageC
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showEmojiPicker]);
-
-  // Handle unread count changes and notify parent
-  useEffect(() => {
-    if (onUnreadMessageCount) {
-      onUnreadMessageCount(unreadCount);
-    }
-  }, [unreadCount, onUnreadMessageCount]);
-
-  // Reset unread count when panel opens
-  useEffect(() => {
-    if (isOpen) {
-      setUnreadCount(0);
-    }
-  }, [isOpen]);
 
   const sendMessage = async () => {
     if ((!newMessage.trim() && !selectedFile) || !chatSession) return;
@@ -460,7 +439,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose, onUnreadMessageC
         className={`fixed bottom-20 right-6 bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-2xl z-50 flex flex-col ${
           isMinimized ? 'w-80 h-16' : 'w-96 h-96'
         }`}
-        style={{ maxHeight: isMinimized ? '64px' : '700px' }}
+        style={{ maxHeight: isMinimized ? '64px' : '500px' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-2xl">

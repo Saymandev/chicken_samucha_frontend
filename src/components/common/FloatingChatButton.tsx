@@ -12,7 +12,6 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
   const { isAuthenticated, language } = useStore();
   const [isOpen, setIsOpen] = useState(false);
   const [showChatPanel, setShowChatPanel] = useState(false);
-  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +33,6 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
     if (isAuthenticated) {
       setShowChatPanel(true);
       setIsOpen(false);
-      setUnreadMessageCount(0); // Reset unread count when opening chat
     } else {
       setIsOpen(!isOpen);
     }
@@ -43,16 +41,8 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
   const handleGuestChat = () => {
     setShowChatPanel(true);
     setIsOpen(false);
-    setUnreadMessageCount(0); // Reset unread count when opening chat
   };
 
-  const handleChatPanelClose = () => {
-    setShowChatPanel(false);
-  };
-
-  const handleUnreadMessageCount = (count: number) => {
-    setUnreadMessageCount(count);
-  };
 
   const handleContactClick = (type: 'phone' | 'email') => {
     if (type === 'phone') {
@@ -68,8 +58,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
       {/* Chat Panel */}
       <ChatPanel 
         isOpen={showChatPanel} 
-        onClose={handleChatPanelClose}
-        onUnreadMessageCount={handleUnreadMessageCount}
+        onClose={() => setShowChatPanel(false)} 
       />
       
       <div className={`fixed bottom-6 right-6 z-50 ${className}`} ref={chatRef}>
@@ -188,12 +177,10 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
             <MessageCircle className="w-8 h-8 font-bold" />
           )}
 
-          {/* Unread Message Badge - show only when closed and has unread messages */}
-          {!isOpen && unreadMessageCount > 0 && (
-            <div className="absolute -top-1 -right-1 min-w-5 h-5 bg-red-500 rounded-full flex items-center justify-center px-1">
-              <span className="text-xs font-bold text-white">
-                {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
-              </span>
+          {/* Notification Badge - show only when closed */}
+          {!isOpen && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full" />
             </div>
           )}
 
