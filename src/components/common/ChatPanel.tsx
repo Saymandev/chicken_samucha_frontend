@@ -157,8 +157,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         phone: '',
         email: '',
         isAnonymous: true
-      } : guestForm;
+      } : {
+        name: guestForm.name,
+        phone: guestForm.phone,
+        email: guestForm.email
+      };
 
+      console.log('Sending customerInfo:', customerInfo);
+      console.log('isAnonymous flag:', isAnonymous);
 
       const response = await chatAPI.startChatSession({
         customerInfo,
@@ -323,12 +329,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     }, 1000);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+ 
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -375,13 +376,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   const handleAnonymousStart = () => {
     setIsAnonymous(true);
     setShowGuestForm(false);
+    // Initialize chat immediately for anonymous users
     initializeChat();
   };
 
-  const handleAnonymousChat = () => {
-    setIsAnonymous(true);
-    initializeChat();
-  };
+ 
 
   if (!isOpen) return null;
 
