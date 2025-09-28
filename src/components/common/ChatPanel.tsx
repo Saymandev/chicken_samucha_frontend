@@ -78,9 +78,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    socketRef.current = io(process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api', {
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api';
+    const socketURL = API_BASE_URL.replace('/api', '');
+
+    socketRef.current = io(socketURL, {
       auth: { token },
-      query: { chatId }
+      query: { chatId },
+      transports: ['websocket', 'polling']
     });
 
     socketRef.current.on('connect', () => {
@@ -118,6 +122,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     
     setIsLoading(true);
     try {
+      console.log('Starting chat session for user:', user);
+      
       // Start chat session with user info
       const sessionData = {
         customerInfo: {
@@ -129,7 +135,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         category: 'general'
       };
       
+      console.log('Sending session data:', sessionData);
       const response = await chatAPI.startChatSession(sessionData);
+      console.log('Chat session response:', response.data);
+      
       setChatSession(response.data.session);
       
       // Load existing messages
@@ -140,9 +149,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       
       // Initialize socket connection
       initializeSocket(response.data.session.chatId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to initialize chat:', error);
-      toast.error('Failed to connect to chat');
+      console.error('Error details:', error.response?.data || error.message);
+      toast.error(`Failed to connect to chat: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsLoading(false);
     }
