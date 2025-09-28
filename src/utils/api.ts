@@ -416,6 +416,7 @@ export const adminAPI = {
   getAllRefunds: (params?: any) => api.get('/admin/refunds', { params }),
   updateRefundStatus: (id: string, data: any) => api.put(`/admin/refunds/${id}`, data),
   getRefundStats: () => api.get('/admin/refunds/stats'),
+
   
   // Promotions (Public) - moved to publicAPI below
 };

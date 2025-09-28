@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Zap } from 'lucide-react';
+import { ArrowLeft, Heart, Minus, Palette, Plus, Ruler, ShoppingCart, Star, Weight, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +35,33 @@ interface Product {
     viewCount: number;
     addToCartCount: number;
     purchaseCount: number;
+  };
+  variants?: {
+    colors?: Array<{
+      name: { en: string; bn: string };
+      hex: string;
+      price: number;
+      stock: number;
+      images: Array<{ url: string; public_id: string }>;
+    }>;
+    sizes?: Array<{
+      name: { en: string; bn: string };
+      dimensions: string;
+      price: number;
+      stock: number;
+    }>;
+    weights?: Array<{
+      name: { en: string; bn: string };
+      value: number;
+      unit: 'g' | 'kg' | 'lb' | 'oz';
+      price: number;
+      stock: number;
+    }>;
+  };
+  defaultVariant?: {
+    color?: string;
+    size?: string;
+    weight?: string;
   };
 }
 
@@ -92,6 +119,26 @@ const ProductDetailPage: React.FC = () => {
     address: ''
   });
 
+  // Variant selection state
+  const [selectedVariants, setSelectedVariants] = useState<{
+    color?: {
+      name: { en: string; bn: string };
+      hex: string;
+      price: number;
+    };
+    size?: {
+      name: { en: string; bn: string };
+      dimensions: string;
+      price: number;
+    };
+    weight?: {
+      name: { en: string; bn: string };
+      value: number;
+      unit: 'g' | 'kg' | 'lb' | 'oz';
+      price: number;
+    };
+  }>({});
+
   useEffect(() => {
     if (id) {
       fetchProduct();
@@ -102,6 +149,39 @@ const ProductDetailPage: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Set default variants when product loads
+  useEffect(() => {
+    if (product?.variants && product?.defaultVariant) {
+      const newVariants: any = {};
+      
+      // Set default color
+      if (product.defaultVariant.color && product.variants.colors) {
+        const defaultColor = product.variants.colors.find(color => color.name.en === product.defaultVariant?.color);
+        if (defaultColor) {
+          newVariants.color = defaultColor;
+        }
+      }
+      
+      // Set default size
+      if (product.defaultVariant.size && product.variants.sizes) {
+        const defaultSize = product.variants.sizes.find(size => size.name.en === product.defaultVariant?.size);
+        if (defaultSize) {
+          newVariants.size = defaultSize;
+        }
+      }
+      
+      // Set default weight
+      if (product.defaultVariant.weight && product.variants.weights) {
+        const defaultWeight = product.variants.weights.find(weight => weight.name.en === product.defaultVariant?.weight);
+        if (defaultWeight) {
+          newVariants.weight = defaultWeight;
+        }
+      }
+      
+      setSelectedVariants(newVariants);
+    }
+  }, [product]);
 
   const fetchProduct = async () => {
     try {
@@ -167,12 +247,41 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  // Variant handling functions
+  const handleVariantChange = (variantType: 'color' | 'size' | 'weight', variantValue: any) => {
+    setSelectedVariants(prev => ({
+      ...prev,
+      [variantType]: variantValue
+    }));
+  };
+
+  // Calculate current price including variant prices
+  const getCurrentPrice = () => {
+    if (!product) return 0;
+    
+    let currentPrice = product.discountPrice || product.price;
+    
+    // Add variant price differences
+    if (selectedVariants.color) {
+      currentPrice += selectedVariants.color.price;
+    }
+    if (selectedVariants.size) {
+      currentPrice += selectedVariants.size.price;
+    }
+    if (selectedVariants.weight) {
+      currentPrice = selectedVariants.weight.price; // Weight variants replace base price
+    }
+    
+    return currentPrice;
+  };
+
   const handleAddToCart = async () => {
     if (!product) return;
     
     setIsAddingToCart(true);
     try {
-      addToCart(product, quantity);
+      // Add product with selected variants to cart
+      addToCart(product, quantity, selectedVariants);
       
       // Open cart sidebar to show the added item
       openCart();
@@ -293,7 +402,7 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  const currentPrice = product.discountPrice || product.price;
+  const currentPrice = getCurrentPrice();
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
 
   // Truncate description to 20 words
@@ -579,6 +688,93 @@ const ProductDetailPage: React.FC = () => {
                   </p>
                 </div>
               </div>
+
+              {/* Variant Selection */}
+              {product.variants && (
+                <div className="mb-6 space-y-4">
+                  {/* Color Variants */}
+                  {product.variants.colors && product.variants.colors.length > 0 && (
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        <Palette className="w-4 h-4 text-pink-500" />
+                        {language === 'bn' ? 'রং' : 'Color'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {product.variants.colors.map((color, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleVariantChange('color', color)}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg border transition-colors ${
+                              selectedVariants?.color?.name.en === color.name.en
+                                ? 'bg-pink-100 text-pink-800 border-pink-300 dark:bg-pink-900/20 dark:text-pink-200 dark:border-pink-700'
+                                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            <div 
+                              className="w-4 h-4 rounded-full border border-gray-300"
+                              style={{ backgroundColor: color.hex }}
+                            />
+                            {language === 'bn' ? color.name.bn : color.name.en}
+                            {color.price > 0 && ` (+৳${color.price})`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Size Variants */}
+                  {product.variants.sizes && product.variants.sizes.length > 0 && (
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        <Ruler className="w-4 h-4 text-green-500" />
+                        {language === 'bn' ? 'সাইজ' : 'Size'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {product.variants.sizes.map((size, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleVariantChange('size', size)}
+                            className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+                              selectedVariants?.size?.name.en === size.name.en
+                                ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/20 dark:text-green-200 dark:border-green-700'
+                                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            {language === 'bn' ? size.name.bn : size.name.en}
+                            {size.price > 0 && ` (+৳${size.price})`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Weight Variants */}
+                  {product.variants.weights && product.variants.weights.length > 0 && (
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        <Weight className="w-4 h-4 text-orange-500" />
+                        {language === 'bn' ? 'ওজন' : 'Weight'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {product.variants.weights.map((weight, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleVariantChange('weight', weight)}
+                            className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+                              selectedVariants?.weight?.name.en === weight.name.en
+                                ? 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/20 dark:text-orange-200 dark:border-orange-700'
+                                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            {language === 'bn' ? weight.name.bn : weight.name.en}
+                            <span className="ml-1">(৳{weight.price})</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Quantity Selector */}
               <div className="mb-6">

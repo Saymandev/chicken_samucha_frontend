@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ImagePlus, Trash2, X } from 'lucide-react';
+import { ImagePlus, Palette, Plus, Ruler, Trash2, Weight, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useStore } from '../../store/useStore';
@@ -17,6 +17,33 @@ interface Product {
   isAvailable: boolean;
   isFeatured: boolean;
   youtubeVideoUrl?: string;
+  variants?: {
+    colors?: Array<{
+      name: { en: string; bn: string };
+      hex: string;
+      price: number;
+      stock: number;
+      images: Array<{ url: string; public_id: string }>;
+    }>;
+    sizes?: Array<{
+      name: { en: string; bn: string };
+      dimensions: string;
+      price: number;
+      stock: number;
+    }>;
+    weights?: Array<{
+      name: { en: string; bn: string };
+      value: number;
+      unit: 'g' | 'kg' | 'lb' | 'oz';
+      price: number;
+      stock: number;
+    }>;
+  };
+  defaultVariant?: {
+    color?: string;
+    size?: string;
+    weight?: string;
+  };
 }
 
 interface ProductFormModalProps {
@@ -47,7 +74,34 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     stock: 0,
     isAvailable: true,
     isFeatured: false,
-    youtubeVideoUrl: ''
+    youtubeVideoUrl: '',
+    variants: {
+      colors: [] as Array<{
+        name: { en: string; bn: string };
+        hex: string;
+        price: number;
+        stock: number;
+        images: Array<{ url: string; public_id: string }>;
+      }>,
+      sizes: [] as Array<{
+        name: { en: string; bn: string };
+        dimensions: string;
+        price: number;
+        stock: number;
+      }>,
+      weights: [] as Array<{
+        name: { en: string; bn: string };
+        value: number;
+        unit: 'g' | 'kg' | 'lb' | 'oz';
+        price: number;
+        stock: number;
+      }>
+    },
+    defaultVariant: {
+      color: '',
+      size: '',
+      weight: ''
+    }
   });
   
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
@@ -68,7 +122,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,
-        youtubeVideoUrl: product.youtubeVideoUrl || ''
+        youtubeVideoUrl: product.youtubeVideoUrl || '',
+        variants: {
+          colors: product.variants?.colors || [],
+          sizes: product.variants?.sizes || [],
+          weights: product.variants?.weights || []
+        },
+        defaultVariant: {
+          color: product.defaultVariant?.color || '',
+          size: product.defaultVariant?.size || '',
+          weight: product.defaultVariant?.weight || ''
+        }
       });
       setImages(product.images || []);
     } else {
@@ -82,7 +146,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         stock: 0,
         isAvailable: true,
         isFeatured: false,
-        youtubeVideoUrl: ''
+        youtubeVideoUrl: '',
+        variants: {
+          colors: [],
+          sizes: [],
+          weights: []
+        },
+        defaultVariant: {
+          color: '',
+          size: '',
+          weight: ''
+        }
       });
       setImages([]);
     }
@@ -157,6 +231,120 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   const removeExistingImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Variant Management Functions
+  const addColorVariant = () => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        colors: [...prev.variants.colors, {
+          name: { en: '', bn: '' },
+          hex: '#000000',
+          price: 0,
+          stock: 0,
+          images: []
+        }]
+      }
+    }));
+  };
+
+  const removeColorVariant = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        colors: prev.variants.colors.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const updateColorVariant = (index: number, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        colors: prev.variants.colors.map((color, i) => 
+          i === index ? { ...color, [field]: value } : color
+        )
+      }
+    }));
+  };
+
+  const addSizeVariant = () => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        sizes: [...prev.variants.sizes, {
+          name: { en: '', bn: '' },
+          dimensions: '',
+          price: 0,
+          stock: 0
+        }]
+      }
+    }));
+  };
+
+  const removeSizeVariant = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        sizes: prev.variants.sizes.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const updateSizeVariant = (index: number, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        sizes: prev.variants.sizes.map((size, i) => 
+          i === index ? { ...size, [field]: value } : size
+        )
+      }
+    }));
+  };
+
+  const addWeightVariant = () => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        weights: [...prev.variants.weights, {
+          name: { en: '', bn: '' },
+          value: 0,
+          unit: 'g' as 'g' | 'kg' | 'lb' | 'oz',
+          price: 0,
+          stock: 0
+        }]
+      }
+    }));
+  };
+
+  const removeWeightVariant = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        weights: prev.variants.weights.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const updateWeightVariant = (index: number, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: {
+        ...prev.variants,
+        weights: prev.variants.weights.map((weight, i) => 
+          i === index ? { ...weight, [field]: value } : weight
+        )
+      }
+    }));
   };
 
   const validateForm = () => {
@@ -245,6 +433,10 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('isAvailable', formData.isAvailable.toString());
       submitData.append('isFeatured', formData.isFeatured.toString());
       submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
+      
+      // Add variants data
+      submitData.append('variants', JSON.stringify(formData.variants));
+      submitData.append('defaultVariant', JSON.stringify(formData.defaultVariant));
       
       // Add new image files from state
       
@@ -490,6 +682,413 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 Featured Product
               </span>
             </label>
+          </div>
+
+          {/* Product Variants */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+              Product Variants (Optional)
+            </h3>
+
+            {/* Color Variants */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Palette className="w-5 h-5 text-pink-500" />
+                  <h4 className="font-medium text-gray-900 dark:text-white">Color Variants</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={addColorVariant}
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-pink-500 text-white rounded-lg hover:bg-pink-600"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Color
+                </button>
+              </div>
+
+              {formData.variants.colors.map((color, index) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Color {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeColorVariant(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Name (EN)
+                      </label>
+                      <input
+                        type="text"
+                        value={color.name.en}
+                        onChange={(e) => updateColorVariant(index, 'name', { ...color.name, en: e.target.value })}
+                        placeholder="Red"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Name (BN)
+                      </label>
+                      <input
+                        type="text"
+                        value={color.name.bn}
+                        onChange={(e) => updateColorVariant(index, 'name', { ...color.name, bn: e.target.value })}
+                        placeholder="লাল"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Color
+                      </label>
+                      <div className="flex gap-1">
+                        <input
+                          type="color"
+                          value={color.hex}
+                          onChange={(e) => updateColorVariant(index, 'hex', e.target.value)}
+                          className="w-8 h-8 border border-gray-300 rounded"
+                        />
+                        <input
+                          type="text"
+                          value={color.hex}
+                          onChange={(e) => updateColorVariant(index, 'hex', e.target.value)}
+                          placeholder="#FF0000"
+                          className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Price Diff (৳)
+                        </label>
+                        <input
+                          type="number"
+                          value={color.price}
+                          onChange={(e) => updateColorVariant(index, 'price', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Stock
+                        </label>
+                        <input
+                          type="number"
+                          value={color.stock}
+                          onChange={(e) => updateColorVariant(index, 'stock', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Size Variants */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Ruler className="w-5 h-5 text-green-500" />
+                  <h4 className="font-medium text-gray-900 dark:text-white">Size Variants</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={addSizeVariant}
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Size
+                </button>
+              </div>
+
+              {formData.variants.sizes.map((size, index) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Size {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeSizeVariant(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Name (EN)
+                      </label>
+                      <input
+                        type="text"
+                        value={size.name.en}
+                        onChange={(e) => updateSizeVariant(index, 'name', { ...size.name, en: e.target.value })}
+                        placeholder="Small"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Name (BN)
+                      </label>
+                      <input
+                        type="text"
+                        value={size.name.bn}
+                        onChange={(e) => updateSizeVariant(index, 'name', { ...size.name, bn: e.target.value })}
+                        placeholder="ছোট"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Dimensions
+                      </label>
+                      <input
+                        type="text"
+                        value={size.dimensions}
+                        onChange={(e) => updateSizeVariant(index, 'dimensions', e.target.value)}
+                        placeholder="10x15 cm"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-1">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Price Diff (৳)
+                        </label>
+                        <input
+                          type="number"
+                          value={size.price}
+                          onChange={(e) => updateSizeVariant(index, 'price', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Stock
+                        </label>
+                        <input
+                          type="number"
+                          value={size.stock}
+                          onChange={(e) => updateSizeVariant(index, 'stock', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Weight Variants */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Weight className="w-5 h-5 text-orange-500" />
+                  <h4 className="font-medium text-gray-900 dark:text-white">Weight Variants</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={addWeightVariant}
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Weight
+                </button>
+              </div>
+
+              {formData.variants.weights.map((weight, index) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Weight {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeWeightVariant(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Name (EN)
+                      </label>
+                      <input
+                        type="text"
+                        value={weight.name.en}
+                        onChange={(e) => updateWeightVariant(index, 'name', { ...weight.name, en: e.target.value })}
+                        placeholder="1kg"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Name (BN)
+                      </label>
+                      <input
+                        type="text"
+                        value={weight.name.bn}
+                        onChange={(e) => updateWeightVariant(index, 'name', { ...weight.name, bn: e.target.value })}
+                        placeholder="১ কেজি"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-1">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Value
+                        </label>
+                        <input
+                          type="number"
+                          value={weight.value}
+                          onChange={(e) => updateWeightVariant(index, 'value', parseInt(e.target.value) || 0)}
+                          placeholder="1000"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Unit
+                        </label>
+                        <select
+                          value={weight.unit}
+                          onChange={(e) => updateWeightVariant(index, 'unit', e.target.value)}
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="g">g</option>
+                          <option value="kg">kg</option>
+                          <option value="lb">lb</option>
+                          <option value="oz">oz</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Price (৳)
+                        </label>
+                        <input
+                          type="number"
+                          value={weight.price}
+                          onChange={(e) => updateWeightVariant(index, 'price', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Stock
+                        </label>
+                        <input
+                          type="number"
+                          value={weight.stock}
+                          onChange={(e) => updateWeightVariant(index, 'stock', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Default Variant Selection */}
+            {(formData.variants.colors.length > 0 || formData.variants.sizes.length > 0 || formData.variants.weights.length > 0) && (
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-3">Default Variant Selection</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {formData.variants.colors.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Default Color
+                      </label>
+                      <select
+                        value={formData.defaultVariant.color}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          defaultVariant: { ...prev.defaultVariant, color: e.target.value }
+                        }))}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">Select Color</option>
+                        {formData.variants.colors.map((color, index) => (
+                          <option key={index} value={color.name.en}>
+                            {color.name.en} ({color.name.bn})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {formData.variants.sizes.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Default Size
+                      </label>
+                      <select
+                        value={formData.defaultVariant.size}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          defaultVariant: { ...prev.defaultVariant, size: e.target.value }
+                        }))}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">Select Size</option>
+                        {formData.variants.sizes.map((size, index) => (
+                          <option key={index} value={size.name.en}>
+                            {size.name.en} ({size.name.bn})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {formData.variants.weights.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Default Weight
+                      </label>
+                      <select
+                        value={formData.defaultVariant.weight}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          defaultVariant: { ...prev.defaultVariant, weight: e.target.value }
+                        }))}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">Select Weight</option>
+                        {formData.variants.weights.map((weight, index) => (
+                          <option key={index} value={weight.name.en}>
+                            {weight.name.en} ({weight.name.bn})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Image Upload */}
