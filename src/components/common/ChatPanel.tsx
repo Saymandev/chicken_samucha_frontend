@@ -179,8 +179,21 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       // Load existing messages
       if (finalChatId) {
         console.log('Loading messages for chatId:', finalChatId);
-        const messagesResponse = await chatAPI.getChatMessages(finalChatId);
-        setMessages(messagesResponse.data.messages || []);
+        try {
+          const messagesResponse = await chatAPI.getChatMessages(finalChatId);
+          console.log('Messages response:', messagesResponse);
+          console.log('Messages data:', messagesResponse.data);
+          console.log('Messages array:', messagesResponse.data.messages);
+          console.log('Messages count:', messagesResponse.data.messages?.length || 0);
+          
+          const loadedMessages = messagesResponse.data.messages || messagesResponse.data.data?.messages || [];
+          console.log('Final messages to set:', loadedMessages);
+          setMessages(loadedMessages);
+        } catch (messageError) {
+          console.error('Failed to load messages:', messageError);
+          // Don't fail the whole chat initialization if messages fail to load
+          setMessages([]);
+        }
       }
       
       // Initialize socket connection
@@ -455,7 +468,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
               ) : (
                 // Messages
                 <>
-                  {messages.length === 0 ? (
+                  {(() => {
+                    console.log('Rendering messages, count:', messages.length);
+                    console.log('Messages array:', messages);
+                    return messages.length === 0;
+                  })() ? (
                     <div className="text-center py-8">
                       <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
