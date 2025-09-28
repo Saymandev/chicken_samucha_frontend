@@ -197,14 +197,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
           console.log('Messages array:', messagesResponse.data.messages);
           console.log('Messages count:', messagesResponse.data.messages?.length || 0);
           
-          const loadedMessages = messagesResponse.data.messages || messagesResponse.data.data?.messages || [];
+          const loadedMessages = messagesResponse.data.data?.messages || messagesResponse.data.messages || [];
           console.log('Final messages to set:', loadedMessages);
+          console.log('Setting messages state with:', loadedMessages.length, 'messages');
           setMessages(loadedMessages);
-        } catch (messageError) {
+        } catch (messageError: any) {
           console.error('Failed to load messages:', messageError);
+          console.error('Message error details:', messageError.response?.data || messageError.message);
           // Don't fail the whole chat initialization if messages fail to load
           setMessages([]);
         }
+      } else {
+        console.log('No chatId available, skipping message loading');
       }
       
       // Initialize socket connection
@@ -222,9 +226,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
 
   // Initialize chat when panel opens
   useEffect(() => {
+    console.log('ChatPanel useEffect triggered:', { isOpen, isAuthenticated, user: !!user });
     if (isOpen && isAuthenticated && user) {
+      console.log('Starting chat initialization...');
       initializeChat();
     } else if (isOpen && !isAuthenticated) {
+      console.log('Guest user - showing guest form');
       setShowGuestForm(false);
     }
     
@@ -570,7 +577,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                       </p>
                     </div>
                   ) : (
-                    messages.map((message, index) => (
+                    (() => {
+                      console.log('Rendering messages:', messages.length, 'messages');
+                      console.log('Messages array:', messages);
+                      return messages.map((message, index) => (
                       <div
                         key={message.id}
                         className={`flex ${message.senderType === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -645,7 +655,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                           </div>
                         </div>
                       </div>
-                    ))
+                    ));
+                    })()
                   )}
                   
                   {adminTyping && (
