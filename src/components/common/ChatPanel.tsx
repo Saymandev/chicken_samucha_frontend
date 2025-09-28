@@ -405,11 +405,20 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1, 
+          y: 0,
+          width: isMinimized ? '320px' : '384px',
+          height: isMinimized ? '64px' : '384px'
+        }}
         exit={{ opacity: 0, scale: 0.8, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="fixed bottom-20 right-6 w-96 h-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col"
-        style={{ maxHeight: '500px' }}
+        className="fixed bottom-20 right-6 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col"
+        style={{ 
+          maxHeight: isMinimized ? '64px' : '500px',
+          minHeight: isMinimized ? '64px' : '384px'
+        }}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 rounded-t-2xl flex items-center justify-between">
@@ -420,7 +429,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
             <div>
               <h3 className="font-semibold text-sm">Customer Support</h3>
               <p className="text-xs opacity-90">
-                {isConnected ? 'Online' : 'Connecting...'}
+                {isMinimized ? 'Click to expand' : (isConnected ? 'Online' : 'Connecting...')}
               </p>
             </div>
           </div>
@@ -733,18 +742,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
               </div>
             )}
           </>
-        ) : (
-          /* Minimized State */
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <User className="w-4 h-4 text-blue-600" />
-              </div>
-              <p className="text-sm text-gray-600">Chat minimized</p>
-              <p className="text-xs text-gray-500">Click to expand</p>
-            </div>
-          </div>
-        )}
+        ) : null}
       </motion.div>
     </AnimatePresence>
   );
