@@ -7,8 +7,8 @@ import DynamicCategorySections from '../components/common/DynamicCategorySection
 import HeroSlider from '../components/common/HeroSlider';
 import ReviewSlider from '../components/common/ReviewSlider';
 import {
-    GridSkeleton,
-    ProductCardSkeleton
+  GridSkeleton,
+  ProductCardSkeleton
 } from '../components/common/Skeleton';
 import TopCategories from '../components/common/TopCategories';
 import ProductCard from '../components/product/ProductCard';
@@ -274,7 +274,7 @@ const HomePage: React.FC = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-8"
+              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
             >
               {bestSellers.map((product, index) => (
                 <motion.div key={(product as any).id || index} initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.05 }}>

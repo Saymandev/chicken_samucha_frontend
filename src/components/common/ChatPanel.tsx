@@ -1,15 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Check,
-    CheckCheck,
-    Download,
-    FileText,
-    Minimize2,
-    Paperclip,
-    Send,
-    Smile,
-    User,
-    X
+  Check,
+  CheckCheck,
+  Download,
+  FileText,
+  Minimize2,
+  Paperclip,
+  Send,
+  Smile,
+  User,
+  X
 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -424,7 +424,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         }}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 rounded-t-2xl flex items-center justify-between">
+        <div className="bg-[#ef4444] text-white p-3 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
               <User className="w-4 h-4" />
@@ -729,7 +729,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                         handleTyping();
                       }}
                       placeholder={selectedFile ? "Add a message (optional)..." : "Type your message..."}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#ef4444] focus:border-[#ef4444] pr-12"
                       disabled={!chatSession}
                     />
                   </div>
@@ -737,7 +737,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     disabled={(!newMessage.trim() && !selectedFile) || !chatSession}
-                    className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-3 bg-[#ef4444] text-white rounded-full hover:bg-[#dc2626] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send className="w-4 h-4" />
                   </button>

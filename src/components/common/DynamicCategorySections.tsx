@@ -123,7 +123,7 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
                 <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
                 <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
                 {[...Array(limit)].map((_, i) => (
                   <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64 animate-pulse"></div>
                 ))}

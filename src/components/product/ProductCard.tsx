@@ -779,7 +779,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               disabled={!inStock || isBuyingNow}
               whileHover={inStock && !isBuyingNow ? { scale: 1.02 } : {}}
               whileTap={inStock && !isBuyingNow ? { scale: 0.98 } : {}}
-              className={`w-full flex items-center justify-center sm:gap-2 gap-1 py-2 sm:py-3 px-1 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg ${
+              className={`w-full flex items-center justify-center sm:gap-2 gap-1 py-2 sm:py-3 px-1 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base bg-[#ef4444] hover:bg-[#dc2626] text-white shadow-lg ${
                 !inStock || isBuyingNow ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -854,7 +854,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     type="text"
                     value={quickOrderData.name}
                     onChange={(e) => setQuickOrderData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
                     required
                   />
                 </div>
@@ -867,7 +867,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     type="tel"
                     value={quickOrderData.phone}
                     onChange={(e) => setQuickOrderData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder="01XXXXXXXXX"
                     required
                   />
@@ -881,7 +881,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     type="email"
                     value={quickOrderData.email}
                     onChange={(e) => setQuickOrderData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
                     required
                   />
                 </div>
@@ -893,7 +893,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <textarea
                     value={quickOrderData.address}
                     onChange={(e) => setQuickOrderData(prev => ({ ...prev, address: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
                     rows={3}
                     placeholder={language === 'bn' ? 'আপনার সম্পূর্ণ ঠিকানা লিখুন' : 'Enter your full address'}
                   />
@@ -910,7 +910,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <button
                     type="submit"
                     disabled={isBuyingNow}
-                    className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2 bg-[#ef4444] hover:bg-[#dc2626] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isBuyingNow ? (
                       <>
