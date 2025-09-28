@@ -2,12 +2,9 @@ import { motion } from 'framer-motion';
 import {
   CreditCard,
   MapPin,
-  Palette,
   Phone,
-  Ruler,
   ShoppingCart,
-  User,
-  Weight
+  User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -117,7 +114,6 @@ const CheckoutPage: React.FC = () => {
         // keep defaults
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist selected zone for logged-in users when it changes
@@ -257,40 +253,6 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
-  // Variant selection functions
-  const handleVariantChange = (productId: string, variantType: 'color' | 'size' | 'weight', variantValue: any) => {
-    // Update cart item with selected variant
-    const updatedCart = cart.map(item => {
-      if (item.product.id === productId) {
-        const newVariants = { ...item.selectedVariants };
-        if (variantType === 'color') {
-          newVariants.color = variantValue;
-        } else if (variantType === 'size') {
-          newVariants.size = variantValue;
-        } else if (variantType === 'weight') {
-          newVariants.weight = variantValue;
-        }
-        
-        // Calculate new price including variant price
-        let newPrice = item.product.price;
-        if (newVariants.color) newPrice += newVariants.color.price;
-        if (newVariants.size) newPrice += newVariants.size.price;
-        if (newVariants.weight) newPrice = newVariants.weight.price; // Weight variants replace base price
-        
-        return {
-          ...item,
-          selectedVariants: newVariants,
-          price: newPrice,
-          subtotal: newPrice * item.quantity
-        };
-      }
-      return item;
-    });
-    
-    // Update cart in store
-    useStore.getState().setCart(updatedCart);
-  };
-
   // File upload not needed for SSLCommerz or COD
 
   const validateForm = () => {
@@ -353,8 +315,7 @@ const CheckoutPage: React.FC = () => {
           customer: customerInfo,
           items: cart.map(item => ({
             product: (item.product as any).id || (item.product as any)._id,
-            quantity: item.quantity,
-            selectedVariants: item.selectedVariants
+            quantity: item.quantity
           })),
           paymentInfo: { method: 'sslcommerz' },
           deliveryInfo: {
@@ -440,19 +401,6 @@ const CheckoutPage: React.FC = () => {
         
         formData.append(`items[${index}][product]`, productId);
         formData.append(`items[${index}][quantity]`, item.quantity.toString());
-        
-        // Add variant information if available
-        if (item.selectedVariants) {
-          if (item.selectedVariants.color) {
-            formData.append(`items[${index}][selectedVariants][color]`, JSON.stringify(item.selectedVariants.color));
-          }
-          if (item.selectedVariants.size) {
-            formData.append(`items[${index}][selectedVariants][size]`, JSON.stringify(item.selectedVariants.size));
-          }
-          if (item.selectedVariants.weight) {
-            formData.append(`items[${index}][selectedVariants][weight]`, JSON.stringify(item.selectedVariants.weight));
-          }
-        }
       });
       
       // Send payment info in the format backend expects
@@ -813,109 +761,20 @@ const CheckoutPage: React.FC = () => {
                   {t('checkout.orderSummary')}
                 </h2>
 
-                <div className="space-y-6 mb-6">
+                <div className="space-y-4 mb-6">
                   {cart.map((item) => (
-                    <div key={item.product.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">
-                            {language === 'bn' ? item.product.name.bn : item.product.name.en}
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Qty: {item.quantity} × ৳{item.price}
-                          </p>
-                        </div>
-                        <span className="font-medium text-gray-900 dark:text-white">
-                          ৳{item.subtotal}
-                        </span>
+                    <div key={item.product.id} className="flex justify-between items-center">
+                      <div>
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {language === 'bn' ? item.product.name.bn : item.product.name.en}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Qty: {item.quantity} × ৳{item.price}
+                        </p>
                       </div>
-
-                      {/* Variant Selection */}
-                      {item.product.variants && (
-                        <div className="space-y-3">
-                          {/* Color Variants */}
-                          {item.product.variants.colors && item.product.variants.colors.length > 0 && (
-                            <div>
-                              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <Palette className="w-4 h-4 text-pink-500" />
-                                {language === 'bn' ? 'রং' : 'Color'}
-                              </label>
-                              <div className="flex flex-wrap gap-2">
-                                {item.product.variants.colors.map((color, index) => (
-                                  <button
-                                    key={index}
-                                    onClick={() => handleVariantChange(item.product.id, 'color', color)}
-                                    className={`flex items-center gap-2 px-3 py-1 text-xs rounded-full border transition-colors ${
-                                      item.selectedVariants?.color?.name.en === color.name.en
-                                        ? 'bg-pink-100 text-pink-800 border-pink-300 dark:bg-pink-900/20 dark:text-pink-200 dark:border-pink-700'
-                                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
-                                    }`}
-                                  >
-                                    <div 
-                                      className="w-3 h-3 rounded-full border border-gray-300"
-                                      style={{ backgroundColor: color.hex }}
-                                    />
-                                    {language === 'bn' ? color.name.bn : color.name.en}
-                                    {color.price > 0 && ` (+৳${color.price})`}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Size Variants */}
-                          {item.product.variants.sizes && item.product.variants.sizes.length > 0 && (
-                            <div>
-                              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <Ruler className="w-4 h-4 text-green-500" />
-                                {language === 'bn' ? 'সাইজ' : 'Size'}
-                              </label>
-                              <div className="flex flex-wrap gap-2">
-                                {item.product.variants.sizes.map((size, index) => (
-                                  <button
-                                    key={index}
-                                    onClick={() => handleVariantChange(item.product.id, 'size', size)}
-                                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                                      item.selectedVariants?.size?.name.en === size.name.en
-                                        ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/20 dark:text-green-200 dark:border-green-700'
-                                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
-                                    }`}
-                                  >
-                                    {language === 'bn' ? size.name.bn : size.name.en}
-                                    {size.price > 0 && ` (+৳${size.price})`}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Weight Variants */}
-                          {item.product.variants.weights && item.product.variants.weights.length > 0 && (
-                            <div>
-                              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <Weight className="w-4 h-4 text-orange-500" />
-                                {language === 'bn' ? 'ওজন' : 'Weight'}
-                              </label>
-                              <div className="flex flex-wrap gap-2">
-                                {item.product.variants.weights.map((weight, index) => (
-                                  <button
-                                    key={index}
-                                    onClick={() => handleVariantChange(item.product.id, 'weight', weight)}
-                                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                                      item.selectedVariants?.weight?.name.en === weight.name.en
-                                        ? 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/20 dark:text-orange-200 dark:border-orange-700'
-                                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
-                                    }`}
-                                  >
-                                    {language === 'bn' ? weight.name.bn : weight.name.en}
-                                    <span className="ml-1">(৳{weight.price})</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        ৳{item.subtotal}
+                      </span>
                     </div>
                   ))}
                 </div>

@@ -63,33 +63,6 @@ export interface Product {
   minOrderQuantity: number;
   maxOrderQuantity: number;
   youtubeVideoUrl?: string;
-  variants?: {
-    colors?: Array<{
-      name: { en: string; bn: string };
-      hex: string;
-      price: number;
-      stock: number;
-      images: Array<{ url: string; public_id: string }>;
-    }>;
-    sizes?: Array<{
-      name: { en: string; bn: string };
-      dimensions: string;
-      price: number;
-      stock: number;
-    }>;
-    weights?: Array<{
-      name: { en: string; bn: string };
-      value: number;
-      unit: 'g' | 'kg' | 'lb' | 'oz';
-      price: number;
-      stock: number;
-    }>;
-  };
-  defaultVariant?: {
-    color?: string;
-    size?: string;
-    weight?: string;
-  };
 }
 
 export interface CartItem {
@@ -97,24 +70,6 @@ export interface CartItem {
   quantity: number;
   price: number;
   subtotal: number;
-  selectedVariants?: {
-    color?: {
-      name: { en: string; bn: string };
-      hex: string;
-      price: number;
-    };
-    size?: {
-      name: { en: string; bn: string };
-      dimensions: string;
-      price: number;
-    };
-    weight?: {
-      name: { en: string; bn: string };
-      value: number;
-      unit: 'g' | 'kg' | 'lb' | 'oz';
-      price: number;
-    };
-  };
 }
 
 export interface Order {
@@ -181,11 +136,10 @@ interface AppStore {
   setLanguage: (language: 'en' | 'bn') => void;
   toggleLanguage: () => void;
   
-  addToCart: (product: Product, quantity: number, selectedVariants?: any) => void;
+  addToCart: (product: Product, quantity: number) => void;
   updateCartItem: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
-  setCart: (cart: CartItem[]) => void;
   
   setLoading: (loading: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
@@ -241,28 +195,12 @@ export const useStore = create<AppStore>()(
       })),
       
       // Cart actions
-      addToCart: (product, quantity, selectedVariants?: any) => {
+      addToCart: (product, quantity) => {
         const state = get();
         const productId = product.id || (product as any)._id;
-        
-        // Calculate price with variants
-        let price = product.discountPrice || product.price;
-        if (selectedVariants) {
-          if (selectedVariants.color) price += selectedVariants.color.price;
-          if (selectedVariants.size) price += selectedVariants.size.price;
-          if (selectedVariants.weight) price = selectedVariants.weight.price; // Weight variants replace base price
-        }
-        
-        // Check for existing item with same product and variants
         const existingItem = state.cart.find(item => {
           const itemId = item.product.id || (item.product as any)._id;
-          if (itemId !== productId) return false;
-          
-          // Compare variants
-          const itemVariants = item.selectedVariants || {};
-          const newVariants = selectedVariants || {};
-          
-          return JSON.stringify(itemVariants) === JSON.stringify(newVariants);
+          return itemId === productId;
         });
         
         if (existingItem) {
@@ -270,13 +208,9 @@ export const useStore = create<AppStore>()(
           if (newQuantity <= product.maxOrderQuantity) {
             const updatedCart = state.cart.map(item => {
               const itemId = item.product.id || (item.product as any)._id;
-              const itemVariants = item.selectedVariants || {};
-              const newVariants = selectedVariants || {};
-              
-              if (itemId === productId && JSON.stringify(itemVariants) === JSON.stringify(newVariants)) {
-                return { ...item, quantity: newQuantity, subtotal: item.price * newQuantity };
-              }
-              return item;
+              return itemId === productId
+                ? { ...item, quantity: newQuantity, subtotal: item.price * newQuantity }
+                : item;
             });
             const cartCount = updatedCart.reduce((sum, item) => sum + item.quantity, 0);
             const cartTotal = updatedCart.reduce((sum, item) => sum + item.subtotal, 0);
@@ -284,12 +218,12 @@ export const useStore = create<AppStore>()(
             set({ cart: updatedCart, cartCount, cartTotal });
           }
         } else {
+          const price = product.discountPrice || product.price;
           const newItem: CartItem = {
             product: { ...product, id: productId },
             quantity,
             price,
-            subtotal: price * quantity,
-            selectedVariants
+            subtotal: price * quantity
           };
           const updatedCart = [...state.cart, newItem];
           const cartCount = updatedCart.reduce((sum, item) => sum + item.quantity, 0);
@@ -331,11 +265,6 @@ export const useStore = create<AppStore>()(
       },
       
       clearCart: () => set({ cart: [], cartCount: 0, cartTotal: 0 }),
-      setCart: (cart) => {
-        const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const cartTotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
-        set({ cart, cartCount, cartTotal });
-      },
       
       // UI actions
       setLoading: (isLoading) => set({ isLoading }),
