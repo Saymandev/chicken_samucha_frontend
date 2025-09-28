@@ -126,6 +126,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       }
     });
 
+    socketRef.current.on('message-read', (data: { messageId: string }) => {
+      setMessages(prev => prev.map(msg => 
+        msg.id === data.messageId ? { ...msg, isRead: true } : msg
+      ));
+    });
+
     socketRef.current.on('user-typing', (data: any) => {
       if (data.senderType === 'admin') {
         setAdminTyping(true);
@@ -295,6 +301,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         msg.id === optimisticMessage.id ? realMessage : msg
       ));
       
+      // Emit message sent event for read tracking
+      socketRef.current?.emit('message-sent', { 
+        messageId: realMessage.id, 
+        chatId: chatId 
+      });
+      
     } catch (error: any) {
       console.error('Error sending message:', error);
       console.error('Error response:', error.response?.data);
@@ -431,7 +443,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         {!isMinimized && (
           <>
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ minHeight: '200px' }}>
               {isLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -574,11 +586,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                               })}
                             </span>
                             {message.senderType === 'user' && (
-                              message.isRead ? (
-                                <CheckCheck className="w-3 h-3" />
-                              ) : (
-                                <Check className="w-3 h-3" />
-                              )
+                              <div className="flex items-center space-x-1">
+                                {message.isRead ? (
+                                  <CheckCheck className="w-3 h-3 text-blue-400" />
+                                ) : (
+                                  <Check className="w-3 h-3 text-gray-400" />
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -586,13 +600,34 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                     ))
                   )}
                   
+                  {/* Typing Indicators */}
                   {adminTyping && (
                     <div className="flex justify-start">
                       <div className="bg-gray-100 text-gray-900 px-3 py-2 rounded-lg">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
+                            <User className="w-3 h-3 text-white" />
+                          </div>
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {isTyping && (
+                    <div className="flex justify-end">
+                      <div className="bg-blue-100 text-blue-900 px-3 py-2 rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          </div>
+                          <span className="text-xs">You are typing...</span>
                         </div>
                       </div>
                     </div>
