@@ -174,6 +174,9 @@ const ProductDetailPage: React.FC = () => {
     try {
       addToCart(product, quantity);
       
+      // Open cart sidebar to show the added item
+      openCart();
+      
       // Track add to cart analytics (ensure we send a valid id)
       try {
         const productId = (product as any).id || (product as any)._id || id;
@@ -338,7 +341,7 @@ const ProductDetailPage: React.FC = () => {
       try {
         setIsBuyingNow(true);
         addToCart(product, quantity);
-        openCart();
+        // Don't open cart sidebar for Buy Now - go directly to checkout
         navigate('/checkout');
         toast.success(t('productDetail.addedToCart'));
       } catch (error) {
