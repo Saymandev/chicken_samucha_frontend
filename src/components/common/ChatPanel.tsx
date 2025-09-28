@@ -118,13 +118,23 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     
     setIsLoading(true);
     try {
-      // Get or create chat session
-      const response = await chatAPI.getOrCreateSession();
+      // Start chat session with user info
+      const sessionData = {
+        customerInfo: {
+          name: user.name,
+          email: user.email,
+          phone: user.phone || '',
+          isAnonymous: false
+        },
+        category: 'general'
+      };
+      
+      const response = await chatAPI.startChatSession(sessionData);
       setChatSession(response.data.session);
       
       // Load existing messages
       if (response.data.session.chatId) {
-        const messagesResponse = await chatAPI.getMessages(response.data.session.chatId);
+        const messagesResponse = await chatAPI.getChatMessages(response.data.session.chatId);
         setMessages(messagesResponse.data.messages || []);
       }
       
@@ -237,7 +247,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const response = await chatAPI.createGuestSession(guestForm);
+      const sessionData = {
+        customerInfo: {
+          name: guestForm.name,
+          email: guestForm.email,
+          phone: guestForm.phone || '',
+          subject: guestForm.subject || 'General Inquiry',
+          isAnonymous: false
+        },
+        category: 'general'
+      };
+      
+      const response = await chatAPI.startChatSession(sessionData);
       setChatSession(response.data.session);
       setShowGuestForm(false);
       setIsAnonymous(false);
@@ -454,15 +475,30 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                   {language === 'bn' ? 'তথ্য দিয়ে চ্যাট শুরু করুন' : 'Start Chat with Details'}
                 </button>
                 <button
-                  onClick={() => {
-                    setIsAnonymous(false);
-                    // Initialize anonymous chat
-                    setChatSession({
-                      id: 'anonymous',
-                      chatId: `anonymous-${Date.now()}`,
-                      isActive: true,
-                      createdAt: new Date().toISOString()
-                    });
+                  onClick={async () => {
+                    try {
+                      const sessionData = {
+                        customerInfo: {
+                          name: 'Anonymous User',
+                          email: '',
+                          phone: '',
+                          isAnonymous: true
+                        },
+                        category: 'general'
+                      };
+                      
+                      const response = await chatAPI.startChatSession(sessionData);
+                      setChatSession(response.data.session);
+                      setIsAnonymous(false);
+                      
+                      // Initialize socket for anonymous user
+                      initializeSocket(response.data.session.chatId);
+                      
+                      toast.success('Anonymous chat started');
+                    } catch (error) {
+                      console.error('Failed to start anonymous chat:', error);
+                      toast.error('Failed to start anonymous chat');
+                    }
                   }}
                   className="w-full border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg transition-colors"
                 >
