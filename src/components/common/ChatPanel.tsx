@@ -428,6 +428,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
             <button
               onClick={() => setIsMinimized(!isMinimized)}
               className="p-1 hover:bg-white/20 rounded transition-colors"
+              title={isMinimized ? "Expand chat" : "Minimize chat"}
             >
               <Minimize2 className="w-4 h-4" />
             </button>
@@ -440,7 +441,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {!isMinimized && (
+        {!isMinimized ? (
           <>
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ minHeight: '200px' }}>
@@ -732,6 +733,17 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
               </div>
             )}
           </>
+        ) : (
+          /* Minimized State */
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <User className="w-4 h-4 text-blue-600" />
+              </div>
+              <p className="text-sm text-gray-600">Chat minimized</p>
+              <p className="text-xs text-gray-500">Click to expand</p>
+            </div>
+          </div>
         )}
       </motion.div>
     </AnimatePresence>
