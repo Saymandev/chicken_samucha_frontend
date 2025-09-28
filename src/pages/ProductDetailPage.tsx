@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
+import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useStore } from '../store/useStore';
-import { productsAPI, reviewsAPI } from '../utils/api';
+import { ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
 
 interface Product {
   id: string;
@@ -60,8 +61,9 @@ const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { language, addToCart } = useStore();
+  const { language, addToCart, user } = useStore();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { openCart } = useCart();
 
   // Extract YouTube video ID from URL
   const getYouTubeVideoId = (url: string): string | null => {
@@ -81,6 +83,14 @@ const ProductDetailPage: React.FC = () => {
   const [relatedLoading, setRelatedLoading] = useState(false);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
+  const [showQuickOrderModal, setShowQuickOrderModal] = useState(false);
+  const [quickOrderData, setQuickOrderData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: ''
+  });
 
   useEffect(() => {
     if (id) {
@@ -320,6 +330,82 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  const handleBuyNow = async () => {
+    if (!product) return;
+
+    // For authenticated users, add to cart and go to checkout
+    if (user) {
+      try {
+        setIsBuyingNow(true);
+        addToCart(product, quantity);
+        openCart();
+        navigate('/checkout');
+        toast.success(t('productDetail.addedToCart'));
+      } catch (error) {
+        toast.error(t('productDetail.somethingWentWrong'));
+      } finally {
+        setIsBuyingNow(false);
+      }
+    } else {
+      // For guest users, show quick order modal
+      setShowQuickOrderModal(true);
+    }
+  };
+
+  const handleQuickOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product) return;
+
+    if (!quickOrderData.name || !quickOrderData.phone || !quickOrderData.email) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setIsBuyingNow(true);
+      
+      // Create direct order for guest user
+      const orderData = new FormData();
+      
+      orderData.append('customer', JSON.stringify({
+        name: quickOrderData.name,
+        phone: quickOrderData.phone,
+        email: quickOrderData.email,
+        address: quickOrderData.address || 'Address not provided'
+      }));
+      
+      orderData.append('items', JSON.stringify([{
+        product: product.id || (product as any)._id,
+        quantity: quantity
+      }]));
+      
+      orderData.append('paymentInfo', JSON.stringify({
+        method: 'cod',
+        status: 'pending'
+      }));
+      
+      orderData.append('deliveryInfo', JSON.stringify({
+        method: 'delivery',
+        address: quickOrderData.address || 'Address not provided'
+      }));
+
+      const response = await ordersAPI.createOrder(orderData);
+      
+      if (response.data.success) {
+        toast.success('Order placed successfully! We will contact you soon.');
+        setShowQuickOrderModal(false);
+        setQuickOrderData({ name: '', phone: '', email: '', address: '' });
+      } else {
+        toast.error(response.data.message || 'Failed to place order');
+      }
+    } catch (error: any) {
+      console.error('Error placing order:', error);
+      toast.error(error.response?.data?.message || 'Failed to place order');
+    } finally {
+      setIsBuyingNow(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
@@ -521,27 +607,39 @@ const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={!product.isAvailable || product.stock === 0 || isAddingToCart}
+                    className="flex-1 bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    {isAddingToCart ? t('productDetail.adding') : t('productDetail.addToCart')}
+                  </button>
+                  <button 
+                    onClick={handleWishlistToggle}
+                    disabled={isWishlistLoading}
+                    className={`p-3 border rounded-lg transition-colors ${
+                      isInWishlist(product.id || (product as any)._id)
+                        ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+                        : 'border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700'
+                    } ${isWishlistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Heart className={`w-5 h-5 ${
+                      isInWishlist(product.id || (product as any)._id) ? 'fill-current' : ''
+                    }`} />
+                  </button>
+                </div>
+                
+                {/* Buy Now Button */}
                 <button
-                  onClick={handleAddToCart}
-                  disabled={!product.isAvailable || product.stock === 0 || isAddingToCart}
-                  className="flex-1 bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  onClick={handleBuyNow}
+                  disabled={!product.isAvailable || product.stock === 0 || isBuyingNow}
+                  className="w-full bg-[#ef4444] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#dc2626] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  {isAddingToCart ? t('productDetail.adding') : t('productDetail.addToCart')}
-                </button>
-                <button 
-                  onClick={handleWishlistToggle}
-                  disabled={isWishlistLoading}
-                  className={`p-3 border rounded-lg transition-colors ${
-                    isInWishlist(product.id || (product as any)._id)
-                      ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
-                      : 'border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700'
-                  } ${isWishlistLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <Heart className={`w-5 h-5 ${
-                    isInWishlist(product.id || (product as any)._id) ? 'fill-current' : ''
-                  }`} />
+                  <Zap className="w-5 h-5" />
+                  {isBuyingNow ? (language === 'bn' ? 'অর্ডার হচ্ছে...' : 'Processing...') : (language === 'bn' ? 'এখনই কিনুন' : 'Buy Now')}
                 </button>
               </div>
 
@@ -680,6 +778,125 @@ const ProductDetailPage: React.FC = () => {
             )}
           </div>
 
+          {/* Quick Order Modal for Guest Users */}
+          {showQuickOrderModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {language === 'bn' ? 'দ্রুত অর্ডার' : 'Quick Order'}
+                    </h3>
+                    <button
+                      onClick={() => setShowQuickOrderModal(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Product Summary */}
+                  <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    {product.images && product.images.length > 0 && (
+                      <img
+                        src={product.images[0].url}
+                        alt={language === 'bn' ? product.name.bn : product.name.en}
+                        className="w-12 h-12 object-cover rounded-lg"
+                      />
+                    )}
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">
+                        {language === 'bn' ? product.name.bn : product.name.en}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Qty: {quantity} × ৳{product.discountPrice || product.price} = ৳{quantity * (product.discountPrice || product.price)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleQuickOrderSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {language === 'bn' ? 'নাম *' : 'Name *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={quickOrderData.name}
+                        onChange={(e) => setQuickOrderData({...quickOrderData, name: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {language === 'bn' ? 'ফোন নম্বর *' : 'Phone Number *'}
+                      </label>
+                      <input
+                        type="tel"
+                        value={quickOrderData.phone}
+                        onChange={(e) => setQuickOrderData({...quickOrderData, phone: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {language === 'bn' ? 'ইমেইল *' : 'Email *'}
+                      </label>
+                      <input
+                        type="email"
+                        value={quickOrderData.email}
+                        onChange={(e) => setQuickOrderData({...quickOrderData, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {language === 'bn' ? 'ঠিকানা' : 'Address'}
+                      </label>
+                      <textarea
+                        value={quickOrderData.address}
+                        onChange={(e) => setQuickOrderData({...quickOrderData, address: e.target.value})}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        placeholder={language === 'bn' ? 'বিস্তারিত ঠিকানা দিন...' : 'Enter detailed address...'}
+                      />
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowQuickOrderModal(false)}
+                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {language === 'bn' ? 'বাতিল' : 'Cancel'}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isBuyingNow}
+                        className="flex-1 px-4 py-2 bg-[#ef4444] hover:bg-[#dc2626] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isBuyingNow ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            {language === 'bn' ? 'অর্ডার হচ্ছে...' : 'Placing Order...'}
+                          </>
+                        ) : (
+                          language === 'bn' ? 'অর্ডার করুন' : 'Place Order'
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
           
         </motion.div>
       </div>
