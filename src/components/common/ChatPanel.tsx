@@ -166,7 +166,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       } : {
         name: guestForm.name || 'Guest User',
         phone: guestForm.phone || '',
-        email: guestForm.email || ''
+        email: guestForm.email || '',
+        isGuest: true
       };
 
       console.log('Sending customerInfo:', customerInfo);
@@ -386,13 +387,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       return;
     }
     setShowGuestForm(false);
-    setIsAnonymous(false);
+    setIsAnonymous(false); // Explicitly set as not anonymous since they provided details
     initializeChat();
   };
 
   const handleAnonymousStart = () => {
     setIsAnonymous(true);
     setShowGuestForm(false);
+    // Clear guest form when starting anonymous chat
+    setGuestForm({ name: '', phone: '', email: '' });
     // Initialize chat immediately for anonymous users
     initializeChat();
   };

@@ -14,6 +14,7 @@ interface ChatSession {
     phone: string;
     user?: string;
     isGuest: boolean;
+    isAnonymous: boolean;
   };
   status: 'active' | 'waiting' | 'closed' | 'archived';
   lastMessage?: {
@@ -417,7 +418,10 @@ const AdminChat: React.FC = () => {
                               {chat.customer.name}
                             </h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {chat.customer.phone}
+                              {chat.customer.isAnonymous ? 'Anonymous User' : 
+                               chat.customer.email ? chat.customer.email : 
+                               chat.customer.phone ? chat.customer.phone : 
+                               'Guest User'}
                             </p>
                           </div>
                         </div>
@@ -498,7 +502,10 @@ const AdminChat: React.FC = () => {
                             {selectedChat.customer.name}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {selectedChat.customer.email} • {selectedChat.customer.phone}
+                            {selectedChat.customer.isAnonymous ? 'Anonymous User' : 
+                             selectedChat.customer.email ? selectedChat.customer.email : 
+                             'Guest User'} 
+                            {selectedChat.customer.phone && !selectedChat.customer.isAnonymous && ` • ${selectedChat.customer.phone}`}
                           </p>
                         </div>
                       </div>
