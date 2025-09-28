@@ -17,7 +17,6 @@ import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 
 // Feature Pages
-import ChatPage from './pages/ChatPage';
 import ContactUsPage from './pages/ContactUsPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import FAQPage from './pages/FAQPage';
@@ -164,7 +163,6 @@ function AppContent() {
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />
-          <Route path="/chat" element={<ChatPage />} />
           
           {/* Payment Result Pages */}
           <Route path="/payment/success" element={<PaymentSuccessPage />} />

@@ -224,8 +224,11 @@ export const contentAPI = {
 
 export const chatAPI = {
   startChatSession: (data: any) => api.post('/chat/session', data),
+  getOrCreateSession: () => api.post('/chat/session/get-or-create'),
   getChatSession: (chatId: string) => api.get(`/chat/session/${chatId}`),
   getChatMessages: (chatId: string, params?: any) =>
+    api.get(`/chat/${chatId}/messages`, { params }),
+  getMessages: (chatId: string, params?: any) =>
     api.get(`/chat/${chatId}/messages`, { params }),
   
   sendMessage: (messageData: FormData) =>
@@ -235,6 +238,16 @@ export const chatAPI = {
   
   updateChatSession: (chatId: string, data: any) =>
     api.put(`/chat/session/${chatId}`, data),
+  
+  markMessageAsRead: (messageId: string) =>
+    api.put(`/chat/message/${messageId}/read`),
+  
+  createGuestSession: (guestData: {
+    name: string;
+    email: string;
+    phone?: string;
+    subject?: string;
+  }) => api.post('/chat/session/guest', guestData),
 };
 
 // Contact and Support APIs

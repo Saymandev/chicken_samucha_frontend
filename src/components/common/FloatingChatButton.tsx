@@ -1,17 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Mail, MessageCircle, Phone, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
+import ChatPanel from './ChatPanel';
 
 interface FloatingChatButtonProps {
   className?: string;
 }
 
 const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' }) => {
-  const { isAuthenticated,  language } = useStore();
-  const navigate = useNavigate();
+  const { isAuthenticated, language } = useStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [showChatPanel, setShowChatPanel] = useState(false);
   
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -31,14 +31,15 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
 
   const handleChatClick = () => {
     if (isAuthenticated) {
-      navigate('/chat');
+      setShowChatPanel(true);
+      setIsOpen(false);
     } else {
       setIsOpen(!isOpen);
     }
   };
 
   const handleGuestChat = () => {
-    navigate('/chat');
+    setShowChatPanel(true);
     setIsOpen(false);
   };
 
@@ -52,8 +53,15 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
   };
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 ${className}`} ref={chatRef}>
-      {/* Chat Options Panel */}
+    <>
+      {/* Chat Panel */}
+      <ChatPanel 
+        isOpen={showChatPanel} 
+        onClose={() => setShowChatPanel(false)} 
+      />
+      
+      <div className={`fixed bottom-6 right-6 z-50 ${className}`} ref={chatRef}>
+        {/* Chat Options Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -156,19 +164,25 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
       {/* Floating Chat Button */}
       <motion.button
         onClick={handleChatClick}
-        className="relative w-16 h-16 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+        className={`relative w-16 h-16 ${
+          showChatPanel 
+            ? 'bg-green-500 hover:bg-green-600' 
+            : 'bg-orange-500 hover:bg-orange-600'
+        } text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group`}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         {/* Toggle icon: Message when closed, X when open */}
         {isOpen ? (
           <X className="w-8 h-8 font-bold" />
+        ) : showChatPanel ? (
+          <MessageCircle className="w-8 h-8 font-bold animate-pulse" />
         ) : (
           <MessageCircle className="w-8 h-8 font-bold" />
         )}
 
-        {/* Notification Badge - show only when closed */}
-        {!isOpen && (
+        {/* Notification Badge - show only when closed and no chat panel */}
+        {!isOpen && !showChatPanel && (
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
             <div className="w-2 h-2 bg-white rounded-full" />
           </div>
@@ -178,11 +192,14 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
         <div className="absolute left-full ml-3 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
           {isOpen
             ? (language === 'bn' ? 'বন্ধ করুন' : 'Close')
+            : showChatPanel
+            ? (language === 'bn' ? 'চ্যাট খোলা' : 'Chat Open')
             : (language === 'bn' ? 'সহায়তা পান' : 'Get Help')}
           <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
         </div>
       </motion.button>
     </div>
+    </>
   );
 };
 

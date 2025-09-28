@@ -1,17 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Globe,
-  Home,
-  LogOut,
-  Menu,
-  MessageCircle,
-  Moon,
-  Package,
-  Settings,
-  ShoppingCart,
-  Sun,
-  User,
-  X
+    Globe,
+    Home,
+    LogOut,
+    Menu,
+    Moon,
+    Package,
+    Settings,
+    ShoppingCart,
+    Sun,
+    User,
+    X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -82,12 +81,6 @@ const Navbar: React.FC = () => {
       icon: <Package className="w-4 h-4" />,
       active: location.pathname.startsWith('/products')
     },
-    {
-      path: '/chat',
-      label: t('nav.chat'),
-      icon: <MessageCircle className="w-4 h-4" />,
-      active: location.pathname === '/chat'
-    }
   ];
 
   const userMenuItems = [
