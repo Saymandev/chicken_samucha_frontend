@@ -56,6 +56,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [adminTyping, setAdminTyping] = useState(false);
   const [chatSession, setChatSession] = useState<ChatSession | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -66,12 +67,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     phone: '',
     email: ''
   });
+  const [showGuestForm, setShowGuestForm] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -156,18 +159,20 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         isAnonymous: true
       } : guestForm;
 
-      console.log('Starting chat session with:', customerInfo);
-      console.log('User data:', user);
-      console.log('Is authenticated:', isAuthenticated);
+      console.log('🔍 Starting chat session with:', customerInfo);
+      console.log('🔍 User data:', user);
+      console.log('🔍 Is authenticated:', isAuthenticated);
+      console.log('🔍 API Base URL:', 'https://rest.ourb.live/api');
 
       const response = await chatAPI.startChatSession({
         customerInfo,
         category: 'general'
       });
 
-      console.log('Chat session response:', response.data);
+      console.log('🔍 Chat session response:', response.data);
 
       const session = response.data.data.chatSession;
+      console.log('🔍 Extracted session:', session);
       setChatSession(session);
 
       if (session.chatId || session.id) {
@@ -176,10 +181,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         
         try {
           const messagesResponse = await chatAPI.getChatMessages(chatId);
-          console.log('Messages response:', messagesResponse.data);
+          console.log('🔍 Messages response:', messagesResponse.data);
           
           const loadedMessages = messagesResponse.data?.data?.messages || [];
-          console.log('Loaded messages:', loadedMessages);
+          console.log('🔍 Loaded messages:', loadedMessages);
+          console.log('🔍 Messages count:', loadedMessages.length);
           
           if (loadedMessages.length > 0) {
             setMessages(loadedMessages);
@@ -195,24 +201,40 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         initializeSocket(chatId);
       }
     } catch (error: any) {
-      console.error('Error initializing chat:', error);
-      console.error('Error response:', error.response?.data);
+      console.error('❌ Error initializing chat:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error status:', error.response?.status);
       toast.error('Failed to start chat session. Please try again.');
     } finally {
       setIsLoading(false);
     }
   }, [isAuthenticated, user, isAnonymous, guestForm, initializeSocket]);
 
+  // Initialize chat when component mounts (like the working ChatPage)
   useEffect(() => {
-    if (isOpen) {
-      // For authenticated users, wait for user data to be available
-      if (isAuthenticated && !user) {
-        console.log('Waiting for user data to load...');
-        return;
-      }
+    if (isAuthenticated && user) {
       initializeChat();
+    } else if (!isAuthenticated) {
+      // For non-authenticated users, show anonymous option first
+      setShowGuestForm(false);
     }
-  }, [isOpen, initializeChat, isAuthenticated, user]);
+    
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user]);
+
+  // Also initialize when chat panel opens
+  useEffect(() => {
+    if (isOpen && !isAuthenticated) {
+      // For non-authenticated users, show guest form when panel opens
+      setShowGuestForm(true);
+    }
+  }, [isOpen, isAuthenticated]);
 
   // Cleanup socket on unmount
   useEffect(() => {
@@ -293,6 +315,33 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleTyping = () => {
+    if (!isTyping && chatSession) {
+      setIsTyping(true);
+      socketRef.current?.emit('typing', {
+        chatId: chatSession.chatId || chatSession.id,
+        senderType: 'user',
+        senderName: user?.name || guestForm.name
+      });
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set new timeout
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      if (chatSession) {
+        socketRef.current?.emit('stop-typing', {
+          chatId: chatSession.chatId || chatSession.id,
+          senderType: 'user'
+        });
+      }
+    }, 1000);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -333,11 +382,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
 
   const handleGuestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!guestForm.name.trim()) {
-      toast.error('Please enter your name');
+    if (!guestForm.name || !guestForm.email) {
+      toast.error('Please fill in your name and email');
       return;
     }
+    setShowGuestForm(false);
     setIsAnonymous(false);
+    initializeChat();
+  };
+
+  const handleAnonymousStart = () => {
+    setIsAnonymous(true);
+    setShowGuestForm(false);
     initializeChat();
   };
 
@@ -395,7 +451,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
-              ) : !isAuthenticated && !isAnonymous ? (
+              ) : showGuestForm ? (
                 <div className="text-center py-8">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <User className="w-6 h-6 text-blue-600" />
@@ -403,51 +459,64 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome to Support</h3>
                   <p className="text-sm text-gray-600 mb-6">Choose how you'd like to chat with us</p>
                   
-                  <form onSubmit={handleGuestSubmit} className="space-y-4">
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Your Name"
-                        value={guestForm.name}
-                        onChange={(e) => setGuestForm(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
+                  <div className="space-y-4">
+                    {/* Anonymous Option */}
+                    <button
+                      type="button"
+                      onClick={handleAnonymousStart}
+                      className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 flex items-center justify-center space-x-2"
+                    >
+                      <User className="w-5 h-5" />
+                      <span>Start Anonymous Chat</span>
+                    </button>
+
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">or</span>
+                      </div>
                     </div>
-                    <div>
-                      <input
-                        type="email"
-                        placeholder="Email (optional)"
-                        value={guestForm.email}
-                        onChange={(e) => setGuestForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="tel"
-                        placeholder="Phone (optional)"
-                        value={guestForm.phone}
-                        onChange={(e) => setGuestForm(prev => ({ ...prev, phone: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div className="flex space-x-2">
+
+                    <form onSubmit={handleGuestSubmit} className="space-y-4">
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Your Name *"
+                          value={guestForm.name}
+                          onChange={(e) => setGuestForm(prev => ({ ...prev, name: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="email"
+                          placeholder="Email *"
+                          value={guestForm.email}
+                          onChange={(e) => setGuestForm(prev => ({ ...prev, email: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="tel"
+                          placeholder="Phone (optional)"
+                          value={guestForm.phone}
+                          onChange={(e) => setGuestForm(prev => ({ ...prev, phone: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
                       <button
                         type="submit"
-                        className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                       >
-                        Start Chat
+                        Start Chat with Details
                       </button>
-                      <button
-                        type="button"
-                        onClick={handleAnonymousChat}
-                        className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors font-medium"
-                      >
-                        Anonymous
-                      </button>
-                    </div>
-                  </form>
+                    </form>
+                  </div>
                 </div>
               ) : (
                 <>
@@ -622,7 +691,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                     <input
                       type="text"
                       value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
+                      onChange={(e) => {
+                        setNewMessage(e.target.value);
+                        handleTyping();
+                      }}
                       placeholder={selectedFile ? "Add a message (optional)..." : "Type your message..."}
                       className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
                       disabled={!chatSession}
