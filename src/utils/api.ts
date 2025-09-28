@@ -236,9 +236,6 @@ export const chatAPI = {
   
   updateChatSession: (chatId: string, data: any) =>
     api.put(`/chat/session/${chatId}`, data),
-  
-  markMessageAsRead: (messageId: string) =>
-    api.put(`/chat/message/${messageId}/read`),
 };
 
 // Contact and Support APIs

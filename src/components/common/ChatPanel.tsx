@@ -82,8 +82,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   };
 
   useEffect(() => {
-    console.log('🔍 Messages state changed:', messages);
-    console.log('🔍 Messages count in state:', messages.length);
     scrollToBottom();
   }, [messages]);
 
@@ -161,71 +159,35 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         isAnonymous: true
       } : guestForm;
 
-      console.log('🔍 Starting chat session with:', customerInfo);
-      console.log('🔍 User data:', user);
-      console.log('🔍 Is authenticated:', isAuthenticated);
-      console.log('🔍 API Base URL:', 'https://rest.ourb.live/api');
 
       const response = await chatAPI.startChatSession({
         customerInfo,
         category: 'general'
       });
 
-      console.log('🔍 Chat session response:', response.data);
-      console.log('🔍 Response data structure:', {
-        hasData: !!response.data,
-        hasDataData: !!response.data?.data,
-        hasChatSession: !!response.data?.data?.chatSession,
-        fullData: response.data
-      });
-
       const session = response.data.data.chatSession;
-      console.log('🔍 Extracted session:', session);
-      console.log('🔍 Session chatId:', session?.chatId);
-      console.log('🔍 Session id:', session?.id);
       setChatSession(session);
 
       if (session.chatId || session.id) {
         const chatId = session.chatId || session.id;
-        console.log('🔍 Loading messages for chatId:', chatId);
-        console.log('🔍 ChatId type:', typeof chatId);
-        console.log('🔍 ChatId value:', JSON.stringify(chatId));
-        
         try {
-          console.log('🔍 Fetching messages for chatId:', chatId);
           const messagesResponse = await chatAPI.getChatMessages(chatId);
-          console.log('🔍 Full messages response:', messagesResponse);
-          console.log('🔍 Messages response data:', messagesResponse.data);
-          console.log('🔍 Messages response data.data:', messagesResponse.data?.data);
-          console.log('🔍 Messages response data.data.messages:', messagesResponse.data?.data?.messages);
-          
           const loadedMessages = messagesResponse.data?.data?.messages || [];
-          console.log('🔍 Loaded messages array:', loadedMessages);
-          console.log('🔍 Messages count:', loadedMessages.length);
-          console.log('🔍 First message:', loadedMessages[0]);
           
           if (loadedMessages.length > 0) {
-            console.log('🔍 Setting messages to state');
             setMessages(loadedMessages);
           } else {
-            console.log('🔍 No messages found, setting empty array');
             setMessages([]);
           }
         } catch (msgError: any) {
-          console.error('❌ Error loading messages:', msgError);
-          console.error('❌ Error details:', msgError.response?.data);
-          console.error('❌ Error status:', msgError.response?.status);
-          console.error('❌ Error message:', msgError.message);
+          console.error('Error loading messages:', msgError);
           setMessages([]);
         }
         
         initializeSocket(chatId);
       }
     } catch (error: any) {
-      console.error('❌ Error initializing chat:', error);
-      console.error('❌ Error response:', error.response?.data);
-      console.error('❌ Error message:', error.message);
-      console.error('❌ Error status:', error.response?.status);
+      console.error('Error initializing chat:', error);
       toast.error('Failed to start chat session. Please try again.');
     } finally {
       setIsLoading(false);
@@ -237,7 +199,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     if (isAuthenticated && user) {
       initializeChat();
     } else if (!isAuthenticated) {
-      // For non-authenticated users, show anonymous option first
       setShowGuestForm(false);
     }
     
@@ -252,7 +213,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   // Also initialize when chat panel opens
   useEffect(() => {
     if (isOpen && !isAuthenticated) {
-      // For non-authenticated users, show guest form when panel opens
       setShowGuestForm(true);
     }
   }, [isOpen, isAuthenticated]);
@@ -568,7 +528,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                             <div className="mt-2 space-y-2">
                               {message.attachments.map((attachment, index) => (
                                 <div key={index} className="bg-white/10 rounded p-2">
-                                  {attachment.type.startsWith('image/') ? (
+                                  {attachment.type === 'image' || attachment.type?.startsWith('image/') ? (
                                     <div className="space-y-2">
                                       <img
                                         src={attachment.url}
