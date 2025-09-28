@@ -225,6 +225,7 @@ export const contentAPI = {
 export const chatAPI = {
   startChatSession: (data: any) => api.post('/chat/session', data),
   getChatSession: (chatId: string) => api.get(`/chat/session/${chatId}`),
+  getChatSessions: (params?: any) => api.get('/chat/sessions', { params }),
   getChatMessages: (chatId: string, params?: any) =>
     api.get(`/chat/${chatId}/messages`, { params }),
   

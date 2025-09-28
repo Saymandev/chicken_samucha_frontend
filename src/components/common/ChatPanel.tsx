@@ -133,11 +133,58 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     
     setIsLoading(true);
     try {
-      console.log('Starting chat session for user:', user);
+      console.log('Starting chat initialization for user:', user);
       console.log('User authentication status:', isAuthenticated);
       console.log('Auth token exists:', !!localStorage.getItem('token'));
       
-      // Start chat session with user info
+      // First, try to get existing active chat sessions for this user
+      try {
+        console.log('Checking for existing chat sessions...');
+        const existingSessionsResponse = await chatAPI.getChatSessions({ 
+          userId: user.id, 
+          status: 'active',
+          limit: 1 
+        });
+        
+        if (existingSessionsResponse.data.sessions && existingSessionsResponse.data.sessions.length > 0) {
+          const existingSession = existingSessionsResponse.data.sessions[0];
+          console.log('Found existing session:', existingSession);
+          
+          const finalChatId = existingSession.chatId || existingSession.id;
+          const sessionWithChatId = { ...existingSession, chatId: finalChatId };
+          
+          console.log('Using existing session:', sessionWithChatId);
+          setChatSession(sessionWithChatId);
+          
+          // Load messages for existing session
+          if (finalChatId) {
+            console.log('Loading messages for existing chatId:', finalChatId);
+            try {
+              const messagesResponse = await chatAPI.getChatMessages(finalChatId);
+              console.log('Messages response:', messagesResponse);
+              console.log('Messages data:', messagesResponse.data);
+              
+              const loadedMessages = messagesResponse.data.data?.messages || messagesResponse.data.messages || [];
+              console.log('Final messages to set:', loadedMessages);
+              console.log('Setting messages state with:', loadedMessages.length, 'messages');
+              setMessages(loadedMessages);
+            } catch (messageError: any) {
+              console.error('Failed to load messages:', messageError);
+              setMessages([]);
+            }
+          }
+          
+          // Initialize socket connection
+          console.log('Initializing socket with existing chatId:', finalChatId);
+          initializeSocket(finalChatId);
+          return;
+        }
+      } catch (existingSessionError) {
+        console.log('No existing sessions found or error:', existingSessionError);
+      }
+      
+      // If no existing session, create a new one
+      console.log('Creating new chat session...');
       const sessionData = {
         customerInfo: {
           name: user.name,
@@ -577,10 +624,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                       </p>
                     </div>
                   ) : (
-                    (() => {
-                      console.log('Rendering messages:', messages.length, 'messages');
-                      console.log('Messages array:', messages);
-                      return messages.map((message, index) => (
+                    messages.map((message, index) => (
                       <div
                         key={message.id}
                         className={`flex ${message.senderType === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -655,8 +699,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                           </div>
                         </div>
                       </div>
-                    ));
-                    })()
+                    ))
                   )}
                   
                   {adminTyping && (
