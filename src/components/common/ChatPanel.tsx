@@ -137,18 +137,28 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       
       console.log('Sending session data:', sessionData);
       const response = await chatAPI.startChatSession(sessionData);
-      console.log('Chat session response:', response.data);
+      console.log('Full response:', response);
+      console.log('Response data:', response.data);
+      console.log('Response data keys:', Object.keys(response.data));
       
-      setChatSession(response.data.chatSession);
+      // Handle different response structures
+      const chatSessionData = response.data.chatSession || response.data.session || response.data;
+      console.log('Session data:', chatSessionData);
+      
+      if (!chatSessionData || !chatSessionData.chatId) {
+        throw new Error('Invalid session data received from server');
+      }
+      
+      setChatSession(chatSessionData);
       
       // Load existing messages
-      if (response.data.chatSession.chatId) {
-        const messagesResponse = await chatAPI.getChatMessages(response.data.chatSession.chatId);
+      if (chatSessionData.chatId) {
+        const messagesResponse = await chatAPI.getChatMessages(chatSessionData.chatId);
         setMessages(messagesResponse.data.messages || []);
       }
       
       // Initialize socket connection
-      initializeSocket(response.data.chatSession.chatId);
+      initializeSocket(chatSessionData.chatId);
     } catch (error: any) {
       console.error('Failed to initialize chat:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -269,12 +279,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       };
       
       const response = await chatAPI.startChatSession(sessionData);
-      setChatSession(response.data.chatSession);
+      console.log('Guest chat response:', response.data);
+      
+      const chatSessionData = response.data.chatSession || response.data.session || response.data;
+      if (!chatSessionData || !chatSessionData.chatId) {
+        throw new Error('Invalid session data received from server');
+      }
+      
+      setChatSession(chatSessionData);
       setShowGuestForm(false);
       setIsAnonymous(false);
       
       // Initialize socket for guest
-      initializeSocket(response.data.chatSession.chatId);
+      initializeSocket(chatSessionData.chatId);
       
       toast.success('Chat session started');
     } catch (error) {
@@ -498,11 +515,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                       };
                       
                       const response = await chatAPI.startChatSession(sessionData);
-                      setChatSession(response.data.chatSession);
+                      console.log('Anonymous chat response:', response.data);
+                      
+                      const chatSessionData = response.data.chatSession || response.data.session || response.data;
+                      if (!chatSessionData || !chatSessionData.chatId) {
+                        throw new Error('Invalid session data received from server');
+                      }
+                      
+                      setChatSession(chatSessionData);
                       setIsAnonymous(false);
                       
                       // Initialize socket for anonymous user
-                      initializeSocket(response.data.chatSession.chatId);
+                      initializeSocket(chatSessionData.chatId);
                       
                       toast.success('Anonymous chat started');
                     } catch (error) {
