@@ -155,7 +155,7 @@ export const useStore = create<AppStore>()(
       isAuthenticated: false,
       
       theme: 'light',
-      language: 'en',
+      language: 'bn',
       
       cart: [],
       cartCount: 0,
