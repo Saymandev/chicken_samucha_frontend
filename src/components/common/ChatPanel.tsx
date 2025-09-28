@@ -140,6 +140,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   const initializeChat = useCallback(async () => {
     setIsLoading(true);
     try {
+      // Wait a bit for user data to be available
+      if (isAuthenticated && !user) {
+        console.log('User is authenticated but user data not loaded yet, waiting...');
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
       const customerInfo = isAuthenticated ? {
         name: user?.name || 'User',
         phone: user?.phone || '',
@@ -152,6 +158,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       } : guestForm;
 
       console.log('Starting chat session with:', customerInfo);
+      console.log('User data:', user);
+      console.log('Is authenticated:', isAuthenticated);
 
       const response = await chatAPI.startChatSession({
         customerInfo,
@@ -198,9 +206,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
+      // For authenticated users, wait for user data to be available
+      if (isAuthenticated && !user) {
+        console.log('Waiting for user data to load...');
+        return;
+      }
       initializeChat();
     }
-  }, [isOpen, initializeChat]);
+  }, [isOpen, initializeChat, isAuthenticated, user]);
 
   // Cleanup socket on unmount
   useEffect(() => {
