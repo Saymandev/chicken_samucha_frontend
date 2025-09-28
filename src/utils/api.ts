@@ -239,11 +239,6 @@ export const chatAPI = {
   
   markMessageAsRead: (messageId: string) =>
     api.put(`/chat/message/${messageId}/read`),
-  
-  uploadFile: (formData: FormData) =>
-    api.post('/chat/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }),
 };
 
 // Contact and Support APIs

@@ -4,7 +4,6 @@ import {
     CheckCheck,
     Download,
     FileText,
-    Image,
     Minimize2,
     Paperclip,
     Send,
@@ -224,70 +223,73 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     };
   }, []);
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() && !selectedFile) return;
-
-    if (!chatSession) {
-      toast.error('Chat session not initialized');
-      return;
-    }
+  const sendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
+    if ((!newMessage.trim() && !selectedFile) || !chatSession) return;
 
     const chatId = chatSession.chatId || chatSession.id;
-    if (!chatId) {
-      toast.error('Invalid chat session');
-      return;
+    const messageText = newMessage.trim();
+    const currentFile = selectedFile;
+    
+    // Create optimistic message for immediate UI feedback
+    const optimisticMessage: Message = {
+      id: `temp-${Date.now()}`,
+      senderId: user?.id || 'guest',
+      senderName: user?.name || guestForm.name || 'You',
+      senderType: 'user',
+      message: messageText || (currentFile ? `Sent an image: ${currentFile.name}` : ''),
+      messageType: currentFile?.type?.startsWith('image/') ? 'image' : 'text',
+      attachments: currentFile ? [{
+        type: currentFile.type?.startsWith('image/') ? 'image' : 'document',
+        url: URL.createObjectURL(currentFile),
+        filename: currentFile.name,
+        size: currentFile.size
+      }] : [],
+      timestamp: new Date().toISOString(),
+      isRead: false
+    };
+
+    // Add optimistic message immediately
+    setMessages(prev => [...prev, optimisticMessage]);
+    
+    // Clear input and file immediately
+    setNewMessage('');
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
 
     try {
-      let messageData: any = {
-        chatId,
-        message: newMessage,
-        senderType: 'user'
-      };
-
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('message', newMessage);
-        formData.append('chatId', chatId);
-        formData.append('senderType', 'user');
-
-        const uploadResponse = await chatAPI.uploadFile(formData);
-        messageData.attachments = uploadResponse.data.attachments;
-        messageData.messageType = selectedFile.type.startsWith('image/') ? 'image' : 'file';
-      }
-
-      // Optimistic update
-      const tempMessage: Message = {
-        id: Date.now().toString(),
-        senderId: user?.id || 'guest',
-        senderName: user?.name || 'You',
-        senderType: 'user',
-        message: newMessage,
-        messageType: selectedFile ? (selectedFile.type.startsWith('image/') ? 'image' : 'file') : 'text',
-        attachments: selectedFile ? [{
-          type: selectedFile.type,
-          url: URL.createObjectURL(selectedFile),
-          filename: selectedFile.name,
-          size: selectedFile.size
-        }] : undefined,
-        timestamp: new Date().toISOString(),
-        isRead: false
-      };
-
-      setMessages(prev => [...prev, tempMessage]);
-      setNewMessage('');
-      setSelectedFile(null);
-
-      // Send to server
-      await chatAPI.sendMessage(messageData);
+      // Send via API for persistence
+      const formData = new FormData();
+      formData.append('chatId', chatId);
       
-      // Emit typing stop
-      socketRef.current?.emit('stop-typing', { chatId, senderType: 'user' });
-
+      // Always append message (can be empty if only file)
+      formData.append('message', messageText);
+      
+      // Append file if selected
+      if (currentFile) {
+        formData.append('attachment', currentFile);
+      }
+      
+      const response = await chatAPI.sendMessage(formData);
+      
+      // Replace optimistic message with real message from API
+      const realMessage = response.data.data.chatMessage;
+      setMessages(prev => prev.map(msg => 
+        msg.id === optimisticMessage.id ? realMessage : msg
+      ));
+      
     } catch (error: any) {
       console.error('Error sending message:', error);
-      toast.error('Failed to send message. Please try again.');
+      console.error('Error response:', error.response?.data);
+      toast.error('Failed to send message');
+      
+      // Remove optimistic message on error and restore input
+      setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+      setNewMessage(messageText);
+      setSelectedFile(currentFile);
     }
   };
 
@@ -549,99 +551,92 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
             {/* Input Area */}
             {(isAuthenticated || isAnonymous || chatSession) && (
               <div className="p-3 border-t border-gray-200">
-                {selectedFile && (
-                  <div className="mb-3 p-2 bg-gray-50 rounded-lg flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      {selectedFile.type.startsWith('image/') ? (
-                        <Image className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <FileText className="w-4 h-4 text-blue-600" />
-                      )}
-                      <span className="text-sm text-gray-700 truncate max-w-48">
-                        {selectedFile.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        ({formatFileSize(selectedFile.size)})
-                      </span>
-                    </div>
+                <form onSubmit={sendMessage} className="flex items-center space-x-2">
+                  {/* File Attachment */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Attach file"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,.pdf,.doc,.docx"
+                  />
+                  
+                  {/* Emoji Picker */}
+                  <div className="relative">
                     <button
-                      onClick={removeSelectedFile}
-                      className="text-red-500 hover:text-red-700"
+                      type="button"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      title="Add emoji"
                     >
-                      <X className="w-4 h-4" />
+                      <Smile className="w-4 h-4" />
                     </button>
+                    
+                    {showEmojiPicker && (
+                      <div 
+                        ref={emojiPickerRef}
+                        className="absolute bottom-12 left-0 bg-white rounded-lg shadow-xl border p-3 z-50 max-h-60 overflow-y-auto"
+                        style={{ minWidth: '280px' }}
+                      >
+                        <div className="grid grid-cols-8 gap-1">
+                          {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏'].map((emoji, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => handleEmojiSelect(emoji)}
+                              className="w-7 h-7 text-sm hover:bg-gray-100 rounded transition-colors flex items-center justify-center"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-
-                <div className="flex items-end space-x-2">
+                  
                   <div className="flex-1 relative">
-                    <textarea
+                    {/* File preview */}
+                    {selectedFile && (
+                      <div className="mb-2 p-2 bg-gray-100 rounded-lg flex items-center justify-between">
+                        <span className="text-sm text-gray-600">
+                          📎 {selectedFile.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={removeSelectedFile}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                    
+                    <input
+                      type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Type your message..."
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      rows={1}
-                      style={{ minHeight: '44px', maxHeight: '120px' }}
+                      placeholder={selectedFile ? "Add a message (optional)..." : "Type your message..."}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
+                      disabled={!chatSession}
                     />
                   </div>
                   
-                  <div className="flex items-center space-x-1">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      onChange={handleFileSelect}
-                      accept="image/*,.pdf,.doc,.docx,.txt"
-                      className="hidden"
-                    />
-                    
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-                      title="Attach file"
-                    >
-                      <Paperclip className="w-4 h-4" />
-                    </button>
-                    
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                        className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-                        title="Add emoji"
-                      >
-                        <Smile className="w-4 h-4" />
-                      </button>
-                      
-                      {showEmojiPicker && (
-                        <div
-                          ref={emojiPickerRef}
-                          className="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10"
-                        >
-                          <div className="grid grid-cols-8 gap-1">
-                            {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏'].map((emoji) => (
-                              <button
-                                key={emoji}
-                                onClick={() => handleEmojiSelect(emoji)}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
-                              >
-                                {emoji}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <button
-                      onClick={sendMessage}
-                      disabled={!newMessage.trim() && !selectedFile}
-                      className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      title="Send message"
-                    >
-                      <Send className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                  <button
+                    type="submit"
+                    disabled={(!newMessage.trim() && !selectedFile) || !chatSession}
+                    className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
               </div>
             )}
           </>
