@@ -217,6 +217,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          />
           
           {/* Admin Routes */}
           <Route
