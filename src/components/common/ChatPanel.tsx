@@ -139,16 +139,16 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       const response = await chatAPI.startChatSession(sessionData);
       console.log('Chat session response:', response.data);
       
-      setChatSession(response.data.session);
+      setChatSession(response.data.chatSession);
       
       // Load existing messages
-      if (response.data.session.chatId) {
-        const messagesResponse = await chatAPI.getChatMessages(response.data.session.chatId);
+      if (response.data.chatSession.chatId) {
+        const messagesResponse = await chatAPI.getChatMessages(response.data.chatSession.chatId);
         setMessages(messagesResponse.data.messages || []);
       }
       
       // Initialize socket connection
-      initializeSocket(response.data.session.chatId);
+      initializeSocket(response.data.chatSession.chatId);
     } catch (error: any) {
       console.error('Failed to initialize chat:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -269,12 +269,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       };
       
       const response = await chatAPI.startChatSession(sessionData);
-      setChatSession(response.data.session);
+      setChatSession(response.data.chatSession);
       setShowGuestForm(false);
       setIsAnonymous(false);
       
       // Initialize socket for guest
-      initializeSocket(response.data.session.chatId);
+      initializeSocket(response.data.chatSession.chatId);
       
       toast.success('Chat session started');
     } catch (error) {
@@ -498,11 +498,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
                       };
                       
                       const response = await chatAPI.startChatSession(sessionData);
-                      setChatSession(response.data.session);
+                      setChatSession(response.data.chatSession);
                       setIsAnonymous(false);
                       
                       // Initialize socket for anonymous user
-                      initializeSocket(response.data.session.chatId);
+                      initializeSocket(response.data.chatSession.chatId);
                       
                       toast.success('Anonymous chat started');
                     } catch (error) {
