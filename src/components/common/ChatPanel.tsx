@@ -82,6 +82,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
   };
 
   useEffect(() => {
+    console.log('🔍 Messages state changed:', messages);
+    console.log('🔍 Messages count in state:', messages.length);
     scrollToBottom();
   }, [messages]);
 
@@ -170,31 +172,50 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
       });
 
       console.log('🔍 Chat session response:', response.data);
+      console.log('🔍 Response data structure:', {
+        hasData: !!response.data,
+        hasDataData: !!response.data?.data,
+        hasChatSession: !!response.data?.data?.chatSession,
+        fullData: response.data
+      });
 
       const session = response.data.data.chatSession;
       console.log('🔍 Extracted session:', session);
+      console.log('🔍 Session chatId:', session?.chatId);
+      console.log('🔍 Session id:', session?.id);
       setChatSession(session);
 
       if (session.chatId || session.id) {
         const chatId = session.chatId || session.id;
-        console.log('Loading messages for chatId:', chatId);
+        console.log('🔍 Loading messages for chatId:', chatId);
+        console.log('🔍 ChatId type:', typeof chatId);
+        console.log('🔍 ChatId value:', JSON.stringify(chatId));
         
         try {
+          console.log('🔍 Fetching messages for chatId:', chatId);
           const messagesResponse = await chatAPI.getChatMessages(chatId);
-          console.log('🔍 Messages response:', messagesResponse.data);
+          console.log('🔍 Full messages response:', messagesResponse);
+          console.log('🔍 Messages response data:', messagesResponse.data);
+          console.log('🔍 Messages response data.data:', messagesResponse.data?.data);
+          console.log('🔍 Messages response data.data.messages:', messagesResponse.data?.data?.messages);
           
           const loadedMessages = messagesResponse.data?.data?.messages || [];
-          console.log('🔍 Loaded messages:', loadedMessages);
+          console.log('🔍 Loaded messages array:', loadedMessages);
           console.log('🔍 Messages count:', loadedMessages.length);
+          console.log('🔍 First message:', loadedMessages[0]);
           
           if (loadedMessages.length > 0) {
+            console.log('🔍 Setting messages to state');
             setMessages(loadedMessages);
           } else {
+            console.log('🔍 No messages found, setting empty array');
             setMessages([]);
           }
         } catch (msgError: any) {
-          console.error('Error loading messages:', msgError);
-          console.error('Error details:', msgError.response?.data);
+          console.error('❌ Error loading messages:', msgError);
+          console.error('❌ Error details:', msgError.response?.data);
+          console.error('❌ Error status:', msgError.response?.status);
+          console.error('❌ Error message:', msgError.message);
           setMessages([]);
         }
         
