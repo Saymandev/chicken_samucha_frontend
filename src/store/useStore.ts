@@ -23,6 +23,68 @@ export interface User {
   lastDeliveryZoneId?: string | null;
 }
 
+export interface ProductAttribute {
+  attributeName: string;
+  attributeType: string;
+  value: string;
+  unit?: string;
+  colorCode?: string;
+}
+
+export interface ProductVariant {
+  _id: string;
+  sku?: string;
+  attributes: ProductAttribute[];
+  price: number;
+  discountPrice?: number;
+  stock: number;
+  images: Array<{
+    url: string;
+    public_id: string;
+    isPrimary?: boolean;
+  }>;
+  isAvailable: boolean;
+  weight?: {
+    value: number;
+    unit: 'g' | 'kg' | 'lb' | 'oz';
+  };
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+    unit: 'cm' | 'in' | 'm' | 'ft';
+  };
+  barcode?: string;
+  customFields?: any;
+}
+
+export interface VariantAttributeValue {
+  value: string;
+  displayName?: {
+    en?: string;
+    bn?: string;
+  };
+  unit?: string;
+  colorCode?: string;
+  imageUrl?: string;
+  priceModifier?: number;
+  stockModifier?: number;
+}
+
+export interface VariantAttribute {
+  name: string;
+  type: 'color' | 'size' | 'weight' | 'volume' | 'material' | 'style' | 'custom';
+  displayName?: {
+    en?: string;
+    bn?: string;
+  };
+  isRequired: boolean;
+  affectsPrice: boolean;
+  affectsStock: boolean;
+  affectsImage: boolean;
+  values: VariantAttributeValue[];
+}
+
 export interface Product {
   id: string;
   _id?: string; // MongoDB ID field
@@ -63,6 +125,10 @@ export interface Product {
   minOrderQuantity: number;
   maxOrderQuantity: number;
   youtubeVideoUrl?: string;
+  // Variant System
+  hasVariants?: boolean;
+  variantAttributes?: VariantAttribute[];
+  variants?: ProductVariant[];
 }
 
 export interface CartItem {
@@ -70,6 +136,11 @@ export interface CartItem {
   quantity: number;
   price: number;
   subtotal: number;
+  selectedVariant?: {
+    variantId: string;
+    attributes: ProductAttribute[];
+    sku?: string;
+  };
 }
 
 export interface Order {
@@ -136,7 +207,7 @@ interface AppStore {
   setLanguage: (language: 'en' | 'bn') => void;
   toggleLanguage: () => void;
   
-  addToCart: (product: Product, quantity: number) => void;
+  addToCart: (product: Product, quantity: number, variantData?: { variantId: string; attributes: ProductAttribute[]; sku?: string }) => void;
   updateCartItem: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
@@ -195,12 +266,22 @@ export const useStore = create<AppStore>()(
       })),
       
       // Cart actions
-      addToCart: (product, quantity) => {
+      addToCart: (product, quantity, variantData) => {
         const state = get();
         const productId = product.id || (product as any)._id;
+        
+        // Create unique key for product + variant combination
+        const itemKey = variantData 
+          ? `${productId}-${variantData.variantId}` 
+          : productId;
+        
         const existingItem = state.cart.find(item => {
           const itemId = item.product.id || (item.product as any)._id;
-          return itemId === productId;
+          const itemVariantId = item.selectedVariant?.variantId;
+          const currentItemKey = itemVariantId 
+            ? `${itemId}-${itemVariantId}` 
+            : itemId;
+          return currentItemKey === itemKey;
         });
         
         if (existingItem) {
@@ -208,7 +289,11 @@ export const useStore = create<AppStore>()(
           if (newQuantity <= product.maxOrderQuantity) {
             const updatedCart = state.cart.map(item => {
               const itemId = item.product.id || (item.product as any)._id;
-              return itemId === productId
+              const itemVariantId = item.selectedVariant?.variantId;
+              const currentItemKey = itemVariantId 
+                ? `${itemId}-${itemVariantId}` 
+                : itemId;
+              return currentItemKey === itemKey
                 ? { ...item, quantity: newQuantity, subtotal: item.price * newQuantity }
                 : item;
             });
@@ -218,13 +303,23 @@ export const useStore = create<AppStore>()(
             set({ cart: updatedCart, cartCount, cartTotal });
           }
         } else {
-          const price = product.discountPrice || product.price;
+          // Calculate price based on variant or base product
+          let price = product.discountPrice || product.price;
+          if (variantData && product.hasVariants && product.variants) {
+            const variant = product.variants.find(v => v._id === variantData.variantId);
+            if (variant) {
+              price = variant.discountPrice || variant.price;
+            }
+          }
+          
           const newItem: CartItem = {
             product: { ...product, id: productId },
             quantity,
             price,
-            subtotal: price * quantity
+            subtotal: price * quantity,
+            selectedVariant: variantData
           };
+          
           const updatedCart = [...state.cart, newItem];
           const cartCount = updatedCart.reduce((sum, item) => sum + item.quantity, 0);
           const cartTotal = updatedCart.reduce((sum, item) => sum + item.subtotal, 0);

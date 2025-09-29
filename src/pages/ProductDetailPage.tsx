@@ -7,35 +7,37 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { useStore } from '../store/useStore';
+import { ProductAttribute, ProductVariant, Product as StoreProduct, useStore } from '../store/useStore';
 import { ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
 
-interface Product {
-  id: string;
-  name: { en: string; bn: string };
-  description: { en: string; bn: string };
-  shortDescription?: { en: string; bn: string };
-  price: number;
-  discountPrice?: number;
-  images: Array<{ url: string; public_id: string }>;
-  category: { 
-    _id: string;
-    name: { en: string; bn: string };
-    slug: string;
-  };
-  // removed: ingredients, preparationTime, servingSize
-  isFeatured: boolean;
-  isAvailable: boolean;
-  stock: number;
-  ratings: { average: number; count: number };
-  minOrderQuantity: number;
-  maxOrderQuantity: number;
-  youtubeVideoUrl?: string;
-  analytics?: {
-    viewCount: number;
-    addToCartCount: number;
-    purchaseCount: number;
-  };
+interface Product extends StoreProduct {
+  // Variant System
+  hasVariants?: boolean;
+  variantAttributes?: Array<{
+    name: string;
+    type: 'color' | 'size' | 'weight' | 'volume' | 'material' | 'style' | 'custom';
+    displayName?: {
+      en?: string;
+      bn?: string;
+    };
+    isRequired: boolean;
+    affectsPrice: boolean;
+    affectsStock: boolean;
+    affectsImage: boolean;
+    values: Array<{
+      value: string;
+      displayName?: {
+        en?: string;
+        bn?: string;
+      };
+      unit?: string;
+      colorCode?: string;
+      imageUrl?: string;
+      priceModifier?: number;
+      stockModifier?: number;
+    }>;
+  }>;
+  variants?: ProductVariant[];
 }
 
 interface Review {
@@ -85,6 +87,10 @@ const ProductDetailPage: React.FC = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [showQuickOrderModal, setShowQuickOrderModal] = useState(false);
+  
+  // Variant selection state
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<ProductAttribute[]>([]);
   const [quickOrderData, setQuickOrderData] = useState({
     name: '',
     phone: '',
@@ -167,12 +173,80 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  // Variant helper functions
+  const findVariantByAttributes = (attributes: ProductAttribute[]): ProductVariant | null => {
+    if (!product?.hasVariants || !product.variants) return null;
+    
+    return product.variants.find(variant => {
+      return attributes.every(attr => 
+        variant.attributes.some(variantAttr => 
+          variantAttr.attributeName === attr.attributeName && 
+          variantAttr.value === attr.value
+        )
+      );
+    }) || null;
+  };
+
+  const handleVariantChange = (attributeName: string, value: string, attributeType: string) => {
+    const newAttributes = selectedAttributes.filter(attr => attr.attributeName !== attributeName);
+    newAttributes.push({
+      attributeName,
+      attributeType,
+      value,
+      unit: '',
+      colorCode: ''
+    });
+    
+    setSelectedAttributes(newAttributes);
+    const variant = findVariantByAttributes(newAttributes);
+    setSelectedVariant(variant);
+    
+    // Update image gallery when variant changes
+    if (variant && variant.images.length > 0) {
+      setSelectedImage(0);
+    }
+  };
+
+  const getCurrentImages = () => {
+    if (selectedVariant && selectedVariant.images.length > 0) {
+      return selectedVariant.images;
+    }
+    return product?.images || [];
+  };
+
+  const getCurrentPrice = (): number => {
+    if (selectedVariant) {
+      return selectedVariant.discountPrice || selectedVariant.price;
+    }
+    return product?.discountPrice || product?.price || 0;
+  };
+
+  const getCurrentStock = (): number => {
+    if (selectedVariant) {
+      return selectedVariant.stock;
+    }
+    return product?.stock || 0;
+  };
+
+  const canAddToCart = () => {
+    if (!product) return false;
+    if (!product.hasVariants) return product.isAvailable && product.stock > 0;
+    if (!selectedVariant) return false;
+    return selectedVariant.isAvailable && selectedVariant.stock > 0;
+  };
+
   const handleAddToCart = async () => {
     if (!product) return;
     
     setIsAddingToCart(true);
     try {
-      addToCart(product, quantity);
+      const variantData = selectedVariant ? {
+        variantId: selectedVariant._id,
+        attributes: selectedAttributes,
+        sku: selectedVariant.sku
+      } : undefined;
+      
+      addToCart(product, quantity, variantData);
       
       // Open cart sidebar to show the added item
       openCart();
@@ -293,8 +367,9 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  const currentPrice = product.discountPrice || product.price;
-  const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+  const currentPrice = getCurrentPrice();
+  const originalPrice = selectedVariant ? selectedVariant.price : product.price;
+  const hasDiscount = currentPrice < originalPrice;
 
   // Truncate description to 20 words
   const truncateDescription = (text: string, maxWords: number = 20) => {
@@ -340,7 +415,13 @@ const ProductDetailPage: React.FC = () => {
     if (user) {
       try {
         setIsBuyingNow(true);
-        addToCart(product, quantity);
+        const variantData = selectedVariant ? {
+          variantId: selectedVariant._id,
+          attributes: selectedAttributes,
+          sku: selectedVariant.sku
+        } : undefined;
+        
+        addToCart(product, quantity, variantData);
         // Don't open cart sidebar for Buy Now - go directly to checkout
         navigate('/checkout');
         toast.success(t('productDetail.addedToCart'));
@@ -442,10 +523,10 @@ const ProductDetailPage: React.FC = () => {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
-                  ) : product.images && product.images.length > 0 ? (
+                  ) : getCurrentImages().length > 0 ? (
                     // Show selected image
                     <img
-                      src={product.images[selectedImage]?.url}
+                      src={getCurrentImages()[selectedImage]?.url}
                       alt={language === 'bn' ? product.name.bn : product.name.en}
                       className="w-full h-full object-cover"
                     />
@@ -461,7 +542,7 @@ const ProductDetailPage: React.FC = () => {
               {/* Thumbnail Images + Video */}
               <div className="flex space-x-2 overflow-x-auto">
                 {/* Product Images */}
-                {product.images && product.images.map((image, index) => (
+                {getCurrentImages().map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
@@ -523,16 +604,102 @@ const ProductDetailPage: React.FC = () => {
                   </span>
                   {hasDiscount && (
                     <span className="text-xl text-gray-500 line-through">
-                      ৳{product.price}
+                      ৳{originalPrice}
                     </span>
                   )}
                   {hasDiscount && (
                     <span className="bg-red-100 text-red-800 text-sm px-2 py-1 rounded-full">
-                      {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
+                      {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}% OFF
                     </span>
                   )}
                 </div>
               </div>
+
+              {/* Comprehensive Variant Selection */}
+              {product.hasVariants && product.variantAttributes && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {language === 'bn' ? 'বিকল্প নির্বাচন করুন' : 'Select Options'}
+                  </h3>
+                  <div className="space-y-4">
+                    {product.variantAttributes.map((attribute) => (
+                      <div key={attribute.name} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {attribute.displayName?.[language] || attribute.name}:
+                          </label>
+                          {attribute.isRequired && (
+                            <span className="text-red-500 text-xs">*</span>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {attribute.values.map((value) => {
+                            const isSelected = selectedAttributes.some(
+                              attr => attr.attributeName === attribute.name && attr.value === value.value
+                            );
+                            
+                            if (attribute.type === 'color') {
+                              return (
+                                <button
+                                  key={value.value}
+                                  onClick={() => handleVariantChange(attribute.name, value.value, attribute.type)}
+                                  className={`w-12 h-12 rounded-full border-2 transition-all ${
+                                    isSelected
+                                      ? 'border-orange-500 scale-110 shadow-lg'
+                                      : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
+                                  }`}
+                                  style={{ backgroundColor: value.colorCode || '#ccc' }}
+                                  title={value.displayName?.[language] || value.value}
+                                >
+                                  {isSelected && (
+                                    <div className="w-full h-full rounded-full flex items-center justify-center">
+                                      <div className="w-2 h-2 bg-white rounded-full shadow-md"></div>
+                                    </div>
+                                  )}
+                                </button>
+                              );
+                            } else {
+                              return (
+                                <button
+                                  key={value.value}
+                                  onClick={() => handleVariantChange(attribute.name, value.value, attribute.type)}
+                                  className={`px-4 py-2 border rounded-lg transition-all ${
+                                    isSelected
+                                      ? 'bg-orange-500 text-white border-orange-500'
+                                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                                  }`}
+                                >
+                                  <span className="font-medium">
+                                    {value.displayName?.[language] || value.value}
+                                  </span>
+                                  {value.unit && (
+                                    <span className="text-sm ml-1">{value.unit}</span>
+                                  )}
+                                  {value.priceModifier && value.priceModifier !== 0 && (
+                                    <span className="text-xs ml-2">
+                                      {value.priceModifier > 0 ? '+' : ''}৳{value.priceModifier}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            }
+                          })}
+                        </div>
+                        
+                        {/* Show selected variant info */}
+                        {selectedAttributes.some(attr => attr.attributeName === attribute.name) && selectedVariant && (
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                            {selectedVariant.sku && (
+                              <span>SKU: {selectedVariant.sku}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Description */}
               <div className="mb-6">
@@ -569,10 +736,10 @@ const ProductDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">{t('productDetail.stock')}</span>
-                  <p className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {product.stock > 0 
-                      ? (typeof product.stock === 'number' && product.stock >= 0 
-                          ? `${product.stock} ${t('productDetail.available')}` 
+                  <p className={`font-medium ${getCurrentStock() > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {getCurrentStock() > 0 
+                      ? (typeof getCurrentStock() === 'number' && getCurrentStock() >= 0 
+                          ? `${getCurrentStock()} ${t('productDetail.available')}` 
                           : t('productDetail.inStock'))
                       : t('productDetail.outOfStock')
                     }
@@ -614,7 +781,7 @@ const ProductDetailPage: React.FC = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    disabled={!product.isAvailable || product.stock === 0 || isAddingToCart}
+                    disabled={!canAddToCart() || isAddingToCart}
                     className="flex-1 bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <ShoppingCart className="w-5 h-5" />
@@ -638,7 +805,7 @@ const ProductDetailPage: React.FC = () => {
                 {/* Buy Now Button */}
                 <button
                   onClick={handleBuyNow}
-                  disabled={!product.isAvailable || product.stock === 0 || isBuyingNow}
+                  disabled={!canAddToCart() || isBuyingNow}
                   className="w-full bg-[#ef4444] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#dc2626] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Zap className="w-5 h-5" />
@@ -647,10 +814,13 @@ const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Availability Status */}
-              {!product.isAvailable && (
+              {!canAddToCart() && (
                 <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <p className="text-red-800 dark:text-red-200 text-sm">
-                    {t('productDetail.unavailable')}
+                    {product?.hasVariants && !selectedVariant 
+                      ? (language === 'bn' ? 'অনুগ্রহ করে বিকল্প নির্বাচন করুন' : 'Please select product options')
+                      : t('productDetail.unavailable')
+                    }
                   </p>
                 </div>
               )}
@@ -802,9 +972,9 @@ const ProductDetailPage: React.FC = () => {
 
                   {/* Product Summary */}
                   <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    {product.images && product.images.length > 0 && (
+                    {getCurrentImages().length > 0 && (
                       <img
-                        src={product.images[0].url}
+                        src={getCurrentImages()[0].url}
                         alt={language === 'bn' ? product.name.bn : product.name.en}
                         className="w-12 h-12 object-cover rounded-lg"
                       />
@@ -814,7 +984,7 @@ const ProductDetailPage: React.FC = () => {
                         {language === 'bn' ? product.name.bn : product.name.en}
                       </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Qty: {quantity} × ৳{product.discountPrice || product.price} = ৳{quantity * (product.discountPrice || product.price)}
+                        Qty: {quantity} × ৳{currentPrice} = ৳{quantity * currentPrice}
                       </p>
                     </div>
                   </div>
