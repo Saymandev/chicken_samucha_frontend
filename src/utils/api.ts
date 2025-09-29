@@ -419,6 +419,14 @@ export const adminAPI = {
   
   // Payment Settings
   updatePaymentSettings: (data: any) => api.put('/payments/admin/settings', data),
+
+  // Courier (Steadfast)
+  getCourierSettings: () => api.get('/admin/courier/settings'),
+  updateCourierSettings: (data: { steadfastAutoBook: boolean }) => api.put('/admin/courier/settings', data),
+  bookSteadfast: (orderId: string) => api.post(`/admin/orders/${orderId}/steadfast/book`),
+  steadfastStatusByCid: (orderId: string, cid: string) => api.get(`/admin/orders/${orderId}/steadfast/status-by-cid/${encodeURIComponent(cid)}`),
+  steadfastStatusByInvoice: (orderId: string, invoice: string) => api.get(`/admin/orders/${orderId}/steadfast/status-by-invoice/${encodeURIComponent(invoice)}`),
+  steadfastStatusByTracking: (orderId: string, code: string) => api.get(`/admin/orders/${orderId}/steadfast/status-by-tracking/${encodeURIComponent(code)}`),
   
   // Promotions (Public) - moved to publicAPI below
 };

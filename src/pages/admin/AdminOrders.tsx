@@ -353,7 +353,7 @@ const AdminOrders: React.FC = () => {
         {/* Quick Actions for Delivery Management - Always visible */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Delivery Management</h3>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 items-center">
             <button
               onClick={() => handleStatusFilterChange('out_for_delivery')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
@@ -397,6 +397,22 @@ const AdminOrders: React.FC = () => {
             >
               <Eye className="w-4 h-4" />
               View All
+            </button>
+            {/* Auto-book toggle */}
+            <button
+              onClick={async () => {
+                try {
+                  const s = await adminAPI.getCourierSettings();
+                  const next = !s.data.settings.steadfastAutoBook;
+                  await adminAPI.updateCourierSettings({ steadfastAutoBook: next });
+                  toast.success(`Auto-book ${next ? 'enabled' : 'disabled'}`);
+                } catch (e: any) {
+                  toast.error('Failed to toggle auto-book');
+                }
+              }}
+              className="ml-auto px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm"
+            >
+              Toggle Auto-book
             </button>
           </div>
         </div>
@@ -581,6 +597,37 @@ const AdminOrders: React.FC = () => {
                       </span>
                     )}
                   </div>
+                </div>
+                {/* Steadfast Actions */}
+                <div className="flex flex-col items-start gap-2 min-w-[220px]">
+                  <button
+                    onClick={async () => {
+                      try {
+                        await adminAPI.bookSteadfast(getOrderId(order));
+                        toast.success('Booked with Steadfast');
+                        fetchOrders();
+                      } catch (e: any) {
+                        toast.error(e?.response?.data?.message || 'Failed to book');
+                      }
+                    }}
+                    className="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-sm w-full"
+                  >
+                    Book with Steadfast
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const r = await adminAPI.steadfastStatusByInvoice(getOrderId(order), order.orderNumber);
+                        toast.success('Status fetched (see console)');
+                        console.log('Steadfast status:', r.data);
+                      } catch (e: any) {
+                        toast.error(e?.response?.data?.message || 'Failed to fetch status');
+                      }
+                    }}
+                    className="px-3 py-2 rounded bg-gray-600 hover:bg-gray-700 text-white text-sm w-full"
+                  >
+                    Check Delivery Status
+                  </button>
                 </div>
               </div>
 
