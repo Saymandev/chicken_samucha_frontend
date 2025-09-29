@@ -628,6 +628,46 @@ const AdminOrders: React.FC = () => {
                   >
                     Check Delivery Status
                   </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const r = await adminAPI.steadfastGetBalance();
+                        toast.success(`Balance: ${r.data?.data?.current_balance ?? 'N/A'}`);
+                      } catch (e: any) {
+                        toast.error('Failed to fetch balance');
+                      }
+                    }}
+                    className="px-3 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white text-sm w-full"
+                  >
+                    Check Courier Balance
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const consignmentId = (order as any).deliveryInfo?.consignmentId;
+                      const tracking = (order as any).deliveryInfo?.trackingNumber;
+                      const invoice = order.orderNumber;
+                      if (!consignmentId && !tracking && !invoice) {
+                        toast.error('No consignment/tracking/invoice available');
+                        return;
+                      }
+                      const reason = prompt('Return reason (optional):') || undefined;
+                      try {
+                        const payload: any = {};
+                        if (consignmentId) payload.consignment_id = consignmentId;
+                        else if (tracking) payload.tracking_code = tracking;
+                        else payload.invoice = invoice;
+                        if (reason) payload.reason = reason;
+                        const r = await adminAPI.steadfastCreateReturn(payload);
+                        toast.success('Return request submitted');
+                        console.log('Return request:', r.data);
+                      } catch (e: any) {
+                        toast.error(e?.response?.data?.message || 'Failed to create return');
+                      }
+                    }}
+                    className="px-3 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm w-full"
+                  >
+                    Request Return
+                  </button>
                 </div>
               </div>
 

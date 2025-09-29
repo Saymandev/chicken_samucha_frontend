@@ -427,6 +427,10 @@ export const adminAPI = {
   steadfastStatusByCid: (orderId: string, cid: string) => api.get(`/admin/orders/${orderId}/steadfast/status-by-cid/${encodeURIComponent(cid)}`),
   steadfastStatusByInvoice: (orderId: string, invoice: string) => api.get(`/admin/orders/${orderId}/steadfast/status-by-invoice/${encodeURIComponent(invoice)}`),
   steadfastStatusByTracking: (orderId: string, code: string) => api.get(`/admin/orders/${orderId}/steadfast/status-by-tracking/${encodeURIComponent(code)}`),
+  steadfastGetBalance: () => api.get('/admin/courier/steadfast/balance'),
+  steadfastCreateReturn: (data: { consignment_id?: string|number; invoice?: string; tracking_code?: string; reason?: string }) => api.post('/admin/courier/steadfast/return', data),
+  steadfastGetReturn: (id: string|number) => api.get(`/admin/courier/steadfast/return/${id}`),
+  steadfastGetReturns: () => api.get('/admin/courier/steadfast/returns'),
   
   // Promotions (Public) - moved to publicAPI below
 };
