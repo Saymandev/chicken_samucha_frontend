@@ -236,17 +236,6 @@ const ProductDetailPage: React.FC = () => {
   const handleAddToCart = async () => {
     if (!product) return;
     
-    // Validate variant selections before proceeding
-    if (product.hasVariants) {
-      const colorRequired = (product.colorVariants?.length || 0) > 0;
-      const sizeRequired = (product.sizeVariants?.length || 0) > 0;
-      const weightRequired = (product.weightVariants?.length || 0) > 0;
-      if ((colorRequired && !selectedColor) || (sizeRequired && !selectedSize) || (weightRequired && !selectedWeight)) {
-        toast.error(language === 'bn' ? 'প্রথমে বিকল্প নির্বাচন করুন' : 'Please select options first');
-        return;
-      }
-    }
-    
     setIsAddingToCart(true);
     try {
       const variantData = getVariantData();
