@@ -910,6 +910,26 @@ const CheckoutPage: React.FC = () => {
                         <h3 className="font-medium text-gray-900 dark:text-white">
                           {language === 'bn' ? item.product.name.bn : item.product.name.en}
                         </h3>
+                        {/* Variant details, if any */}
+                        {item.variantData && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 space-x-2 mt-1">
+                            {item.variantData.color && (
+                              <span className="inline-block px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700">
+                                Color: {item.variantData.color}
+                              </span>
+                            )}
+                            {item.variantData.size && (
+                              <span className="inline-block px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700">
+                                Size: {item.variantData.size}
+                              </span>
+                            )}
+                            {item.variantData.weight && (
+                              <span className="inline-block px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700">
+                                Weight: {item.variantData.weight}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Qty: {item.quantity} × ৳{item.price}
                         </p>
