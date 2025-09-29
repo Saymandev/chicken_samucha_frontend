@@ -2,8 +2,9 @@ import { motion } from 'framer-motion';
 import { ImagePlus, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useStore } from '../../store/useStore';
+import { ProductVariant, useStore, VariantAttribute } from '../../store/useStore';
 import { adminAPI, categoriesAPI } from '../../utils/api';
+import AdvancedVariantManager from './AdvancedVariantManager';
 
 interface Product {
   _id?: string;
@@ -17,6 +18,9 @@ interface Product {
   isAvailable: boolean;
   isFeatured: boolean;
   youtubeVideoUrl?: string;
+  hasVariants?: boolean;
+  variantAttributes?: VariantAttribute[];
+  variants?: ProductVariant[];
 }
 
 interface ProductFormModalProps {
@@ -52,6 +56,10 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
   
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
+  
+  // Variant state
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [variantAttributes, setVariantAttributes] = useState<VariantAttribute[]>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -71,6 +79,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         youtubeVideoUrl: product.youtubeVideoUrl || ''
       });
       setImages(product.images || []);
+      setVariants(product.variants || []);
+      setVariantAttributes(product.variantAttributes || []);
     } else {
       // Reset form for new product
       setFormData({
@@ -85,6 +95,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         youtubeVideoUrl: ''
       });
       setImages([]);
+      setVariants([]);
+      setVariantAttributes([]);
     }
     setNewImages([]);
   }, [product, isOpen]);
@@ -246,6 +258,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('isFeatured', formData.isFeatured.toString());
       submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
       
+      // Add variant data
+      submitData.append('hasVariants', (variants.length > 0).toString());
+      submitData.append('variants', JSON.stringify(variants));
+      submitData.append('variantAttributes', JSON.stringify(variantAttributes));
+      
       // Add new image files from state
       
       newImages.forEach((file, index) => {
@@ -403,6 +420,32 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
               Add a YouTube video URL to showcase your product
             </p>
           </div>
+
+          {/* Advanced Variant Manager */}
+          <AdvancedVariantManager
+            product={{
+              ...formData,
+              id: product?._id || '',
+              _id: product?._id,
+              images,
+              hasVariants: variants.length > 0,
+              variants,
+              variantAttributes,
+              ratings: { average: 0, count: 0 },
+              minOrderQuantity: 1,
+              maxOrderQuantity: 9999,
+              category: {
+                _id: formData.category,
+                name: { en: 'Category', bn: 'বিভাগ' },
+                slug: 'category'
+              }
+            }}
+            onVariantsChange={(newVariants, newVariantAttributes) => {
+              setVariants(newVariants);
+              setVariantAttributes(newVariantAttributes);
+            }}
+            className="border-t pt-6"
+          />
 
           {/* Price and Category */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
