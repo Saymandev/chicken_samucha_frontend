@@ -202,7 +202,11 @@ const ProductDetailPage: React.FC = () => {
     if (selectedColor && product?.colorVariants) {
       const colorVariant = product.colorVariants.find(c => c.color === selectedColor);
       if (colorVariant?.image?.url) {
-        return [colorVariant.image];
+        // Prepend color image but keep original product images available
+        const baseImages = product?.images || [];
+        // Avoid duplicate if the color image URL already exists in base images
+        const isDuplicate = baseImages.some(img => img.url === colorVariant.image!.url);
+        return isDuplicate ? baseImages : [colorVariant.image, ...baseImages];
       }
     }
     
