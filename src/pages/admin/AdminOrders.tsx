@@ -680,7 +680,11 @@ const AdminOrders: React.FC = () => {
                             ? ({
                                 ...o,
                                 orderStatus: 'out_for_delivery',
-                                deliveryInfo: { ...(o as any).deliveryInfo, courier: 'steadfast' }
+                                deliveryInfo: { 
+                                  ...(o as any).deliveryInfo, 
+                                  courier: 'Steadfast',
+                                  sentToCourierAt: new Date().toISOString()
+                                }
                               } as any)
                             : o
                           ));
