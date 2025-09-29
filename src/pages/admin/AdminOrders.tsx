@@ -617,6 +617,25 @@ const AdminOrders: React.FC = () => {
                         💰 REFUND {getRefundStatus(order)!.status.toUpperCase()}
                       </span>
                     )}
+                    {/* Courier badge + track link */}
+                    {((order as any).deliveryInfo?.courier || (order as any).deliveryInfo?.trackingNumber) && (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300">
+                          <Truck className="w-3 h-3" />
+                          {(order as any).deliveryInfo?.courier || 'Courier'}
+                        </span>
+                        {((order as any).deliveryInfo?.trackingUrl || (order as any).deliveryInfo?.trackingNumber) && (
+                          <a
+                            href={(order as any).deliveryInfo?.trackingUrl || `https://steadfast.com.bd/t/${(order as any).deliveryInfo?.trackingNumber}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            Track
+                          </a>
+                        )}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {/* Steadfast Actions */}
