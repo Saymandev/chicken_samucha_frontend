@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Settings, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, CreditCard, Settings, ToggleLeft, ToggleRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,14 @@ interface PaymentMethod {
   logo: string;
   color: string;
   instructions: string[];
+  subMethods?: {
+    [key: string]: {
+      enabled: boolean;
+      name: string;
+      accountNumber: string;
+      instructions: string;
+    };
+  };
 }
 
 const PaymentSettingsPage: React.FC = () => {
@@ -19,6 +27,7 @@ const PaymentSettingsPage: React.FC = () => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchPaymentMethods();
@@ -47,6 +56,20 @@ const PaymentSettingsPage: React.FC = () => {
               'Complete the payment securely',
               'You will be redirected back automatically'
             ]
+          },
+          {
+            id: 'manual_payment',
+            name: 'Manual Payment',
+            enabled: response.data.data.manual_payment?.enabled || false,
+            logo: '📱',
+            color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-800',
+            instructions: [
+              'Choose your preferred mobile banking method',
+              'Send money to the provided account number',
+              'Include your order number in the transaction',
+              'Provide transaction ID for verification'
+            ],
+            subMethods: response.data.data.manual_payment?.subMethods || {}
           },
           {
             id: 'cash_on_delivery',
@@ -87,6 +110,8 @@ const PaymentSettingsPage: React.FC = () => {
       const updateData: any = {};
       if (methodId === 'sslcommerz') {
         updateData.sslcommerz = { enabled: !paymentMethods.find(m => m.id === methodId)?.enabled };
+      } else if (methodId === 'manual_payment') {
+        updateData.manual_payment = { enabled: !paymentMethods.find(m => m.id === methodId)?.enabled };
       } else if (methodId === 'cash_on_delivery') {
         updateData.cash_on_delivery = { enabled: !paymentMethods.find(m => m.id === methodId)?.enabled };
       }
@@ -101,6 +126,96 @@ const PaymentSettingsPage: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const toggleSubMethod = async (parentId: string, subMethodId: string) => {
+    try {
+      setSaving(true);
+      const updatedMethods = paymentMethods.map(method => {
+        if (method.id === parentId && method.subMethods) {
+          const updatedSubMethods = {
+            ...method.subMethods,
+            [subMethodId]: {
+              ...method.subMethods[subMethodId],
+              enabled: !method.subMethods[subMethodId].enabled
+            }
+          };
+          return { ...method, subMethods: updatedSubMethods };
+        }
+        return method;
+      });
+      
+      setPaymentMethods(updatedMethods);
+      
+      // Save to backend
+      const parentMethod = updatedMethods.find(m => m.id === parentId);
+      if (parentMethod?.subMethods) {
+        await adminAPI.updatePaymentSettings({
+          manual_payment: {
+            subMethods: parentMethod.subMethods
+          }
+        });
+      }
+      
+      toast.success('Sub-method updated successfully!');
+    } catch (error) {
+      console.error('Error updating sub-method:', error);
+      toast.error('Failed to update sub-method');
+      fetchPaymentMethods();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateSubMethod = async (parentId: string, subMethodId: string, field: string, value: string) => {
+    try {
+      setSaving(true);
+      const updatedMethods = paymentMethods.map(method => {
+        if (method.id === parentId && method.subMethods) {
+          const updatedSubMethods = {
+            ...method.subMethods,
+            [subMethodId]: {
+              ...method.subMethods[subMethodId],
+              [field]: value
+            }
+          };
+          return { ...method, subMethods: updatedSubMethods };
+        }
+        return method;
+      });
+      
+      setPaymentMethods(updatedMethods);
+      
+      // Save to backend
+      const parentMethod = updatedMethods.find(m => m.id === parentId);
+      if (parentMethod?.subMethods) {
+        await adminAPI.updatePaymentSettings({
+          manual_payment: {
+            subMethods: parentMethod.subMethods
+          }
+        });
+      }
+      
+      toast.success('Sub-method updated successfully!');
+    } catch (error) {
+      console.error('Error updating sub-method:', error);
+      toast.error('Failed to update sub-method');
+      fetchPaymentMethods();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleExpanded = (itemId: string) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
   };
 
   if (loading) {
@@ -153,58 +268,153 @@ const PaymentSettingsPage: React.FC = () => {
             </h3>
             
             <div className="space-y-4">
-              {paymentMethods.map((method) => (
-                <div
-                  key={method.id}
-                  className={`p-4 border-2 rounded-lg transition-all ${
-                    method.enabled
-                      ? `${method.color} border-current`
-                      : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="text-3xl">{method.logo}</div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white">
-                          {method.name}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {method.enabled ? 'Enabled' : 'Disabled'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <button
-                      onClick={() => togglePaymentMethod(method.id)}
-                      disabled={saving}
-                      className="flex items-center gap-2"
+              {paymentMethods.map((method) => {
+                const isExpanded = expandedItems.has(method.id);
+                const hasSubMethods = method.subMethods && Object.keys(method.subMethods).length > 0;
+                
+                return (
+                  <div key={method.id} className="space-y-2">
+                    {/* Main Payment Method */}
+                    <div
+                      className={`p-4 border-2 rounded-lg transition-all ${
+                        method.enabled
+                          ? `${method.color} border-current`
+                          : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'
+                      }`}
                     >
-                      {method.enabled ? (
-                        <ToggleRight className="w-6 h-6 text-green-500" />
-                      ) : (
-                        <ToggleLeft className="w-6 h-6 text-gray-400" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          {hasSubMethods && (
+                            <button
+                              onClick={() => toggleExpanded(method.id)}
+                              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                            >
+                              {isExpanded ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
+                          <div className="text-3xl">{method.logo}</div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                              {method.name}
+                            </h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {method.enabled ? 'Enabled' : 'Disabled'}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={() => togglePaymentMethod(method.id)}
+                          disabled={saving}
+                          className="flex items-center gap-2"
+                        >
+                          {method.enabled ? (
+                            <ToggleRight className="w-6 h-6 text-green-500" />
+                          ) : (
+                            <ToggleLeft className="w-6 h-6 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                      
+                      {method.enabled && !hasSubMethods && (
+                        <div className="mt-4 pl-16">
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Instructions:
+                          </h5>
+                          <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                            {method.instructions.map((instruction, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="text-orange-500 mt-1">•</span>
+                                {instruction}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       )}
-                    </button>
-                  </div>
-                  
-                  {method.enabled && (
-                    <div className="mt-4 pl-16">
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Instructions:
-                      </h5>
-                      <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                        {method.instructions.map((instruction, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-orange-500 mt-1">•</span>
-                            {instruction}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {/* Sub Methods */}
+                    {hasSubMethods && isExpanded && method.subMethods && (
+                      <div className="ml-8 space-y-2">
+                        {Object.entries(method.subMethods).map(([subMethodId, subMethod]) => (
+                          <div
+                            key={subMethodId}
+                            className={`p-3 border rounded-lg transition-all ${
+                              subMethod.enabled
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <div className="text-2xl">
+                                  {subMethodId === 'bkash' && '📱'}
+                                  {subMethodId === 'nagad' && '📱'}
+                                  {subMethodId === 'rocket' && '🚀'}
+                                  {subMethodId === 'upay' && '📱'}
+                                </div>
+                                <div>
+                                  <h5 className="font-medium text-gray-900 dark:text-white">
+                                    {subMethod.name}
+                                  </h5>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                                    {subMethod.enabled ? 'Enabled' : 'Disabled'}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <button
+                                onClick={() => toggleSubMethod(method.id, subMethodId)}
+                                disabled={saving}
+                                className="flex items-center gap-2"
+                              >
+                                {subMethod.enabled ? (
+                                  <ToggleRight className="w-5 h-5 text-green-500" />
+                                ) : (
+                                  <ToggleLeft className="w-5 h-5 text-gray-400" />
+                                )}
+                              </button>
+                            </div>
+
+                            {subMethod.enabled && (
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Account Number
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={subMethod.accountNumber}
+                                    onChange={(e) => updateSubMethod(method.id, subMethodId, 'accountNumber', e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                    placeholder="Enter account number"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Instructions
+                                  </label>
+                                  <textarea
+                                    value={subMethod.instructions}
+                                    onChange={(e) => updateSubMethod(method.id, subMethodId, 'instructions', e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                                    placeholder="Enter payment instructions"
+                                    rows={2}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

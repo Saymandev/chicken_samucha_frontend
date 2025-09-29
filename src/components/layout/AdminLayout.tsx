@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   BarChart3,
+  ChevronDown,
   ChevronLeft,
+  ChevronRight,
   CreditCard,
   FileText,
   Home,
@@ -36,8 +38,10 @@ interface NavItem {
   id: string;
   label: string;
   icon: React.ReactNode;
-  path: string;
+  path?: string;
   badge?: number;
+  children?: NavItem[];
+  isGroup?: boolean;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
@@ -46,6 +50,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['core']));
 
   const navItems: NavItem[] = [
     {
@@ -55,102 +60,154 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       path: '/admin'
     },
     {
-      id: 'products',
-      label: 'Products',
+      id: 'core',
+      label: 'Core Management',
       icon: <Package className="w-5 h-5" />,
-      path: '/admin/products'
-    },
-    {
-      id: 'categories',
-      label: 'Categories',
-      icon: <Package className="w-5 h-5" />,
-      path: '/admin/categories'
-    },
-    {
-      id: 'orders',
-      label: 'Orders',
-      icon: <ShoppingBag className="w-5 h-5" />,
-      path: '/admin/orders'
-    },
-    {
-      id: 'refunds',
-      label: 'Refunds',
-      icon: <RefreshCw className="w-5 h-5" />,
-      path: '/admin/refunds'
+      isGroup: true,
+      children: [
+        {
+          id: 'products',
+          label: 'Products',
+          icon: <Package className="w-4 h-4" />,
+          path: '/admin/products'
+        },
+        {
+          id: 'categories',
+          label: 'Categories',
+          icon: <Package className="w-4 h-4" />,
+          path: '/admin/categories'
+        },
+        {
+          id: 'orders',
+          label: 'Orders',
+          icon: <ShoppingBag className="w-4 h-4" />,
+          path: '/admin/orders'
+        },
+        {
+          id: 'refunds',
+          label: 'Refunds',
+          icon: <RefreshCw className="w-4 h-4" />,
+          path: '/admin/refunds'
+        }
+      ]
     },
     {
       id: 'users',
-      label: 'Users',
+      label: 'Users & Reviews',
       icon: <Users className="w-5 h-5" />,
-      path: '/admin/users'
+      isGroup: true,
+      children: [
+        {
+          id: 'users',
+          label: 'Users',
+          icon: <Users className="w-4 h-4" />,
+          path: '/admin/users'
+        },
+        {
+          id: 'reviews',
+          label: 'Reviews',
+          icon: <Star className="w-4 h-4" />,
+          path: '/admin/reviews'
+        },
+        {
+          id: 'subscribers',
+          label: 'Subscribers',
+          icon: <Users className="w-4 h-4" />,
+          path: '/admin/subscribers'
+        }
+      ]
     },
     {
-      id: 'reviews',
-      label: 'Reviews',
-      icon: <Star className="w-5 h-5" />,
-      path: '/admin/reviews'
-    },
-    {
-      id: 'chat',
-      label: 'Chat Support',
-      icon: <MessageCircle className="w-5 h-5" />,
-      path: '/admin/chat'
-    },
-    {
-      id: 'content',
-      label: 'Content',
-      icon: <FileText className="w-5 h-5" />,
-      path: '/admin/content'
-    },
-    {
-      id: 'navigation',
-      label: 'Navigation Menu',
-      icon: <Navigation className="w-5 h-5" />,
-      path: '/admin/navigation'
-    },
-    {
-      id: 'payment-settings',
-      label: 'Payment Settings',
-      icon: <CreditCard className="w-5 h-5" />,
-      path: '/admin/payment-settings'
-    },
-    {
-      id: 'coupons',
-      label: 'Coupons',
-      icon: <TicketPercent className="w-5 h-5" />,
-      path: '/admin/coupons'
-    },
-    {
-      id: 'flash-sales',
-      label: 'Flash Sales',
+      id: 'marketing',
+      label: 'Marketing',
       icon: <Zap className="w-5 h-5" />,
-      path: '/admin/flash-sales'
+      isGroup: true,
+      children: [
+        {
+          id: 'coupons',
+          label: 'Coupons',
+          icon: <TicketPercent className="w-4 h-4" />,
+          path: '/admin/coupons'
+        },
+        {
+          id: 'flash-sales',
+          label: 'Flash Sales',
+          icon: <Zap className="w-4 h-4" />,
+          path: '/admin/flash-sales'
+        },
+        {
+          id: 'promotions',
+          label: 'Promotions',
+          icon: <Star className="w-4 h-4" />,
+          path: '/admin/promotions'
+        },
+        {
+          id: 'campaigns',
+          label: 'Campaigns',
+          icon: <FileText className="w-4 h-4" />,
+          path: '/admin/campaigns'
+        }
+      ]
     },
     {
-      id: 'promotions',
-      label: 'Promotions',
-      icon: <Star className="w-5 h-5" />,
-      path: '/admin/promotions'
+      id: 'settings',
+      label: 'Settings',
+      icon: <Settings className="w-5 h-5" />,
+      isGroup: true,
+      children: [
+        {
+          id: 'payment-settings',
+          label: 'Payment Settings',
+          icon: <CreditCard className="w-4 h-4" />,
+          path: '/admin/payment-settings'
+        },
+        {
+          id: 'content',
+          label: 'Content',
+          icon: <FileText className="w-4 h-4" />,
+          path: '/admin/content'
+        },
+        {
+          id: 'navigation',
+          label: 'Navigation Menu',
+          icon: <Navigation className="w-4 h-4" />,
+          path: '/admin/navigation'
+        }
+      ]
     },
     {
-      id: 'subscribers',
-      label: 'Subscribers',
-      icon: <Users className="w-5 h-5" />,
-      path: '/admin/subscribers'
-    },
-    {
-      id: 'campaigns',
-      label: 'Campaigns',
-      icon: <FileText className="w-5 h-5" />,
-      path: '/admin/campaigns'
-    },
-    {
-      id: 'reports',
-      label: 'Reports',
-      icon: <BarChart3 className="w-5 h-5" />,
-      path: '/admin/reports'
+      id: 'support',
+      label: 'Support & Reports',
+      icon: <MessageCircle className="w-5 h-5" />,
+      isGroup: true,
+      children: [
+        {
+          id: 'chat',
+          label: 'Chat Support',
+          icon: <MessageCircle className="w-4 h-4" />,
+          path: '/admin/chat'
+        },
+        {
+          id: 'reports',
+          label: 'Reports',
+          icon: <BarChart3 className="w-4 h-4" />,
+          path: '/admin/reports'
+        }
+      ]
     }
   ];
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupId)) {
+        newSet.delete(groupId);
+      } else {
+        newSet.add(groupId);
+      }
+      return newSet;
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -199,32 +256,98 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
       {/* Navigation - Scrollable */}
       <nav className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent touch-pan-y">
-        {navItems.map((item) => (
-          <Link
-            key={item.id}
-            to={item.path}
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-lg transition-all group min-h-[44px] ${
-              isActivePath(item.path)
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-            }`}
-          >
-            <span className={`${isActivePath(item.path) ? 'text-white' : 'text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`}>
-              {item.icon}
-            </span>
-            {sidebarOpen && (
-              <>
-                <span className="font-medium">{item.label}</span>
-                {item.badge && (
-                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                    {item.badge}
+        {navItems.map((item) => {
+          if (item.isGroup) {
+            const isExpanded = expandedGroups.has(item.id);
+            return (
+              <div key={item.id} className="space-y-1">
+                {/* Group Header */}
+                <button
+                  onClick={() => toggleGroup(item.id)}
+                  className="w-full flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-lg transition-all group min-h-[44px] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                >
+                  <span className="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
+                    {item.icon}
                   </span>
+                  {sidebarOpen && (
+                    <>
+                      <span className="font-medium flex-1 text-left">{item.label}</span>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </>
+                  )}
+                </button>
+
+                {/* Group Children */}
+                <AnimatePresence>
+                  {isExpanded && sidebarOpen && item.children && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="ml-4 space-y-1"
+                    >
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.id}
+                          to={child.path!}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all group min-h-[36px] ${
+                            isActivePath(child.path!)
+                              ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                          }`}
+                        >
+                          <span className={`${isActivePath(child.path!) ? 'text-white' : 'text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`}>
+                            {child.icon}
+                          </span>
+                          <span className="font-medium text-sm">{child.label}</span>
+                          {child.badge && (
+                            <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                              {child.badge}
+                            </span>
+                          )}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          } else {
+            // Regular menu item
+            return (
+              <Link
+                key={item.id}
+                to={item.path!}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-lg transition-all group min-h-[44px] ${
+                  isActivePath(item.path!)
+                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <span className={`${isActivePath(item.path!) ? 'text-white' : 'text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`}>
+                  {item.icon}
+                </span>
+                {sidebarOpen && (
+                  <>
+                    <span className="font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </Link>
-        ))}
+              </Link>
+            );
+          }
+        })}
       </nav>
 
       {/* User Profile & Actions - Fixed at bottom */}

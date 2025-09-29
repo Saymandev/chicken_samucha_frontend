@@ -27,7 +27,7 @@ interface CustomerInfo {
 }
 
 interface PaymentInfo {
-  method: 'sslcommerz' | 'cash_on_delivery';
+  method: 'sslcommerz' | 'cash_on_delivery' | 'bkash' | 'nagad' | 'rocket' | 'upay';
   transactionId?: string;
   screenshot?: File;
 }
@@ -182,7 +182,7 @@ const CheckoutPage: React.FC = () => {
     setCouponCode('');
   };
 
-  // Payment methods - only SSLCommerz and Cash on Delivery
+  // Payment methods - SSLCommerz, Manual Payment, and Cash on Delivery
   const getPaymentMethods = () => {
     if (!paymentSettings) return [];
 
@@ -204,27 +204,52 @@ const CheckoutPage: React.FC = () => {
           'Complete the payment securely',
           'You will be redirected back automatically'
         ]
-      },
-      {
-        id: 'cash_on_delivery',
-        name: 'Cash on Delivery',
-        logo: '💵',
-        color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-200 dark:border-green-800',
-        number: '',
-        enabled: paymentSettings.cash_on_delivery?.enabled,
-        instructions: deliveryMethod === 'pickup' ? [
-          'Pay cash when you collect your order',
-          'Keep exact amount ready: ৳' + finalTotal,
-          'You can also pay with mobile banking at pickup',
-          'No delivery charge for pickup orders'
-        ] : [
-          'Pay cash when our delivery person arrives',
-          'Keep exact amount ready: ৳' + finalTotal,
-          'You can also pay with mobile banking to our delivery person',
-          deliveryCharge === 0 ? 'FREE delivery (Order ≥ ৳500) 🎉' : 'Delivery charge: ৳' + deliveryCharge + ' (included in total)'
-        ]
       }
     ];
+
+    // Add manual payment methods if enabled
+    if (paymentSettings.manual_payment?.enabled && paymentSettings.manual_payment?.subMethods) {
+      const manualMethods = Object.entries(paymentSettings.manual_payment.subMethods)
+        .filter(([_, subMethod]: [string, any]) => subMethod.enabled)
+        .map(([key, subMethod]: [string, any]) => ({
+          id: key,
+          name: subMethod.name,
+          logo: key === 'bkash' ? '📱' : key === 'nagad' ? '📱' : key === 'rocket' ? '🚀' : '📱',
+          color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-800',
+          number: subMethod.accountNumber || '',
+          enabled: true,
+          instructions: [
+            `Send money to ${subMethod.name} number: ${subMethod.accountNumber || 'Not configured'}`,
+            'Include your order number in the transaction',
+            'Take a screenshot of the payment confirmation',
+            'Enter the transaction ID below',
+            subMethod.instructions || 'Complete the payment and provide transaction details'
+          ]
+        }));
+      
+      allMethods.push(...manualMethods);
+    }
+
+    // Add Cash on Delivery
+    allMethods.push({
+      id: 'cash_on_delivery',
+      name: 'Cash on Delivery',
+      logo: '💵',
+      color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-200 dark:border-green-800',
+      number: '',
+      enabled: paymentSettings.cash_on_delivery?.enabled,
+      instructions: deliveryMethod === 'pickup' ? [
+        'Pay cash when you collect your order',
+        'Keep exact amount ready: ৳' + finalTotal,
+        'You can also pay with mobile banking at pickup',
+        'No delivery charge for pickup orders'
+      ] : [
+        'Pay cash when our delivery person arrives',
+        'Keep exact amount ready: ৳' + finalTotal,
+        'You can also pay with mobile banking to our delivery person',
+        deliveryCharge === 0 ? 'FREE delivery (Order ≥ ৳500) 🎉' : 'Delivery charge: ৳' + deliveryCharge + ' (included in total)'
+      ]
+    });
 
     // Filter only enabled payment methods
     return allMethods.filter(method => method.enabled);
@@ -276,8 +301,18 @@ const CheckoutPage: React.FC = () => {
       return false;
     }
 
-    // SSLCommerz and Cash on Delivery don't require transaction ID or screenshot
-    // SSLCommerz redirects to payment gateway, COD is paid on delivery
+    // Validate manual payment methods
+    const manualPaymentMethods = ['bkash', 'nagad', 'rocket', 'upay'];
+    if (manualPaymentMethods.includes(paymentInfo.method)) {
+      if (!paymentInfo.transactionId?.trim()) {
+        toast.error('Please enter the transaction ID for your payment');
+        return false;
+      }
+      if (!paymentInfo.screenshot) {
+        toast.error('Please upload a screenshot of your payment confirmation');
+        return false;
+      }
+    }
 
     return true;
   };
@@ -425,6 +460,17 @@ const CheckoutPage: React.FC = () => {
       
       // Send payment info in the format backend expects
       formData.append('paymentInfo[method]', paymentInfo.method);
+      
+      // Add transaction ID and screenshot for manual payment methods
+      const manualPaymentMethods = ['bkash', 'nagad', 'rocket', 'upay'];
+      if (manualPaymentMethods.includes(paymentInfo.method)) {
+        if (paymentInfo.transactionId) {
+          formData.append('paymentInfo[transactionId]', paymentInfo.transactionId);
+        }
+        if (paymentInfo.screenshot) {
+          formData.append('paymentInfo[screenshot]', paymentInfo.screenshot);
+        }
+      }
       
       // Send delivery info
       formData.append('deliveryInfo[method]', deliveryMethod);
@@ -750,7 +796,51 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Transaction Details - Not needed for SSLCommerz or COD */}
+                {/* Transaction Details for Manual Payment Methods */}
+                {['bkash', 'nagad', 'rocket', 'upay'].includes(paymentInfo.method) && (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-4">
+                      Payment Details
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Transaction ID *
+                        </label>
+                        <input
+                          type="text"
+                          value={paymentInfo.transactionId || ''}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, transactionId: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                          placeholder="Enter transaction ID from your payment"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Payment Screenshot *
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setPaymentInfo({ ...paymentInfo, screenshot: file });
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                        />
+                        {paymentInfo.screenshot && (
+                          <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                            ✓ {paymentInfo.screenshot.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* SSLCommerz Payment Button */}
                 {paymentInfo.method === 'sslcommerz' && (
