@@ -274,9 +274,32 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('isFeatured', formData.isFeatured.toString());
       submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
       
-      // Add variant data
+      // Add variant data (sanitize out File objects and upload separately)
       submitData.append('hasVariants', hasVariants.toString());
-      submitData.append('colorVariants', JSON.stringify(colorVariants));
+
+      const sanitizedColorVariants = colorVariants.map(cv => ({
+        color: cv.color,
+        colorCode: cv.colorCode,
+        // keep existing image URL reference if present (edit mode)
+        ...(cv.imageUrl ? { image: { url: cv.imageUrl } as any } : {})
+      }));
+
+      // Upload color variant images and map indices
+      const colorVariantImageIndexMap: Array<{ variantIndex: number; fileIndex: number }> = [];
+      let colorVariantFileIndex = 0;
+      colorVariants.forEach((cv, idx) => {
+        if (cv.image instanceof File) {
+          submitData.append('colorVariantImages', cv.image);
+          colorVariantImageIndexMap.push({ variantIndex: idx, fileIndex: colorVariantFileIndex });
+          colorVariantFileIndex += 1;
+        }
+      });
+
+      submitData.append('colorVariants', JSON.stringify(sanitizedColorVariants));
+      if (colorVariantImageIndexMap.length > 0) {
+        submitData.append('colorVariantImageIndexMap', JSON.stringify(colorVariantImageIndexMap));
+      }
+
       submitData.append('sizeVariants', JSON.stringify(sizeVariants));
       submitData.append('weightVariants', JSON.stringify(weightVariants));
       
