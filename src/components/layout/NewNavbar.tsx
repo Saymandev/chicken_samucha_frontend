@@ -550,7 +550,7 @@ const NewNavbar: React.FC = () => {
               onClick={openCart}
               className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
             >
-              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+              <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
                   {cartCount}
@@ -563,7 +563,7 @@ const NewNavbar: React.FC = () => {
               to="/wishlist"
               className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
             >
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+              <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
                   {wishlistCount}
