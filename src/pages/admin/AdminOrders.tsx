@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { AdminOrderCardSkeleton } from '../../components/common/Skeleton';
 import { adminAPI } from '../../utils/api';
@@ -88,6 +89,8 @@ const AdminOrders: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [courierAutoBook, setCourierAutoBook] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   // Debounce search term
   useEffect(() => {
@@ -127,6 +130,16 @@ const AdminOrders: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  // Load courier settings for toggle label
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await adminAPI.getCourierSettings();
+        setCourierAutoBook(!!r.data?.settings?.steadfastAutoBook);
+      } catch {}
+    })();
+  }, []);
 
   // Socket.IO connection for real-time updates
   useEffect(() => {
@@ -399,21 +412,29 @@ const AdminOrders: React.FC = () => {
               View All
             </button>
             {/* Auto-book toggle */}
-            <button
-              onClick={async () => {
-                try {
-                  const s = await adminAPI.getCourierSettings();
-                  const next = !s.data.settings.steadfastAutoBook;
-                  await adminAPI.updateCourierSettings({ steadfastAutoBook: next });
-                  toast.success(`Auto-book ${next ? 'enabled' : 'disabled'}`);
-                } catch (e: any) {
-                  toast.error('Failed to toggle auto-book');
-                }
-              }}
-              className="ml-auto px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm"
-            >
-              Toggle Auto-book
-            </button>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    const next = !courierAutoBook;
+                    await adminAPI.updateCourierSettings({ steadfastAutoBook: next });
+                    setCourierAutoBook(next);
+                    toast.success(`Auto-book ${next ? 'enabled' : 'disabled'}`);
+                  } catch (e: any) {
+                    toast.error('Failed to toggle auto-book');
+                  }
+                }}
+                className={`px-3 py-2 rounded text-white text-sm ${courierAutoBook ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+              >
+                Auto-book: {courierAutoBook ? 'On' : 'Off'}
+              </button>
+              <button
+                onClick={() => navigate('/admin/courier-returns')}
+                className="px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              >
+                View Courier Returns
+              </button>
+            </div>
           </div>
         </div>
 

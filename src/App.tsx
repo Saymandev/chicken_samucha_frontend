@@ -51,6 +51,7 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminChat from './pages/admin/AdminChat';
 import AdminContent from './pages/admin/AdminContent';
 import AdminCoupons from './pages/admin/AdminCoupons';
+import AdminCourierReturns from './pages/admin/AdminCourierReturns';
 import AdminFlashSales from './pages/admin/AdminFlashSales';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminProducts from './pages/admin/AdminProducts';
@@ -246,6 +247,16 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <AdminOrders />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/courier-returns"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <AdminCourierReturns />
                 </AdminLayout>
               </ProtectedRoute>
             }
