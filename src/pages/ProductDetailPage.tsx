@@ -216,14 +216,17 @@ const ProductDetailPage: React.FC = () => {
 
   const canAddToCart = () => {
     if (!product) return false;
-    if (!product.hasVariants) return product.isAvailable && product.stock > 0;
+    if (!product.isAvailable || product.stock <= 0) return false;
     
-    // Check if all required variants are selected
+    // If no variants, allow add to cart
+    if (!product.hasVariants) return true;
+    
+    // Check if all available variant types have selections
     const hasColor = !product.colorVariants?.length || selectedColor;
     const hasSize = !product.sizeVariants?.length || selectedSize;
     const hasWeight = !product.weightVariants?.length || selectedWeight;
     
-    return hasColor && hasSize && hasWeight && product.isAvailable && product.stock > 0;
+    return hasColor && hasSize && hasWeight;
   };
 
   const getVariantData = () => {
