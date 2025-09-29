@@ -2,9 +2,8 @@ import { motion } from 'framer-motion';
 import { ImagePlus, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { ProductVariant, useStore, VariantAttribute } from '../../store/useStore';
+import { useStore } from '../../store/useStore';
 import { adminAPI, categoriesAPI } from '../../utils/api';
-import SimpleVariantManager from './SimpleVariantManager';
 
 interface Product {
   _id?: string;
@@ -13,15 +12,16 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: string | { _id: string; name: { en: string; bn: string }; slug: string };
+  category: string;
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
   youtubeVideoUrl?: string;
-  // Variant System
+  // Simple Variant System
   hasVariants?: boolean;
-  variantAttributes?: VariantAttribute[];
-  variants?: ProductVariant[];
+  colorVariants?: Array<{ color: string; colorCode: string; image: File | null; imageUrl?: string }>;
+  sizeVariants?: Array<{ size: string }>;
+  weightVariants?: Array<{ weight: string; priceModifier: number }>;
 }
 
 interface ProductFormModalProps {
@@ -58,10 +58,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   
-  // Variant state
+  // Simple Variant System State
   const [hasVariants, setHasVariants] = useState(false);
-  const [variantAttributes, setVariantAttributes] = useState<VariantAttribute[]>([]);
-  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [colorVariants, setColorVariants] = useState<Array<{ color: string; colorCode: string; image: File | null; imageUrl?: string }>>([]);
+  const [sizeVariants, setSizeVariants] = useState<Array<{ size: string }>>([]);
+  const [weightVariants, setWeightVariants] = useState<Array<{ weight: string; priceModifier: number }>>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -69,17 +70,12 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   useEffect(() => {
     if (product) {
-      // Handle category - it might be a string or an object
-      const categoryId = typeof product.category === 'string' 
-        ? product.category 
-        : product.category?._id || '';
-      
       setFormData({
         name: product.name || { en: '', bn: '' },
         description: product.description || { en: '', bn: '' },
         price: product.price || 0,
         discountPrice: product.discountPrice || 0,
-        category: categoryId,
+        category: product.category || '',
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,
@@ -89,8 +85,9 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       
       // Initialize variant data
       setHasVariants(product.hasVariants || false);
-      setVariantAttributes(product.variantAttributes || []);
-      setVariants(product.variants || []);
+      setColorVariants(product.colorVariants || []);
+      setSizeVariants(product.sizeVariants || []);
+      setWeightVariants(product.weightVariants || []);
     } else {
       // Reset form for new product
       setFormData({
@@ -108,8 +105,9 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       
       // Reset variant data for new product
       setHasVariants(false);
-      setVariantAttributes([]);
-      setVariants([]);
+      setColorVariants([]);
+      setSizeVariants([]);
+      setWeightVariants([]);
     }
     setNewImages([]);
   }, [product, isOpen]);
@@ -273,8 +271,9 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       
       // Add variant data
       submitData.append('hasVariants', hasVariants.toString());
-      submitData.append('variantAttributes', JSON.stringify(variantAttributes));
-      submitData.append('variants', JSON.stringify(variants));
+      submitData.append('colorVariants', JSON.stringify(colorVariants));
+      submitData.append('sizeVariants', JSON.stringify(sizeVariants));
+      submitData.append('weightVariants', JSON.stringify(weightVariants));
       
       // Add new image files from state
       
@@ -434,6 +433,180 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
             </p>
           </div>
 
+          {/* Simple Variant System */}
+          <div className="border-t pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="checkbox"
+                id="hasVariants"
+                checked={hasVariants}
+                onChange={(e) => setHasVariants(e.target.checked)}
+                className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+              />
+              <label htmlFor="hasVariants" className="text-lg font-semibold text-gray-900 dark:text-white">
+                Enable Product Variants (Optional)
+              </label>
+            </div>
+            
+            {hasVariants && (
+              <div className="space-y-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                {/* Color Variants */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                    Color Variants
+                  </h4>
+                  <div className="space-y-3">
+                    {colorVariants.map((variant, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded border">
+                        <input
+                          type="color"
+                          value={variant.colorCode}
+                          onChange={(e) => {
+                            const newVariants = [...colorVariants];
+                            newVariants[index].colorCode = e.target.value;
+                            setColorVariants(newVariants);
+                          }}
+                          className="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Color name (e.g., Red, Blue)"
+                          value={variant.color}
+                          onChange={(e) => {
+                            const newVariants = [...colorVariants];
+                            newVariants[index].color = e.target.value;
+                            setColorVariants(newVariants);
+                          }}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const newVariants = [...colorVariants];
+                            newVariants[index].image = e.target.files?.[0] || null;
+                            setColorVariants(newVariants);
+                          }}
+                          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVariants = colorVariants.filter((_, i) => i !== index);
+                            setColorVariants(newVariants);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setColorVariants([...colorVariants, { color: '', colorCode: '#000000', image: null }])}
+                      className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors"
+                    >
+                      + Add Color Variant
+                    </button>
+                  </div>
+                </div>
+
+                {/* Size Variants */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                    Size Variants
+                  </h4>
+                  <div className="space-y-3">
+                    {sizeVariants.map((variant, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded border">
+                        <input
+                          type="text"
+                          placeholder="Size (e.g., L, M, XL, XXL)"
+                          value={variant.size}
+                          onChange={(e) => {
+                            const newVariants = [...sizeVariants];
+                            newVariants[index].size = e.target.value;
+                            setSizeVariants(newVariants);
+                          }}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVariants = sizeVariants.filter((_, i) => i !== index);
+                            setSizeVariants(newVariants);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setSizeVariants([...sizeVariants, { size: '' }])}
+                      className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors"
+                    >
+                      + Add Size Variant
+                    </button>
+                  </div>
+                </div>
+
+                {/* Weight Variants */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                    Weight Variants
+                  </h4>
+                  <div className="space-y-3">
+                    {weightVariants.map((variant, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded border">
+                        <input
+                          type="text"
+                          placeholder="Weight (e.g., 1kg, 2kg, 500g)"
+                          value={variant.weight}
+                          onChange={(e) => {
+                            const newVariants = [...weightVariants];
+                            newVariants[index].weight = e.target.value;
+                            setWeightVariants(newVariants);
+                          }}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Price Modifier"
+                          value={variant.priceModifier}
+                          onChange={(e) => {
+                            const newVariants = [...weightVariants];
+                            newVariants[index].priceModifier = parseFloat(e.target.value) || 0;
+                            setWeightVariants(newVariants);
+                          }}
+                          className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVariants = weightVariants.filter((_, i) => i !== index);
+                            setWeightVariants(newVariants);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setWeightVariants([...weightVariants, { weight: '', priceModifier: 0 }])}
+                      className="w-full p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors"
+                    >
+                      + Add Weight Variant
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Price and Category */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -494,34 +667,6 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 required
               />
             </div>
-          </div>
-
-          {/* Variant System */}
-          <div className="border-t pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <input
-                type="checkbox"
-                id="hasVariants"
-                checked={hasVariants}
-                onChange={(e) => setHasVariants(e.target.checked)}
-                className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-              />
-              <label htmlFor="hasVariants" className="text-lg font-semibold text-gray-900 dark:text-white">
-                Enable Product Variants
-              </label>
-            </div>
-            
-            {hasVariants && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <SimpleVariantManager
-                  variantAttributes={variantAttributes}
-                  setVariantAttributes={setVariantAttributes}
-                  variants={variants}
-                  setVariants={setVariants}
-                  language={language}
-                />
-              </div>
-            )}
           </div>
 
           {/* Product Status */}

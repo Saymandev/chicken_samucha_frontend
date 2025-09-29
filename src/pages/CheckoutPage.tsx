@@ -343,6 +343,22 @@ const CheckoutPage: React.FC = () => {
         const productId = (item.product as any).id || (item.product as any)._id;
         formData.append(`items[${index}][product]`, productId);
         formData.append(`items[${index}][quantity]`, item.quantity.toString());
+        
+        // Add variant data if available
+        if (item.variantData) {
+          if (item.variantData.color) {
+            formData.append(`items[${index}][variantData][color]`, item.variantData.color);
+          }
+          if (item.variantData.size) {
+            formData.append(`items[${index}][variantData][size]`, item.variantData.size);
+          }
+          if (item.variantData.weight) {
+            formData.append(`items[${index}][variantData][weight]`, item.variantData.weight);
+          }
+          if (item.variantData.priceModifier !== undefined) {
+            formData.append(`items[${index}][variantData][priceModifier]`, item.variantData.priceModifier.toString());
+          }
+        }
       });
 
       // Add payment info
@@ -456,6 +472,22 @@ const CheckoutPage: React.FC = () => {
         
         formData.append(`items[${index}][product]`, productId);
         formData.append(`items[${index}][quantity]`, item.quantity.toString());
+        
+        // Add variant data if available
+        if (item.variantData) {
+          if (item.variantData.color) {
+            formData.append(`items[${index}][variantData][color]`, item.variantData.color);
+          }
+          if (item.variantData.size) {
+            formData.append(`items[${index}][variantData][size]`, item.variantData.size);
+          }
+          if (item.variantData.weight) {
+            formData.append(`items[${index}][variantData][weight]`, item.variantData.weight);
+          }
+          if (item.variantData.priceModifier !== undefined) {
+            formData.append(`items[${index}][variantData][priceModifier]`, item.variantData.priceModifier.toString());
+          }
+        }
       });
       
       // Send payment info in the format backend expects

@@ -7,37 +7,40 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ProductCard from '../components/product/ProductCard';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { ProductAttribute, ProductVariant, Product as StoreProduct, useStore } from '../store/useStore';
+import { useStore } from '../store/useStore';
 import { ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
 
-interface Product extends StoreProduct {
-  // Variant System
+interface Product {
+  id: string;
+  name: { en: string; bn: string };
+  description: { en: string; bn: string };
+  shortDescription?: { en: string; bn: string };
+  price: number;
+  discountPrice?: number;
+  images: Array<{ url: string; public_id: string }>;
+  category: { 
+    _id: string;
+    name: { en: string; bn: string };
+    slug: string;
+  };
+  // removed: ingredients, preparationTime, servingSize
+  isFeatured: boolean;
+  isAvailable: boolean;
+  stock: number;
+  ratings: { average: number; count: number };
+  minOrderQuantity: number;
+  maxOrderQuantity: number;
+  youtubeVideoUrl?: string;
+  analytics?: {
+    viewCount: number;
+    addToCartCount: number;
+    purchaseCount: number;
+  };
+  // Simple Variant System
   hasVariants?: boolean;
-  variantAttributes?: Array<{
-    name: string;
-    type: 'color' | 'size' | 'weight' | 'volume' | 'material' | 'style' | 'custom';
-    displayName?: {
-      en?: string;
-      bn?: string;
-    };
-    isRequired: boolean;
-    affectsPrice: boolean;
-    affectsStock: boolean;
-    affectsImage: boolean;
-    values: Array<{
-      value: string;
-      displayName?: {
-        en?: string;
-        bn?: string;
-      };
-      unit?: string;
-      colorCode?: string;
-      imageUrl?: string;
-      priceModifier?: number;
-      stockModifier?: number;
-    }>;
-  }>;
-  variants?: ProductVariant[];
+  colorVariants?: Array<{ color: string; colorCode: string; image: { public_id: string; url: string } }>;
+  sizeVariants?: Array<{ size: string }>;
+  weightVariants?: Array<{ weight: string; priceModifier: number }>;
 }
 
 interface Review {
@@ -87,16 +90,17 @@ const ProductDetailPage: React.FC = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [showQuickOrderModal, setShowQuickOrderModal] = useState(false);
-  
-  // Variant selection state
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<ProductAttribute[]>([]);
   const [quickOrderData, setQuickOrderData] = useState({
     name: '',
     phone: '',
     email: '',
     address: ''
   });
+  
+  // Simple Variant Selection State
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedWeight, setSelectedWeight] = useState<string>('');
 
   useEffect(() => {
     if (id) {
@@ -173,66 +177,57 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
-  // Variant helper functions
-  const findVariantByAttributes = (attributes: ProductAttribute[]): ProductVariant | null => {
-    if (!product?.hasVariants || !product.variants) return null;
+  // Simple Variant Helper Functions
+  const getCurrentPrice = (): number => {
+    let price = product?.discountPrice || product?.price || 0;
     
-    return product.variants.find(variant => {
-      return attributes.every(attr => 
-        variant.attributes.some(variantAttr => 
-          variantAttr.attributeName === attr.attributeName && 
-          variantAttr.value === attr.value
-        )
-      );
-    }) || null;
-  };
-
-  const handleVariantChange = (attributeName: string, value: string, attributeType: string) => {
-    const newAttributes = selectedAttributes.filter(attr => attr.attributeName !== attributeName);
-    newAttributes.push({
-      attributeName,
-      attributeType,
-      value,
-      unit: '',
-      colorCode: ''
-    });
-    
-    setSelectedAttributes(newAttributes);
-    const variant = findVariantByAttributes(newAttributes);
-    setSelectedVariant(variant);
-    
-    // Update image gallery when variant changes
-    if (variant && variant.images.length > 0) {
-      setSelectedImage(0);
+    // Add weight variant price modifier
+    if (selectedWeight && product?.weightVariants) {
+      const weightVariant = product.weightVariants.find(w => w.weight === selectedWeight);
+      if (weightVariant) {
+        price += weightVariant.priceModifier;
+      }
     }
+    
+    return price;
   };
 
   const getCurrentImages = () => {
-    if (selectedVariant && selectedVariant.images.length > 0) {
-      return selectedVariant.images;
+    // If color is selected and has image, show color image
+    if (selectedColor && product?.colorVariants) {
+      const colorVariant = product.colorVariants.find(c => c.color === selectedColor);
+      if (colorVariant?.image?.url) {
+        return [colorVariant.image];
+      }
     }
+    
+    // Otherwise show product images
     return product?.images || [];
-  };
-
-  const getCurrentPrice = (): number => {
-    if (selectedVariant) {
-      return selectedVariant.discountPrice || selectedVariant.price;
-    }
-    return product?.discountPrice || product?.price || 0;
-  };
-
-  const getCurrentStock = (): number => {
-    if (selectedVariant) {
-      return selectedVariant.stock;
-    }
-    return product?.stock || 0;
   };
 
   const canAddToCart = () => {
     if (!product) return false;
     if (!product.hasVariants) return product.isAvailable && product.stock > 0;
-    if (!selectedVariant) return false;
-    return selectedVariant.isAvailable && selectedVariant.stock > 0;
+    
+    // Check if all required variants are selected
+    const hasColor = !product.colorVariants?.length || selectedColor;
+    const hasSize = !product.sizeVariants?.length || selectedSize;
+    const hasWeight = !product.weightVariants?.length || selectedWeight;
+    
+    return hasColor && hasSize && hasWeight && product.isAvailable && product.stock > 0;
+  };
+
+  const getVariantData = () => {
+    if (!product?.hasVariants) return undefined;
+    
+    return {
+      color: selectedColor || undefined,
+      size: selectedSize || undefined,
+      weight: selectedWeight || undefined,
+      priceModifier: selectedWeight && product?.weightVariants 
+        ? product.weightVariants.find(w => w.weight === selectedWeight)?.priceModifier || 0
+        : 0
+    };
   };
 
   const handleAddToCart = async () => {
@@ -240,12 +235,7 @@ const ProductDetailPage: React.FC = () => {
     
     setIsAddingToCart(true);
     try {
-      const variantData = selectedVariant ? {
-        variantId: selectedVariant._id,
-        attributes: selectedAttributes,
-        sku: selectedVariant.sku
-      } : undefined;
-      
+      const variantData = getVariantData();
       addToCart(product, quantity, variantData);
       
       // Open cart sidebar to show the added item
@@ -368,7 +358,7 @@ const ProductDetailPage: React.FC = () => {
   }
 
   const currentPrice = getCurrentPrice();
-  const originalPrice = selectedVariant ? selectedVariant.price : product.price;
+  const originalPrice = product?.discountPrice || product?.price || 0;
   const hasDiscount = currentPrice < originalPrice;
 
   // Truncate description to 20 words
@@ -415,12 +405,7 @@ const ProductDetailPage: React.FC = () => {
     if (user) {
       try {
         setIsBuyingNow(true);
-        const variantData = selectedVariant ? {
-          variantId: selectedVariant._id,
-          attributes: selectedAttributes,
-          sku: selectedVariant.sku
-        } : undefined;
-        
+        const variantData = getVariantData();
         addToCart(product, quantity, variantData);
         // Don't open cart sidebar for Buy Now - go directly to checkout
         navigate('/checkout');
@@ -604,100 +589,130 @@ const ProductDetailPage: React.FC = () => {
                   </span>
                   {hasDiscount && (
                     <span className="text-xl text-gray-500 line-through">
-                      ৳{originalPrice}
+                      ৳{product.price}
                     </span>
                   )}
                   {hasDiscount && (
                     <span className="bg-red-100 text-red-800 text-sm px-2 py-1 rounded-full">
-                      {Math.round(((originalPrice - currentPrice) / originalPrice) * 100)}% OFF
+                      {Math.round(((product.price - currentPrice) / product.price) * 100)}% OFF
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Comprehensive Variant Selection */}
-              {product.hasVariants && product.variantAttributes && (
+              {/* Simple Variant Selection */}
+              {product.hasVariants && (
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {language === 'bn' ? 'বিকল্প নির্বাচন করুন' : 'Select Options'}
                   </h3>
-                  <div className="space-y-4">
-                    {product.variantAttributes.map((attribute) => (
-                      <div key={attribute.name} className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {attribute.displayName?.[language] || attribute.name}:
-                          </label>
-                          {attribute.isRequired && (
-                            <span className="text-red-500 text-xs">*</span>
-                          )}
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-2">
-                          {attribute.values.map((value) => {
-                            const isSelected = selectedAttributes.some(
-                              attr => attr.attributeName === attribute.name && attr.value === value.value
-                            );
-                            
-                            if (attribute.type === 'color') {
-                              return (
-                                <button
-                                  key={value.value}
-                                  onClick={() => handleVariantChange(attribute.name, value.value, attribute.type)}
-                                  className={`w-12 h-12 rounded-full border-2 transition-all ${
-                                    isSelected
-                                      ? 'border-orange-500 scale-110 shadow-lg'
-                                      : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
-                                  }`}
-                                  style={{ backgroundColor: value.colorCode || '#ccc' }}
-                                  title={value.displayName?.[language] || value.value}
-                                >
-                                  {isSelected && (
-                                    <div className="w-full h-full rounded-full flex items-center justify-center">
-                                      <div className="w-2 h-2 bg-white rounded-full shadow-md"></div>
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            } else {
-                              return (
-                                <button
-                                  key={value.value}
-                                  onClick={() => handleVariantChange(attribute.name, value.value, attribute.type)}
-                                  className={`px-4 py-2 border rounded-lg transition-all ${
-                                    isSelected
-                                      ? 'bg-orange-500 text-white border-orange-500'
-                                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
-                                  }`}
-                                >
-                                  <span className="font-medium">
-                                    {value.displayName?.[language] || value.value}
-                                  </span>
-                                  {value.unit && (
-                                    <span className="text-sm ml-1">{value.unit}</span>
-                                  )}
-                                  {value.priceModifier && value.priceModifier !== 0 && (
-                                    <span className="text-xs ml-2">
-                                      {value.priceModifier > 0 ? '+' : ''}৳{value.priceModifier}
-                                    </span>
-                                  )}
-                                </button>
-                              );
-                            }
-                          })}
-                        </div>
-                        
-                        {/* Show selected variant info */}
-                        {selectedAttributes.some(attr => attr.attributeName === attribute.name) && selectedVariant && (
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                            {selectedVariant.sku && (
-                              <span>SKU: {selectedVariant.sku}</span>
+                  
+                  {/* Color Variants */}
+                  {product.colorVariants && product.colorVariants.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {language === 'bn' ? 'রঙ' : 'Color'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {product.colorVariants.map((variant, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedColor(variant.color)}
+                            className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-all ${
+                              selectedColor === variant.color
+                                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                            }`}
+                          >
+                            <div
+                              className="w-4 h-4 rounded-full border border-gray-300"
+                              style={{ backgroundColor: variant.colorCode }}
+                            />
+                            <span className="text-sm font-medium">{variant.color}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Size Variants */}
+                  {product.sizeVariants && product.sizeVariants.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {language === 'bn' ? 'সাইজ' : 'Size'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {product.sizeVariants.map((variant, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedSize(variant.size)}
+                            className={`px-4 py-2 border rounded-lg transition-all ${
+                              selectedSize === variant.size
+                                ? 'border-orange-500 bg-orange-500 text-white'
+                                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                            }`}
+                          >
+                            <span className="text-sm font-medium">{variant.size}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Weight Variants */}
+                  {product.weightVariants && product.weightVariants.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {language === 'bn' ? 'ওজন' : 'Weight'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {product.weightVariants.map((variant, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedWeight(variant.weight)}
+                            className={`px-4 py-2 border rounded-lg transition-all ${
+                              selectedWeight === variant.weight
+                                ? 'border-orange-500 bg-orange-500 text-white'
+                                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                            }`}
+                          >
+                            <span className="text-sm font-medium">{variant.weight}</span>
+                            {variant.priceModifier !== 0 && (
+                              <span className="text-xs ml-1">
+                                {variant.priceModifier > 0 ? '+' : ''}৳{variant.priceModifier}
+                              </span>
                             )}
-                          </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Selected Variants Summary */}
+                  {(selectedColor || selectedSize || selectedWeight) && (
+                    <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        {language === 'bn' ? 'নির্বাচিত বিকল্প' : 'Selected Options'}
+                      </h4>
+                      <div className="flex flex-wrap gap-2 text-sm">
+                        {selectedColor && (
+                          <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 rounded">
+                            {language === 'bn' ? 'রঙ' : 'Color'}: {selectedColor}
+                          </span>
+                        )}
+                        {selectedSize && (
+                          <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded">
+                            {language === 'bn' ? 'সাইজ' : 'Size'}: {selectedSize}
+                          </span>
+                        )}
+                        {selectedWeight && (
+                          <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded">
+                            {language === 'bn' ? 'ওজন' : 'Weight'}: {selectedWeight}
+                          </span>
                         )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -736,10 +751,10 @@ const ProductDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">{t('productDetail.stock')}</span>
-                  <p className={`font-medium ${getCurrentStock() > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {getCurrentStock() > 0 
-                      ? (typeof getCurrentStock() === 'number' && getCurrentStock() >= 0 
-                          ? `${getCurrentStock()} ${t('productDetail.available')}` 
+                  <p className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {product.stock > 0 
+                      ? (typeof product.stock === 'number' && product.stock >= 0 
+                          ? `${product.stock} ${t('productDetail.available')}` 
                           : t('productDetail.inStock'))
                       : t('productDetail.outOfStock')
                     }
@@ -814,13 +829,10 @@ const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Availability Status */}
-              {!canAddToCart() && (
+              {!product.isAvailable && (
                 <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <p className="text-red-800 dark:text-red-200 text-sm">
-                    {product?.hasVariants && !selectedVariant 
-                      ? (language === 'bn' ? 'অনুগ্রহ করে বিকল্প নির্বাচন করুন' : 'Please select product options')
-                      : t('productDetail.unavailable')
-                    }
+                    {t('productDetail.unavailable')}
                   </p>
                 </div>
               )}
@@ -972,9 +984,9 @@ const ProductDetailPage: React.FC = () => {
 
                   {/* Product Summary */}
                   <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    {getCurrentImages().length > 0 && (
+                    {product.images && product.images.length > 0 && (
                       <img
-                        src={getCurrentImages()[0].url}
+                        src={product.images[0].url}
                         alt={language === 'bn' ? product.name.bn : product.name.en}
                         className="w-12 h-12 object-cover rounded-lg"
                       />
@@ -984,7 +996,7 @@ const ProductDetailPage: React.FC = () => {
                         {language === 'bn' ? product.name.bn : product.name.en}
                       </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Qty: {quantity} × ৳{currentPrice} = ৳{quantity * currentPrice}
+                        Qty: {quantity} × ৳{product.discountPrice || product.price} = ৳{quantity * (product.discountPrice || product.price)}
                       </p>
                     </div>
                   </div>

@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-  CheckCircle,
-  Clock,
-  Eye,
-  Package,
-  Search,
-  Truck,
-  X,
-  XCircle
+    CheckCircle,
+    Clock,
+    Eye,
+    Package,
+    Search,
+    Truck,
+    X,
+    XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -37,6 +37,12 @@ interface Order {
     quantity: number; 
     price: number; 
     subtotal: number;
+    variantData?: {
+      color?: string;
+      size?: string;
+      weight?: string;
+      priceModifier?: number;
+    };
   }>;
   totalAmount: number;
   finalAmount: number;
@@ -653,9 +659,16 @@ const AdminOrders: React.FC = () => {
                 <div className="space-y-2">
                   {order.items.map((item, index) => (
                     <div key={index} className="flex justify-between items-center py-1 flex-wrap gap-2">
-                      <span className="text-gray-900 dark:text-gray-100 flex-1 min-w-0">
-                        {getItemName(item)} x {item.quantity}
-                      </span>
+                      <div className="text-gray-900 dark:text-gray-100 flex-1 min-w-0">
+                        <div className="font-medium">{getItemName(item)} x {item.quantity}</div>
+                        {item.variantData && (item.variantData.color || item.variantData.size || item.variantData.weight) && (
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            {item.variantData.color && <span className="mr-2">Color: {item.variantData.color}</span>}
+                            {item.variantData.size && <span className="mr-2">Size: {item.variantData.size}</span>}
+                            {item.variantData.weight && <span>Weight: {item.variantData.weight}</span>}
+                          </div>
+                        )}
+                      </div>
                       <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
                         ৳{(item.subtotal || item.price * item.quantity)}
                       </span>
@@ -904,9 +917,21 @@ const AdminOrders: React.FC = () => {
                     <div className="space-y-3">
                       {selectedOrder.items.map((item, index) => (
                         <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
-                          <div>
+                          <div className="flex-1">
                             <p className="font-medium text-gray-900 dark:text-white">{getItemName(item)}</p>
                             <p className="text-sm text-gray-600 dark:text-gray-300">Quantity: {item.quantity}</p>
+                            {item.variantData && (item.variantData.color || item.variantData.size || item.variantData.weight) && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {item.variantData.color && <span className="mr-3">Color: {item.variantData.color}</span>}
+                                {item.variantData.size && <span className="mr-3">Size: {item.variantData.size}</span>}
+                                {item.variantData.weight && <span>Weight: {item.variantData.weight}</span>}
+                                {item.variantData.priceModifier && item.variantData.priceModifier !== 0 && (
+                                  <span className="ml-2 text-orange-600">
+                                    ({item.variantData.priceModifier > 0 ? '+' : ''}৳{item.variantData.priceModifier})
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                           <div className="text-right">
                             <p className="font-medium text-gray-900 dark:text-white">৳{(item.subtotal || item.price * item.quantity)}</p>
