@@ -90,7 +90,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       
       // Initialize variant data
       setHasVariants(product.hasVariants || false);
-      setColorVariants(product.colorVariants || []);
+      setColorVariants(
+        (product.colorVariants || []).map((v: any) => ({
+          color: v.color,
+          colorCode: v.colorCode || '#000000',
+          image: null,
+          imageUrl: v.image?.url || undefined
+        }))
+      );
       setSizeVariants(product.sizeVariants || []);
       setWeightVariants(product.weightVariants || []);
     } else {
@@ -512,11 +519,24 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                           accept="image/*"
                           onChange={(e) => {
                             const newVariants = [...colorVariants];
-                            newVariants[index].image = e.target.files?.[0] || null;
+                            const file = e.target.files?.[0] || null;
+                            newVariants[index].image = file;
+                            if (file) {
+                              try {
+                                newVariants[index].imageUrl = URL.createObjectURL(file);
+                              } catch {}
+                            }
                             setColorVariants(newVariants);
                           }}
                           className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-600 dark:text-white"
                         />
+                        {variant.imageUrl && (
+                          <img
+                            src={variant.imageUrl}
+                            alt={`Variant ${index + 1}`}
+                            className="w-10 h-10 object-cover rounded border border-gray-300"
+                          />
+                        )}
                         <button
                           type="button"
                           onClick={() => {

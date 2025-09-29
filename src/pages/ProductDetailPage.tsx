@@ -626,7 +626,7 @@ const ProductDetailPage: React.FC = () => {
                         {product.colorVariants.map((variant, index) => (
                           <button
                             key={index}
-                            onClick={() => setSelectedColor(variant.color)}
+                            onClick={() => setSelectedColor(prev => prev === variant.color ? '' : variant.color)}
                             className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-all ${
                               selectedColor === variant.color
                                 ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
@@ -654,7 +654,7 @@ const ProductDetailPage: React.FC = () => {
                         {product.sizeVariants.map((variant, index) => (
                           <button
                             key={index}
-                            onClick={() => setSelectedSize(variant.size)}
+                            onClick={() => setSelectedSize(prev => prev === variant.size ? '' : variant.size)}
                             className={`px-4 py-2 border rounded-lg transition-all ${
                               selectedSize === variant.size
                                 ? 'border-orange-500 bg-orange-500 text-white'
@@ -678,7 +678,7 @@ const ProductDetailPage: React.FC = () => {
                         {product.weightVariants.map((variant, index) => (
                           <button
                             key={index}
-                            onClick={() => setSelectedWeight(variant.weight)}
+                            onClick={() => setSelectedWeight(prev => prev === variant.weight ? '' : variant.weight)}
                             className={`px-4 py-2 border rounded-lg transition-all ${
                               selectedWeight === variant.weight
                                 ? 'border-orange-500 bg-orange-500 text-white'
