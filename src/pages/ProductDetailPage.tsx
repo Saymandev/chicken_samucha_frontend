@@ -113,6 +113,11 @@ const ProductDetailPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Reset gallery index when variant selection changes so color image shows immediately
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [selectedColor, selectedSize, selectedWeight]);
+
   const fetchProduct = async () => {
     try {
       setLoading(true);
