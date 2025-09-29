@@ -520,7 +520,7 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
             animate={{ opacity: 1 }}
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 md:gap-3'
+                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2'
                 : 'space-y-6'
             }
           >
