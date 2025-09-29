@@ -379,34 +379,52 @@ const NewNavbar: React.FC = () => {
       <div className="bg-orange-600 text-white py-3">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0">
-            {/* Logo - large on lg+, compact on <lg */}
-            <Link to="/" className="flex flex-col items-start">
-              <span className="hidden lg:block"><PickplaceLogo size="lg" /></span>
-              <span className="lg:hidden flex items-center gap-2">
-                <img src="/logo.png" alt="Pickplace" className="h-8 w-auto" />
-                <span className="text-white font-semibold">Pickplace</span>
-              </span>
-              <span className="mt-1 text-white text-sm hidden lg:inline">www.pickplace.com.bd</span>
+            {/* Small screens: logo + search in one row */}
+            <div className="w-full flex items-center gap-3 lg:hidden">
+              <Link to="/" className="flex items-center gap-2">
+                <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+              </Link>
+              <form onSubmit={handleSearch} className="relative flex-1 min-w-0">
+                <input
+                  type="text"
+                  placeholder="Search entire store here..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="w-full px-3 py-2 pr-9 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm placeholder:text-xs"
+                />
+                <button 
+                  type="submit"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-1.5 rounded-lg transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </form>
+            </div>
+
+            {/* Logo - large on lg+ */}
+            <Link to="/" className="hidden lg:flex flex-col items-start">
+              <PickplaceLogo size="lg" />
+              <span className="mt-1 text-white text-sm">www.pickplace.com.bd</span>
             </Link>
 
-            {/* Search Bar */}
-            <div className="w-full lg:flex-1 lg:max-w-2xl lg:mx-8 order-3 lg:order-2 min-w-0">
+            {/* Search Bar (desktop) */}
+            <div className="hidden lg:block w-full lg:flex-1 lg:max-w-2xl lg:mx-8 order-3 lg:order-2 min-w-0">
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
                   placeholder="Search entire store here..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-10 sm:pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm"
+                  className="w-full px-4 py-3 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 text-base placeholder:text-sm"
                 />
                 <button 
                   type="submit"
-                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-lg transition-colors"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition-colors"
                 >
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Search className="w-5 h-5" />
                 </button>
               </form>
-                  </div>
+            </div>
 
             {/* Right Side - User Only */}
             <div className="flex items-center space-x-3 sm:space-x-6 order-2 lg:order-3">
