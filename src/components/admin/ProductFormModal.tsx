@@ -70,6 +70,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   useEffect(() => {
     if (product) {
+      console.log('Full product data:', product);
+      
       // Handle category - it might be a string or an object
       const categoryId = typeof product.category === 'string' 
         ? product.category 
@@ -91,17 +93,22 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       // Initialize variant data
       setHasVariants(product.hasVariants || false);
       console.log('Product colorVariants:', product.colorVariants);
-      setColorVariants(
-        (product.colorVariants || []).map((v: any) => {
-          console.log('Color variant:', v, 'Image:', v.image);
-          return {
-            color: v.color,
-            colorCode: v.colorCode || '#000000',
-            image: null,
-            imageUrl: v.image?.url || undefined
-          };
-        })
-      );
+      console.log('Product hasVariants:', product.hasVariants);
+      
+      const mappedColorVariants = (product.colorVariants || []).map((v: any) => {
+        console.log('Color variant:', v);
+        console.log('Color variant image:', v.image);
+        console.log('Color variant image URL:', v.image?.url);
+        return {
+          color: v.color,
+          colorCode: v.colorCode || '#000000',
+          image: null,
+          imageUrl: v.image?.url || undefined
+        };
+      });
+      
+      console.log('Mapped color variants:', mappedColorVariants);
+      setColorVariants(mappedColorVariants);
       setSizeVariants(product.sizeVariants || []);
       setWeightVariants(product.weightVariants || []);
     } else {
