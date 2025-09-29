@@ -297,19 +297,14 @@ const CheckoutPage: React.FC = () => {
     if (deliveryMethod === 'delivery') {
       const hasStreet = !!customerInfo.address.street?.trim();
       const hasArea = !!customerInfo.address.area?.trim();
-      if (deliveryCharge === 0) {
-        // Free delivery: accept if at least one of street or area is present
-        if (!hasStreet && !hasArea) {
-          toast.error('Please enter delivery address (street or area)');
-          return false;
-        }
-      } else {
+      if (deliveryCharge > 0) {
         // Paid delivery: require both street and area
         if (!hasStreet || !hasArea) {
           toast.error('Please fill in complete delivery address');
           return false;
         }
       }
+      // For free delivery, skip strict address validation
     }
 
     // Validate Bangladesh phone number
