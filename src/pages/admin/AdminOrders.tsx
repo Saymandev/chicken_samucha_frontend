@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-    CheckCircle,
-    Clock,
-    Eye,
-    Package,
-    Search,
-    Truck,
-    X,
-    XCircle
+  CheckCircle,
+  Clock,
+  Eye,
+  Package,
+  Search,
+  Truck,
+  X,
+  XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -149,7 +149,7 @@ const AdminOrders: React.FC = () => {
     newSocket.on('order-status-updated', (data) => {
       // Only show toast if this is from another admin (not from our own action)
       // The local state update already handled the immediate UI change
-      console.log(`Order ${data.orderNumber} status updated to ${data.newStatus}`);
+     
       
       // Refresh orders list to ensure data consistency with server
       setTimeout(() => {

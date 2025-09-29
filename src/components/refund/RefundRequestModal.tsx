@@ -131,7 +131,7 @@ const RefundRequestModal: React.FC<RefundRequestModalProps> = ({
         );
         
         // Show existing refund details
-        console.log('Existing refund details:', existingRefund);
+      
       } else {
         toast.error(error.response?.data?.message || 'Failed to submit refund request');
       }

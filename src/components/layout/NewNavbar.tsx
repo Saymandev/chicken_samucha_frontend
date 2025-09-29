@@ -82,9 +82,7 @@ const NewNavbar: React.FC = () => {
   }, []);
 
   // Debug menu items
-  useEffect(() => {
-    console.log('Menu items updated:', menuItems);
-  }, [menuItems]);
+  
 
   const fetchCategories = async () => {
     try {
@@ -168,11 +166,11 @@ const NewNavbar: React.FC = () => {
 
   // Handle menu item click with filtering
   const handleMenuClick = (item: any) => {
-    console.log('Menu clicked:', item); // Debug log
+   // Debug log
     if (item.isExternal) {
       window.open(item.path, item.target);
     } else {
-      console.log('Navigating to:', item.path); // Debug log
+      // Debug log
       navigate(item.path);
     }
     // Close mobile menu if open

@@ -152,25 +152,25 @@ const OrdersPage: React.FC = () => {
     });
 
     socket.on('connect', () => {
-      console.log('🔌 Connected to server for order updates');
+     
       socket.emit('join-user-room', { userId: user.id });
     });
 
     socket.on('order-status-updated', (data) => {
-      console.log('📢 Order status updated:', data);
+      
       // Refresh orders when status changes
       fetchOrders();
       toast.success(`Order ${data.orderNumber} status updated to ${data.newStatus}`);
     });
 
     socket.on('refund-request-created', (data) => {
-      console.log('📢 Refund request created:', data);
+      
       // Refresh orders when refund is created
       fetchOrders();
     });
 
     socket.on('refund-status-updated', (data) => {
-      console.log('📢 Refund status updated:', data);
+      
       // Refresh orders when refund status changes
       fetchOrders();
     });

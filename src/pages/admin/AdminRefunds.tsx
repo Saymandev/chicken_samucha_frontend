@@ -109,17 +109,17 @@ const AdminRefunds: React.FC = () => {
     });
 
     socket.on('connect', () => {
-      console.log('🔌 Connected to server for refund updates');
+    
     });
 
     socket.on('refund-status-updated', (data) => {
-      console.log('📢 Refund status updated:', data);
+      
       // Refresh refunds when status changes
       fetchRefunds();
     });
 
     socket.on('new-refund-request', (data) => {
-      console.log('📢 New refund request:', data);
+      
       // Refresh refunds when new request is created
       fetchRefunds();
     });

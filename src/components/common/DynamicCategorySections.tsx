@@ -34,11 +34,11 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
   const fetchCategoriesWithProducts = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Fetching categories...');
+      
       
       // First try with productCount
       const response = await categoriesAPI.getAllCategories({ withProductCount: 'true', limit: 50 });
-      console.log('Categories API response:', response.data);
+      
       
       if (response.data.success && response.data.data) {
         // Filter categories that have products
@@ -46,16 +46,16 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
           (category: Category) => category.productCount && category.productCount > 0
         );
         
-        console.log('Categories with productCount > 0:', categoriesWithProducts.length);
+        
         
         // If no categories with productCount, try without productCount and check manually
         if (categoriesWithProducts.length === 0) {
-          console.log('No categories with productCount, trying all categories...');
+          
           const allCategoriesResponse = await categoriesAPI.getAllCategories({ limit: 50 });
           
           if (allCategoriesResponse.data.success && allCategoriesResponse.data.data) {
             const allCategories = allCategoriesResponse.data.data;
-            console.log('All categories found:', allCategories.length);
+            
             
             // Check first few categories for products
             const checkCategories = allCategories.slice(0, 10); // Check first 10 categories
@@ -64,7 +64,7 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
                 const productsResponse = await productsAPI.getProducts({ category: category.slug, limit: 1 });
                 const hasProducts = productsResponse.data.success && 
                   (productsResponse.data.products?.length > 0 || productsResponse.data.data?.length > 0);
-                console.log(`Category ${category.slug} has products:`, hasProducts);
+                
                 return hasProducts ? { ...category, productCount: 1 } : null;
               } catch (error) {
                 console.error(`Error checking products for category ${category.slug}:`, error);
@@ -74,7 +74,7 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
             
             const results = await Promise.all(categoriesWithProductsPromises);
             categoriesWithProducts = results.filter(Boolean);
-            console.log('Categories with products found:', categoriesWithProducts.length);
+           
           }
         }
         
@@ -83,11 +83,10 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
           .sort((a: Category, b: Category) => (b.productCount || 0) - (a.productCount || 0))
           .slice(0, maxCategories);
         
-        console.log('Final sorted categories to display:', sortedCategories.length);
+        
         setCategories(sortedCategories);
       } else {
-        console.log('No categories found in response');
-        setCategories([]);
+        
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -95,7 +94,7 @@ const DynamicCategorySections: React.FC<DynamicCategorySectionsProps> = ({
       try {
         const fallbackResponse = await categoriesAPI.getAllCategories({ limit: maxCategories });
         if (fallbackResponse.data.success && fallbackResponse.data.data) {
-          console.log('Using fallback categories:', fallbackResponse.data.data.length);
+          
           setCategories(fallbackResponse.data.data);
         } else {
           setCategories([]);

@@ -239,7 +239,7 @@ export const usePromotions = () => {
 
   // Handle promotion updates
   const handlePromotionUpdate = useCallback((data: any) => {
-    console.log('📢 Promotion update received:', data);
+  
     const { promotion, action } = data;
     // Normalize id for socket payloads that might use _id
     const normalized = {
@@ -288,14 +288,14 @@ export const usePromotions = () => {
     });
 
     newSocket.on('connect', () => {
-      console.log('🔌 Connected to server for promotion updates');
+     
       newSocket.emit('join-promotion-room');
     });
 
     newSocket.on('promotion-updated', handlePromotionUpdate);
 
     newSocket.on('disconnect', () => {
-      console.log('🔌 Disconnected from server');
+     
     });
 
     setSocket(newSocket);

@@ -108,18 +108,17 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     });
 
     socketRef.current.on('connect', () => {
-      console.log('Socket connected');
-      setIsConnected(true);
+      
       socketRef.current?.emit('join-chat', chatId);
     });
 
     socketRef.current.on('disconnect', () => {
-      console.log('Socket disconnected');
+      
       setIsConnected(false);
     });
 
     socketRef.current.on('receive-message', (messageData: Message) => {
-      console.log('Received message:', messageData);
+    
       if (messageData.senderType === 'admin') {
         setMessages(prev => [...prev, messageData]);
         setAdminTyping(false);
@@ -150,7 +149,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     try {
       // Wait a bit for user data to be available
       if (isAuthenticated && !user) {
-        console.log('User is authenticated but user data not loaded yet, waiting...');
+    
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
@@ -170,9 +169,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         isGuest: true
       };
 
-      console.log('Sending customerInfo:', customerInfo);
-      console.log('isAnonymous flag:', isAnonymous);
-      console.log('isAuthenticated:', isAuthenticated);
+    
 
       const response = await chatAPI.startChatSession({
         customerInfo,

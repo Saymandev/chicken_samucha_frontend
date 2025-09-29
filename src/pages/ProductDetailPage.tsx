@@ -215,18 +215,9 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const canAddToCart = () => {
+    // Enable the button as long as the product can be bought; we will validate selections on click
     if (!product) return false;
-    if (!product.isAvailable || product.stock <= 0) return false;
-    
-    // If no variants, allow add to cart
-    if (!product.hasVariants) return true;
-    
-    // Check if all available variant types have selections
-    const hasColor = !product.colorVariants?.length || selectedColor;
-    const hasSize = !product.sizeVariants?.length || selectedSize;
-    const hasWeight = !product.weightVariants?.length || selectedWeight;
-    
-    return hasColor && hasSize && hasWeight;
+    return product.isAvailable && product.stock > 0;
   };
 
   const getVariantData = () => {
@@ -244,6 +235,17 @@ const ProductDetailPage: React.FC = () => {
 
   const handleAddToCart = async () => {
     if (!product) return;
+    
+    // Validate variant selections before proceeding
+    if (product.hasVariants) {
+      const colorRequired = (product.colorVariants?.length || 0) > 0;
+      const sizeRequired = (product.sizeVariants?.length || 0) > 0;
+      const weightRequired = (product.weightVariants?.length || 0) > 0;
+      if ((colorRequired && !selectedColor) || (sizeRequired && !selectedSize) || (weightRequired && !selectedWeight)) {
+        toast.error(language === 'bn' ? 'প্রথমে বিকল্প নির্বাচন করুন' : 'Please select options first');
+        return;
+      }
+    }
     
     setIsAddingToCart(true);
     try {

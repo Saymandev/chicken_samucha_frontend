@@ -125,8 +125,7 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
           c.slug === decodeURIComponent(categorySlug) ||
           c.slug.toLowerCase() === categorySlug.toLowerCase()
         );
-        console.log('Found category for slug:', categorySlug, category);
-        console.log('All categories:', res.data.data);
+        
         setCurrentCategory(category || null);
       }
     } catch (error) {
