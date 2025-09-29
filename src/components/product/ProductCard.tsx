@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Heart, Minus, Plus, ShoppingCart, Star, X, Zap } from 'lucide-react';
+import { Heart, Minus, Plus, ShoppingCart, Star, Zap } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useFlashSalePrice } from '../../hooks/useFlashSalePrice';
 import { Product, useStore } from '../../store/useStore';
-import { ordersAPI, productsAPI } from '../../utils/api';
+import { productsAPI } from '../../utils/api';
 
 interface ProductCardProps {
   product: Product;
@@ -36,13 +36,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isAdding, setIsAdding] = useState(false);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
-  const [showQuickOrderModal, setShowQuickOrderModal] = useState(false);
-  const [quickOrderData, setQuickOrderData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: ''
-  });
   // Track viewport width to adapt description length responsively
   const [viewportWidth, setViewportWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
   React.useEffect(() => {
@@ -227,76 +220,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
         setIsBuyingNow(false);
       }
     } else {
-      // For guest users, show quick order modal
-      setShowQuickOrderModal(true);
-    }
-  };
-
-  const handleQuickOrderSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!quickOrderData.name || !quickOrderData.phone || !quickOrderData.email) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    setIsBuyingNow(true);
-    
-    try {
-      const productId = product.id || (product as any)._id;
-
-      // Create direct order for guest user
-      const orderData = new FormData();
-      
-      orderData.append('customer', JSON.stringify({
-        name: quickOrderData.name,
-        phone: quickOrderData.phone,
-        email: quickOrderData.email,
-        address: quickOrderData.address || 'Address not provided'
-      }));
-      
-      orderData.append('items', JSON.stringify([{
-        product: productId,
-        quantity: quantity
-      }]));
-      
-      orderData.append('paymentInfo', JSON.stringify({
-        method: 'cod',
-        status: 'pending'
-      }));
-      
-      orderData.append('deliveryInfo', JSON.stringify({
-        method: 'delivery',
-        address: quickOrderData.address || 'Address not provided'
-      }));
-
-      const response = await ordersAPI.createOrder(orderData);
-      
-      if (response.data.success) {
-        toast.success(
-          language === 'bn' 
-            ? `অর্ডার সফলভাবে দেওয়া হয়েছে! অর্ডার নম্বর: ${response.data.order.orderNumber}`
-            : `Order placed successfully! Order Number: ${response.data.order.orderNumber}`,
-          { duration: 5000 }
-        );
-        
-        setShowQuickOrderModal(false);
-        setQuickOrderData({ name: '', phone: '', email: '', address: '' });
-        
-        // Navigate to order tracking
-        navigate(`/track-order?orderNumber=${response.data.order.orderNumber}`);
+      // Guest users: add to cart and go to checkout directly
+      setIsBuyingNow(true);
+      try {
+        addToCart({ ...product, id: product.id || (product as any)._id }, quantity);
+        navigate('/checkout');
+        toast.success(language === 'bn' ? 'চেকআউটে যান' : 'Proceeding to checkout');
+      } finally {
+        setIsBuyingNow(false);
       }
-    } catch (error: any) {
-      console.error('Error creating quick order:', error);
-      toast.error(
-        error.response?.data?.message || 
-        (language === 'bn' ? 'অর্ডার দেওয়া যাচ্ছে না' : 'Failed to place order')
-      );
-    } finally {
-      setIsBuyingNow(false);
     }
   };
 
+  
   // Flash sale price takes priority over regular discount
   const currentPrice = flashSalePrice?.isOnFlashSale 
     ? flashSalePrice.flashSalePrice 
@@ -807,137 +743,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       )}
 
-      {/* Quick Order Modal for Guest Users */}
-      {showQuickOrderModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {language === 'bn' ? 'দ্রুত অর্ডার' : 'Quick Order'}
-                </h3>
-                <button
-                  onClick={() => setShowQuickOrderModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={product.images[0]?.url || '/placeholder-product.jpg'}
-                    alt={product.name[language]}
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">
-                      {product.name[language]}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Qty: {quantity} × ৳{currentPrice} = ৳{quantity * currentPrice}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <form onSubmit={handleQuickOrderSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {language === 'bn' ? 'নাম *' : 'Name *'}
-                  </label>
-                  <input
-                    type="text"
-                    value={quickOrderData.name}
-                    onChange={(e) => setQuickOrderData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {language === 'bn' ? 'ফোন নম্বর *' : 'Phone Number *'}
-                  </label>
-                  <input
-                    type="tel"
-                    value={quickOrderData.phone}
-                    onChange={(e) => setQuickOrderData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    placeholder="01XXXXXXXXX"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {language === 'bn' ? 'ইমেইল *' : 'Email *'}
-                  </label>
-                  <input
-                    type="email"
-                    value={quickOrderData.email}
-                    onChange={(e) => setQuickOrderData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {language === 'bn' ? 'ঠিকানা' : 'Address (Optional)'}
-                  </label>
-                  <textarea
-                    value={quickOrderData.address}
-                    onChange={(e) => setQuickOrderData(prev => ({ ...prev, address: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                    rows={3}
-                    placeholder={language === 'bn' ? 'আপনার সম্পূর্ণ ঠিকানা লিখুন' : 'Enter your full address'}
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowQuickOrderModal(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    {language === 'bn' ? 'বাতিল' : 'Cancel'}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isBuyingNow}
-                    className="flex-1 px-4 py-2 bg-[#ef4444] hover:bg-[#dc2626] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {isBuyingNow ? (
-                      <>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                        />
-                        {language === 'bn' ? 'অর্ডার করা হচ্ছে...' : 'Ordering...'}
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-4 h-4" />
-                        {language === 'bn' ? 'অর্ডার দিন' : 'Place Order'}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 text-center">
-                {language === 'bn' 
-                  ? 'অর্ডার দেওয়ার পর আপনি অর্ডার ট্র্যাক করতে পারবেন' 
-                  : 'You can track your order after placing it'
-                }
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </motion.div>
   );
 };
