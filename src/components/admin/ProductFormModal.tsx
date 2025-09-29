@@ -90,13 +90,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       
       // Initialize variant data
       setHasVariants(product.hasVariants || false);
+      console.log('Product colorVariants:', product.colorVariants);
       setColorVariants(
-        (product.colorVariants || []).map((v: any) => ({
-          color: v.color,
-          colorCode: v.colorCode || '#000000',
-          image: null,
-          imageUrl: v.image?.url || undefined
-        }))
+        (product.colorVariants || []).map((v: any) => {
+          console.log('Color variant:', v, 'Image:', v.image);
+          return {
+            color: v.color,
+            colorCode: v.colorCode || '#000000',
+            image: null,
+            imageUrl: v.image?.url || undefined
+          };
+        })
       );
       setSizeVariants(product.sizeVariants || []);
       setWeightVariants(product.weightVariants || []);
