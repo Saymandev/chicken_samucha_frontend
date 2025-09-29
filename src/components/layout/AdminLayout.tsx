@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   BarChart3,
   ChevronLeft,
+  CreditCard,
   FileText,
   Home,
   LogOut,
@@ -106,6 +107,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: 'Navigation Menu',
       icon: <Navigation className="w-5 h-5" />,
       path: '/admin/navigation'
+    },
+    {
+      id: 'payment-settings',
+      label: 'Payment Settings',
+      icon: <CreditCard className="w-5 h-5" />,
+      path: '/admin/payment-settings'
     },
     {
       id: 'coupons',

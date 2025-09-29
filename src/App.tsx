@@ -61,6 +61,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminSubscribers from './pages/admin/AdminSubscribers';
 import AdminUsers from './pages/admin/AdminUsers';
 import NavigationMenuPage from './pages/admin/NavigationMenuPage';
+import PaymentSettingsPage from './pages/admin/PaymentSettingsPage';
 
 // Components
 import FloatingChatButton from './components/common/FloatingChatButton';
@@ -375,6 +376,16 @@ function AppContent() {
               <ProtectedRoute adminOnly>
                 <AdminLayout>
                   <NavigationMenuPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payment-settings"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout>
+                  <PaymentSettingsPage />
                 </AdminLayout>
               </ProtectedRoute>
             }

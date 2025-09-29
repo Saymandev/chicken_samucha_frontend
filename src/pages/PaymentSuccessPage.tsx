@@ -8,7 +8,7 @@ import { ordersAPI } from '../utils/api';
 const PaymentSuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { language, removeFromCart, clearCart } = useStore();
+  const { language, clearCart } = useStore();
   
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -16,36 +16,23 @@ const PaymentSuccessPage: React.FC = () => {
   useEffect(() => {
     const order = searchParams.get('order');
     const status = searchParams.get('status');
-    const verified = searchParams.get('verified');
-    const transactionId = searchParams.get('transactionId');
-    const provider = searchParams.get('provider');
-    const cardBrand = searchParams.get('cardBrand');
-    const cardType = searchParams.get('cardType');
     
     if (order) {
       setOrderNumber(order);
     }
     
     if (status === 'success') {
-      // remove only purchased items from cart based on order contents
+      // Order should already exist in database (created before payment)
+      // Just track the existing order and clear cart
       (async () => {
         try {
           if (order) {
-            // Order should already exist in database (created before payment)
-            // Just track the existing order and clear cart
-            try {
-              await ordersAPI.trackOrder(order);
-              clearCart();
-              console.log('✅ Order tracked successfully');
-            } catch (error) {
-              console.error('❌ Order tracking failed:', error);
-              // Clear cart as fallback
-              try { clearCart(); } catch {}
-            }
+            await ordersAPI.trackOrder(order);
+            clearCart();
           }
         } catch (e) {
-          console.error('❌ Payment success processing error:', e);
-          // if order lookup fails (e.g., 404), clear the whole cart as a fallback
+          console.error('Payment success processing error:', e);
+          // Clear cart as fallback
           try { clearCart(); } catch {}
         } finally {
           setIsLoading(false);
@@ -55,7 +42,7 @@ const PaymentSuccessPage: React.FC = () => {
       // If not success, redirect to fail page
       navigate(`/payment/fail?order=${order}&status=${status}`);
     }
-  }, [searchParams, navigate, removeFromCart, clearCart]);
+  }, [searchParams, navigate, clearCart]);
 
   if (isLoading) {
     return (
