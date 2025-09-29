@@ -2,8 +2,9 @@ import { motion } from 'framer-motion';
 import { ImagePlus, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useStore } from '../../store/useStore';
+import { ProductVariant, useStore, VariantAttribute } from '../../store/useStore';
 import { adminAPI, categoriesAPI } from '../../utils/api';
+import SimpleVariantManager from './SimpleVariantManager';
 
 interface Product {
   _id?: string;
@@ -12,11 +13,15 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: string;
+  category: string | { _id: string; name: { en: string; bn: string }; slug: string };
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
   youtubeVideoUrl?: string;
+  // Variant System
+  hasVariants?: boolean;
+  variantAttributes?: VariantAttribute[];
+  variants?: ProductVariant[];
 }
 
 interface ProductFormModalProps {
@@ -52,6 +57,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
   
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
+  
+  // Variant state
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variantAttributes, setVariantAttributes] = useState<VariantAttribute[]>([]);
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -59,18 +69,28 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   useEffect(() => {
     if (product) {
+      // Handle category - it might be a string or an object
+      const categoryId = typeof product.category === 'string' 
+        ? product.category 
+        : product.category?._id || '';
+      
       setFormData({
         name: product.name || { en: '', bn: '' },
         description: product.description || { en: '', bn: '' },
         price: product.price || 0,
         discountPrice: product.discountPrice || 0,
-        category: product.category || '',
+        category: categoryId,
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,
         youtubeVideoUrl: product.youtubeVideoUrl || ''
       });
       setImages(product.images || []);
+      
+      // Initialize variant data
+      setHasVariants(product.hasVariants || false);
+      setVariantAttributes(product.variantAttributes || []);
+      setVariants(product.variants || []);
     } else {
       // Reset form for new product
       setFormData({
@@ -85,6 +105,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         youtubeVideoUrl: ''
       });
       setImages([]);
+      
+      // Reset variant data for new product
+      setHasVariants(false);
+      setVariantAttributes([]);
+      setVariants([]);
     }
     setNewImages([]);
   }, [product, isOpen]);
@@ -245,6 +270,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('isAvailable', formData.isAvailable.toString());
       submitData.append('isFeatured', formData.isFeatured.toString());
       submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
+      
+      // Add variant data
+      submitData.append('hasVariants', hasVariants.toString());
+      submitData.append('variantAttributes', JSON.stringify(variantAttributes));
+      submitData.append('variants', JSON.stringify(variants));
       
       // Add new image files from state
       
@@ -464,6 +494,34 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 required
               />
             </div>
+          </div>
+
+          {/* Variant System */}
+          <div className="border-t pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="checkbox"
+                id="hasVariants"
+                checked={hasVariants}
+                onChange={(e) => setHasVariants(e.target.checked)}
+                className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+              />
+              <label htmlFor="hasVariants" className="text-lg font-semibold text-gray-900 dark:text-white">
+                Enable Product Variants
+              </label>
+            </div>
+            
+            {hasVariants && (
+              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <SimpleVariantManager
+                  variantAttributes={variantAttributes}
+                  setVariantAttributes={setVariantAttributes}
+                  variants={variants}
+                  setVariants={setVariants}
+                  language={language}
+                />
+              </div>
+            )}
           </div>
 
           {/* Product Status */}
