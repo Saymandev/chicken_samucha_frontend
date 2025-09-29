@@ -27,6 +27,7 @@ interface Product {
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
+  freeDelivery?: boolean;
   ratings: { average: number; count: number };
   analytics?: {
     viewCount: number;
@@ -142,6 +143,18 @@ const AdminProducts: React.FC = () => {
       formData.append('isFeatured', (!product.isFeatured).toString());
       await adminAPI.updateProduct(product._id, formData);
       toast.success(`Product ${!product.isFeatured ? 'featured' : 'unfeatured'}`);
+      fetchProducts();
+    } catch (error) {
+      toast.error('Failed to update product');
+    }
+  };
+
+  const toggleFreeDelivery = async (product: Product) => {
+    try {
+      const formData = new FormData();
+      formData.append('freeDelivery', (!product.freeDelivery).toString());
+      await adminAPI.updateProduct(product._id, formData);
+      toast.success(`Product ${!product.freeDelivery ? 'enabled for free delivery' : 'disabled from free delivery'}`);
       fetchProducts();
     } catch (error) {
       toast.error('Failed to update product');
@@ -351,6 +364,11 @@ const AdminProducts: React.FC = () => {
                       Featured
                     </span>
                   )}
+                  {product.freeDelivery && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      Free Delivery
+                    </span>
+                  )}
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     product.isAvailable 
                       ? 'bg-green-500 text-white' 
@@ -450,7 +468,7 @@ const AdminProducts: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-2">
                   <button
                     onClick={() => toggleAvailability(product)}
                     className={`flex-1 py-2 px-3 rounded-lg text-sm transition-colors ${
@@ -470,6 +488,19 @@ const AdminProducts: React.FC = () => {
                     }`}
                   >
                     {product.isFeatured ? 'Unfeature' : 'Feature'}
+                  </button>
+                </div>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => toggleFreeDelivery(product)}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm transition-colors ${
+                      product.freeDelivery
+                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {product.freeDelivery ? 'Remove Free Delivery' : 'Add Free Delivery'}
                   </button>
                 </div>
               </div>

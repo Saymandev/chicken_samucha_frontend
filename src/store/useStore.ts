@@ -55,6 +55,7 @@ export interface Product {
   // removed: ingredients, preparationTime, servingSize
   isFeatured: boolean;
   isAvailable: boolean;
+  freeDelivery?: boolean;
   stock: number;
   ratings: {
     average: number;

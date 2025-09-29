@@ -83,7 +83,14 @@ const CheckoutPage: React.FC = () => {
   const selectedZonePrice = deliverySettings?.zones?.find(z => z.id === selectedZoneId)?.price;
   const baseDeliveryCharge = (selectedZonePrice ?? deliverySettings?.deliveryCharge) ?? 60; // Default fallback
   const freeThreshold = deliverySettings?.freeDeliveryThreshold ?? 500; // Default fallback
-  const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold ? 0 : baseDeliveryCharge);
+  
+  // Check if any product in cart has free delivery
+  const hasFreeDeliveryProduct = cart.some(item => {
+    const product = item.product;
+    return product && product.freeDelivery === true;
+  });
+  
+  const deliveryCharge = deliveryMethod === 'pickup' ? 0 : (cartTotal >= freeThreshold || hasFreeDeliveryProduct ? 0 : baseDeliveryCharge);
   const couponDiscount = appliedCoupon?.discount || 0;
   const finalTotal = Math.max(0, cartTotal + deliveryCharge - couponDiscount);
 
@@ -247,7 +254,7 @@ const CheckoutPage: React.FC = () => {
         'Pay cash when our delivery person arrives',
         'Keep exact amount ready: ৳' + finalTotal,
         'You can also pay with mobile banking to our delivery person',
-        deliveryCharge === 0 ? 'FREE delivery (Order ≥ ৳500) 🎉' : 'Delivery charge: ৳' + deliveryCharge + ' (included in total)'
+        deliveryCharge === 0 ? (hasFreeDeliveryProduct ? 'FREE delivery (Product) 🎉' : 'FREE delivery (Order ≥ ৳500) 🎉') : 'Delivery charge: ৳' + deliveryCharge + ' (included in total)'
       ]
     });
 
@@ -1020,7 +1027,7 @@ const CheckoutPage: React.FC = () => {
                       </span>
                     <span className={deliveryCharge === 0 && deliveryMethod === 'delivery' ? 'text-green-600 dark:text-green-400 font-medium' : ''}>
                       {deliveryMethod === 'pickup' ? 'Free' : 
-                       deliveryCharge === 0 ? 'FREE 🎉' : `৳${deliveryCharge}`}
+                       deliveryCharge === 0 ? (hasFreeDeliveryProduct ? 'FREE (Product) 🎉' : 'FREE 🎉') : `৳${deliveryCharge}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">

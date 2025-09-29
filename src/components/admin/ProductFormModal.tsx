@@ -16,6 +16,7 @@ interface Product {
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
+  freeDelivery?: boolean;
   youtubeVideoUrl?: string;
   // Simple Variant System
   hasVariants?: boolean;
@@ -52,6 +53,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     stock: 0,
     isAvailable: true,
     isFeatured: false,
+    freeDelivery: false,
     youtubeVideoUrl: ''
   });
   
@@ -86,6 +88,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,
+        freeDelivery: product.freeDelivery ?? false,
         youtubeVideoUrl: product.youtubeVideoUrl || ''
       });
       setImages(product.images || []);
@@ -119,6 +122,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         stock: 0,
         isAvailable: true,
         isFeatured: false,
+        freeDelivery: false,
         youtubeVideoUrl: ''
       });
       setImages([]);
@@ -287,6 +291,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       submitData.append('stock', formData.stock.toString());
       submitData.append('isAvailable', formData.isAvailable.toString());
       submitData.append('isFeatured', formData.isFeatured.toString());
+      submitData.append('freeDelivery', formData.freeDelivery.toString());
       submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
       
       // Add variant data (sanitize out File objects and upload separately)
@@ -747,6 +752,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Featured Product
+              </span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.freeDelivery}
+                onChange={(e) => handleInputChange('freeDelivery', e.target.checked)}
+                className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Free Delivery
               </span>
             </label>
           </div>
