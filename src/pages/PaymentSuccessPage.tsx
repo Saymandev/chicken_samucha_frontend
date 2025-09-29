@@ -31,63 +31,17 @@ const PaymentSuccessPage: React.FC = () => {
       (async () => {
         try {
           if (order) {
-            // Create the order now using stored checkout payload
-            const key = `checkout:${order}`;
-            const stored = localStorage.getItem(key);
-            if (stored) {
-              const data = JSON.parse(stored);
-              const formData = new FormData();
-              if (data.orderNumber) formData.append('orderNumber', data.orderNumber);
-              // customer
-              formData.append('customer[name]', data.customer.name);
-              formData.append('customer[phone]', data.customer.phone);
-              formData.append('customer[email]', data.customer.email);
-              if (data.deliveryInfo.method === 'delivery') {
-                const [street, area, city] = (data.deliveryInfo.address || '').split(',').map((s: string) => s.trim());
-                if (street) formData.append('customer[address][street]', street);
-                if (area) formData.append('customer[address][area]', area);
-                if (city) formData.append('customer[address][city]', city);
-                // district optional
-              }
-              // items
-              (data.items || []).forEach((it: any, idx: number) => {
-                formData.append(`items[${idx}][product]`, it.product);
-                formData.append(`items[${idx}][quantity]`, String(it.quantity));
-              });
-              // payment - include verification data if available
-              formData.append('paymentInfo[method]', 'sslcommerz');
-              if (verified === 'true' && transactionId) {
-                formData.append('paymentInfo[status]', 'verified');
-                formData.append('paymentInfo[transactionId]', transactionId);
-                formData.append('paymentInfo[paymentGateway]', 'sslcommerz');
-                formData.append('paymentInfo[provider]', provider || 'sslcommerz');
-                formData.append('paymentInfo[cardBrand]', cardBrand || 'sslcommerz');
-                formData.append('paymentInfo[cardType]', cardType || 'sslcommerz');
-                formData.append('paymentInfo[verifiedAt]', new Date().toISOString());
-              }
-              // delivery
-              formData.append('deliveryInfo[method]', data.deliveryInfo.method);
-              formData.append('deliveryInfo[address]', data.deliveryInfo.address || '');
-              formData.append('deliveryInfo[phone]', data.deliveryInfo.phone || '');
-              formData.append('deliveryInfo[deliveryCharge]', String(data.deliveryInfo.deliveryCharge || 0));
-              // totals
-              formData.append('totalAmount', String(data.totals?.totalAmount || 0));
-              formData.append('finalAmount', String(data.totals?.finalAmount || 0));
-
-              try {
-                const response = await ordersAPI.createOrder(formData);
-                if (response.data.success) {
-                  console.log('✅ Order created successfully with payment verification');
-                }
-              } catch (error) {
-                console.error('❌ Order creation failed:', error);
-              }
-              try { localStorage.removeItem(key); } catch {}
+            // Order should already exist in database (created before payment)
+            // Just track the existing order and clear cart
+            try {
+              await ordersAPI.trackOrder(order);
+              clearCart();
+              console.log('✅ Order tracked successfully');
+            } catch (error) {
+              console.error('❌ Order tracking failed:', error);
+              // Clear cart as fallback
+              try { clearCart(); } catch {}
             }
-
-            // Track to show order details and clear cart
-            await ordersAPI.trackOrder(order);
-            clearCart();
           }
         } catch (e) {
           console.error('❌ Payment success processing error:', e);
