@@ -12,7 +12,7 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: string;
+  category: string | { _id: string; name: { en: string; bn: string } };
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
@@ -70,12 +70,17 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   useEffect(() => {
     if (product) {
+      // Handle category - it might be a string or an object
+      const categoryId = typeof product.category === 'string' 
+        ? product.category 
+        : product.category?._id || '';
+      
       setFormData({
         name: product.name || { en: '', bn: '' },
         description: product.description || { en: '', bn: '' },
         price: product.price || 0,
         discountPrice: product.discountPrice || 0,
-        category: product.category || '',
+        category: categoryId,
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,

@@ -244,9 +244,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     
     try {
       const productId = product.id || (product as any)._id;
-      const currentPrice = flashSalePrice?.isOnFlashSale 
-        ? flashSalePrice.flashSalePrice 
-        : (product.discountPrice || product.price);
 
       // Create direct order for guest user
       const orderData = new FormData();

@@ -23,7 +23,7 @@ interface Product {
   price: number;
   discountPrice?: number;
   images: Array<{ url: string; public_id: string }>;
-  category: string;
+  category: string | { _id: string; name: { en: string; bn: string }; slug: string };
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
