@@ -25,6 +25,7 @@ interface PaymentMethod {
 const PaymentSettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [originalPaymentMethods, setOriginalPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -86,6 +87,7 @@ const PaymentSettingsPage: React.FC = () => {
           }
         ];
         setPaymentMethods(methods);
+        setOriginalPaymentMethods(JSON.parse(JSON.stringify(methods))); // Deep copy for comparison
       }
     } catch (error) {
       console.error('Error fetching payment methods:', error);
@@ -95,115 +97,49 @@ const PaymentSettingsPage: React.FC = () => {
     }
   };
 
-  const togglePaymentMethod = async (methodId: string) => {
-    try {
-      setSaving(true);
-      const updatedMethods = paymentMethods.map(method => 
-        method.id === methodId 
-          ? { ...method, enabled: !method.enabled }
-          : method
-      );
-      
-      setPaymentMethods(updatedMethods);
-      
-      // Save to backend
-      const updateData: any = {};
-      if (methodId === 'sslcommerz') {
-        updateData.sslcommerz = { enabled: !paymentMethods.find(m => m.id === methodId)?.enabled };
-      } else if (methodId === 'manual_payment') {
-        updateData.manual_payment = { enabled: !paymentMethods.find(m => m.id === methodId)?.enabled };
-      } else if (methodId === 'cash_on_delivery') {
-        updateData.cash_on_delivery = { enabled: !paymentMethods.find(m => m.id === methodId)?.enabled };
-      }
-      
-      await adminAPI.updatePaymentSettings(updateData);
-      toast.success('Payment method updated successfully!');
-    } catch (error) {
-      console.error('Error updating payment method:', error);
-      toast.error('Failed to update payment method');
-      // Revert the change on error
-      fetchPaymentMethods();
-    } finally {
-      setSaving(false);
-    }
+  const togglePaymentMethod = (methodId: string) => {
+    const updatedMethods = paymentMethods.map(method => 
+      method.id === methodId 
+        ? { ...method, enabled: !method.enabled }
+        : method
+    );
+    setPaymentMethods(updatedMethods);
   };
 
-  const toggleSubMethod = async (parentId: string, subMethodId: string) => {
-    try {
-      setSaving(true);
-      const updatedMethods = paymentMethods.map(method => {
-        if (method.id === parentId && method.subMethods) {
-          const updatedSubMethods = {
-            ...method.subMethods,
-            [subMethodId]: {
-              ...method.subMethods[subMethodId],
-              enabled: !method.subMethods[subMethodId].enabled
-            }
-          };
-          return { ...method, subMethods: updatedSubMethods };
-        }
-        return method;
-      });
-      
-      setPaymentMethods(updatedMethods);
-      
-      // Save to backend
-      const parentMethod = updatedMethods.find(m => m.id === parentId);
-      if (parentMethod?.subMethods) {
-        await adminAPI.updatePaymentSettings({
-          manual_payment: {
-            subMethods: parentMethod.subMethods
+  const toggleSubMethod = (parentId: string, subMethodId: string) => {
+    const updatedMethods = paymentMethods.map(method => {
+      if (method.id === parentId && method.subMethods) {
+        const updatedSubMethods = {
+          ...method.subMethods,
+          [subMethodId]: {
+            ...method.subMethods[subMethodId],
+            enabled: !method.subMethods[subMethodId].enabled
           }
-        });
+        };
+        return { ...method, subMethods: updatedSubMethods };
       }
-      
-      toast.success('Sub-method updated successfully!');
-    } catch (error) {
-      console.error('Error updating sub-method:', error);
-      toast.error('Failed to update sub-method');
-      fetchPaymentMethods();
-    } finally {
-      setSaving(false);
-    }
+      return method;
+    });
+    
+    setPaymentMethods(updatedMethods);
   };
 
-  const updateSubMethod = async (parentId: string, subMethodId: string, field: string, value: string) => {
-    try {
-      setSaving(true);
-      const updatedMethods = paymentMethods.map(method => {
-        if (method.id === parentId && method.subMethods) {
-          const updatedSubMethods = {
-            ...method.subMethods,
-            [subMethodId]: {
-              ...method.subMethods[subMethodId],
-              [field]: value
-            }
-          };
-          return { ...method, subMethods: updatedSubMethods };
-        }
-        return method;
-      });
-      
-      setPaymentMethods(updatedMethods);
-      
-      // Save to backend
-      const parentMethod = updatedMethods.find(m => m.id === parentId);
-      if (parentMethod?.subMethods) {
-        await adminAPI.updatePaymentSettings({
-          manual_payment: {
-            subMethods: parentMethod.subMethods
+  const updateSubMethod = (parentId: string, subMethodId: string, field: string, value: string) => {
+    const updatedMethods = paymentMethods.map(method => {
+      if (method.id === parentId && method.subMethods) {
+        const updatedSubMethods = {
+          ...method.subMethods,
+          [subMethodId]: {
+            ...method.subMethods[subMethodId],
+            [field]: value
           }
-        });
+        };
+        return { ...method, subMethods: updatedSubMethods };
       }
-      
-      toast.success('Sub-method updated successfully!');
-    } catch (error) {
-      console.error('Error updating sub-method:', error);
-      toast.error('Failed to update sub-method');
-      fetchPaymentMethods();
-    } finally {
-      setSaving(false);
-    }
+      return method;
+    });
+    
+    setPaymentMethods(updatedMethods);
   };
 
   const toggleExpanded = (itemId: string) => {
@@ -216,6 +152,42 @@ const PaymentSettingsPage: React.FC = () => {
       }
       return newSet;
     });
+  };
+
+  const hasUnsavedChanges = () => {
+    return JSON.stringify(paymentMethods) !== JSON.stringify(originalPaymentMethods);
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      
+      // Prepare update data
+      const updateData: any = {};
+      
+      // Update main payment methods
+      paymentMethods.forEach(method => {
+        if (method.id === 'sslcommerz') {
+          updateData.sslcommerz = { enabled: method.enabled };
+        } else if (method.id === 'manual_payment') {
+          updateData.manual_payment = { 
+            enabled: method.enabled,
+            subMethods: method.subMethods || {}
+          };
+        } else if (method.id === 'cash_on_delivery') {
+          updateData.cash_on_delivery = { enabled: method.enabled };
+        }
+      });
+      
+      await adminAPI.updatePaymentSettings(updateData);
+      setOriginalPaymentMethods(JSON.parse(JSON.stringify(paymentMethods))); // Update original state
+      toast.success('Payment settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving payment settings:', error);
+      toast.error('Failed to save payment settings');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -238,26 +210,51 @@ const PaymentSettingsPage: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <button
-              onClick={() => navigate('/admin')}
-              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                <CreditCard className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Payment Settings
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Manage available payment methods
-                </p>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/admin')}
+                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                  <CreditCard className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    Payment Settings
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Manage available payment methods
+                  </p>
+                </div>
               </div>
             </div>
+            
+            {/* Save Button */}
+            <button
+              onClick={handleSave}
+              disabled={saving || !hasUnsavedChanges()}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                hasUnsavedChanges() 
+                  ? 'bg-orange-500 text-white hover:bg-orange-600' 
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400'
+              }`}
+            >
+              {saving ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Settings className="w-4 h-4" />
+                  {hasUnsavedChanges() ? 'Save Changes' : 'No Changes'}
+                </>
+              )}
+            </button>
           </div>
 
           {/* Payment Methods */}
@@ -309,7 +306,6 @@ const PaymentSettingsPage: React.FC = () => {
                         
                         <button
                           onClick={() => togglePaymentMethod(method.id)}
-                          disabled={saving}
                           className="flex items-center gap-2"
                         >
                           {method.enabled ? (
@@ -367,11 +363,10 @@ const PaymentSettingsPage: React.FC = () => {
                                 </div>
                               </div>
                               
-                              <button
-                                onClick={() => toggleSubMethod(method.id, subMethodId)}
-                                disabled={saving}
-                                className="flex items-center gap-2"
-                              >
+                      <button
+                        onClick={() => toggleSubMethod(method.id, subMethodId)}
+                        className="flex items-center gap-2"
+                      >
                                 {subMethod.enabled ? (
                                   <ToggleRight className="w-5 h-5 text-green-500" />
                                 ) : (

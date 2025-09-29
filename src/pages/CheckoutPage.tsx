@@ -468,7 +468,7 @@ const CheckoutPage: React.FC = () => {
           formData.append('paymentInfo[transactionId]', paymentInfo.transactionId);
         }
         if (paymentInfo.screenshot) {
-          formData.append('paymentInfo[screenshot]', paymentInfo.screenshot);
+          formData.append('paymentScreenshot', paymentInfo.screenshot);
         }
       }
       
