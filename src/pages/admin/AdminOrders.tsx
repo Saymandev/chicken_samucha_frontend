@@ -674,7 +674,7 @@ const AdminOrders: React.FC = () => {
                         const r = await adminAPI.steadfastStatusByInvoice(getOrderId(order), order.orderNumber);
                         const status = r.data?.data?.delivery_status || 'unknown';
                         toast.success(`Status: ${status}`);
-                        console.log('Steadfast status:', r.data);
+                        
                       } catch (e: any) {
                         toast.error(e?.response?.data?.message || 'Failed to fetch status');
                       }
@@ -714,7 +714,7 @@ const AdminOrders: React.FC = () => {
                         if (reason) payload.reason = reason;
                         const r = await adminAPI.steadfastCreateReturn(payload);
                         toast.success('Return request submitted');
-                        console.log('Return request:', r.data);
+                       
                       } catch (e: any) {
                         toast.error(e?.response?.data?.message || 'Failed to create return');
                       }
