@@ -663,6 +663,10 @@ const AdminOrders: React.FC = () => {
                         </div>
                       )}
                     </div>
+                  ) : bookingInFlightId === getOrderId(order) ? (
+                    <div className="w-full px-3 py-2 rounded bg-indigo-100 text-indigo-800 text-sm text-center">
+                      Booking…
+                    </div>
                   ) : (
                     <button
                       onClick={async () => {
