@@ -295,9 +295,20 @@ const CheckoutPage: React.FC = () => {
 
     // Only validate delivery address if delivery is selected
     if (deliveryMethod === 'delivery') {
-      if (!customerInfo.address.street || !customerInfo.address.area) {
-        toast.error('Please fill in complete delivery address');
-        return false;
+      const hasStreet = !!customerInfo.address.street?.trim();
+      const hasArea = !!customerInfo.address.area?.trim();
+      if (deliveryCharge === 0) {
+        // Free delivery: accept if at least one of street or area is present
+        if (!hasStreet && !hasArea) {
+          toast.error('Please enter delivery address (street or area)');
+          return false;
+        }
+      } else {
+        // Paid delivery: require both street and area
+        if (!hasStreet || !hasArea) {
+          toast.error('Please fill in complete delivery address');
+          return false;
+        }
       }
     }
 
@@ -375,7 +386,11 @@ const CheckoutPage: React.FC = () => {
       // Add delivery info
       formData.append('deliveryInfo[method]', deliveryMethod);
       formData.append('deliveryInfo[address]', deliveryMethod === 'delivery'
-        ? `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`
+        ? [customerInfo.address.street, customerInfo.address.area, customerInfo.address.city]
+            .filter(Boolean)
+            .map((s) => String(s).trim())
+            .filter((s) => s.length > 0)
+            .join(', ')
         : 'Pickup from restaurant');
       formData.append('deliveryInfo[phone]', customerInfo.phone);
       formData.append('deliveryInfo[deliveryCharge]', deliveryCharge.toString());
@@ -514,7 +529,11 @@ const CheckoutPage: React.FC = () => {
       // Send delivery info
       formData.append('deliveryInfo[method]', deliveryMethod);
       if (deliveryMethod === 'delivery') {
-        formData.append('deliveryInfo[address]', `${customerInfo.address.street}, ${customerInfo.address.area}, ${customerInfo.address.city}`);
+        formData.append('deliveryInfo[address]', [customerInfo.address.street, customerInfo.address.area, customerInfo.address.city]
+          .filter(Boolean)
+          .map((s) => String(s).trim())
+          .filter((s) => s.length > 0)
+          .join(', '));
       } else {
         formData.append('deliveryInfo[address]', 'Pickup from restaurant');
       }
