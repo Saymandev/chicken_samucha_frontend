@@ -651,8 +651,8 @@ const AdminOrders: React.FC = () => {
                 </div>
                 {/* Steadfast Actions */}
                 <div className="flex flex-col items-start gap-2 min-w-[220px]">
-                  {/* Show status if already booked */}
-                  {((order as any).deliveryInfo?.courier || (order as any).deliveryInfo?.trackingNumber) ? (
+                  {/* Show status if already booked or already out for delivery */}
+                  {((order as any).deliveryInfo?.courier || (order as any).deliveryInfo?.trackingNumber || order.orderStatus === 'out_for_delivery') ? (
                     <div className="w-full">
                       <div className="px-3 py-2 rounded bg-green-100 text-green-800 text-sm w-full text-center">
                         ✓ Sent to {(order as any).deliveryInfo?.courier || 'Courier'}
