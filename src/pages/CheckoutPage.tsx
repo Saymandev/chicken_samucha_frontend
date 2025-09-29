@@ -644,6 +644,15 @@ const CheckoutPage: React.FC = () => {
                       onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="your@email.com"
+                      onBlur={() => {
+                        // If left empty, set a safe placeholder so gateways requiring email won't fail
+                        if (!customerInfo.email || !customerInfo.email.trim()) {
+                          setCustomerInfo((prev) => ({
+                            ...prev,
+                            email: `${(prev.phone || 'guest').toString().replace(/[^\d]/g,'') || 'guest'}@noemail.local`
+                          }));
+                        }
+                      }}
                     />
                   </div>
                 </div>
