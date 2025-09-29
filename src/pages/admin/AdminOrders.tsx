@@ -601,8 +601,14 @@ const AdminOrders: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex flex-col sm:text-right">
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">
                     ৳{order.finalAmount || order.totalAmount}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                    <span>Products: ৳{order.totalAmount}</span>
+                    {typeof (order as any).deliveryCharge !== 'undefined' && (
+                      <span className="ml-3">Delivery: ৳{(order as any).deliveryCharge}</span>
+                    )}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span className={`inline-block px-3 py-1 text-xs rounded-full ${getStatusColor(order.orderStatus)}`}>
@@ -712,7 +718,7 @@ const AdminOrders: React.FC = () => {
                         else if (tracking) payload.tracking_code = tracking;
                         else payload.invoice = invoice;
                         if (reason) payload.reason = reason;
-                        const r = await adminAPI.steadfastCreateReturn(payload);
+                        await adminAPI.steadfastCreateReturn(payload);
                         toast.success('Return request submitted');
                        
                       } catch (e: any) {
@@ -1083,9 +1089,21 @@ const AdminOrders: React.FC = () => {
                       ))}
                     </div>
                     <div className="border-t border-gray-200 dark:border-gray-600 pt-3 mt-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-900 dark:text-white">Total Amount:</span>
-                        <span className="text-xl font-bold text-gray-900 dark:text-white">৳{selectedOrder.finalAmount || selectedOrder.totalAmount}</span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-700 dark:text-gray-200">Product amount:</span>
+                          <span className="text-gray-900 dark:text-white">৳{selectedOrder.totalAmount}</span>
+                        </div>
+                        {typeof (selectedOrder as any).deliveryCharge !== 'undefined' && (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-700 dark:text-gray-200">Delivery charge:</span>
+                            <span className="text-gray-900 dark:text-white">৳{(selectedOrder as any).deliveryCharge}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-semibold text-gray-900 dark:text-white">Final amount:</span>
+                          <span className="text-xl font-bold text-gray-900 dark:text-white">৳{selectedOrder.finalAmount || selectedOrder.totalAmount}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
