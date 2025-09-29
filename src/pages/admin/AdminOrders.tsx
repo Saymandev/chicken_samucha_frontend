@@ -640,25 +640,40 @@ const AdminOrders: React.FC = () => {
                 </div>
                 {/* Steadfast Actions */}
                 <div className="flex flex-col items-start gap-2 min-w-[220px]">
-                  <button
-                    onClick={async () => {
-                      try {
-                        await adminAPI.bookSteadfast(getOrderId(order));
-                        toast.success('Booked with Steadfast');
-                        fetchOrders();
-                      } catch (e: any) {
-                        toast.error(e?.response?.data?.message || 'Failed to book');
-                      }
-                    }}
-                    className="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-sm w-full"
-                  >
-                    Book with Steadfast
-                  </button>
+                  {/* Show status if already booked */}
+                  {((order as any).deliveryInfo?.courier || (order as any).deliveryInfo?.trackingNumber) ? (
+                    <div className="w-full">
+                      <div className="px-3 py-2 rounded bg-green-100 text-green-800 text-sm w-full text-center">
+                        ✓ Sent to {(order as any).deliveryInfo?.courier || 'Courier'}
+                      </div>
+                      {(order as any).deliveryInfo?.trackingNumber && (
+                        <div className="text-xs text-gray-600 mt-1 text-center">
+                          Track: {(order as any).deliveryInfo?.trackingNumber}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await adminAPI.bookSteadfast(getOrderId(order));
+                          toast.success('Booked with Steadfast');
+                          fetchOrders();
+                        } catch (e: any) {
+                          toast.error(e?.response?.data?.message || 'Failed to book');
+                        }
+                      }}
+                      className="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-sm w-full"
+                    >
+                      Book with Steadfast
+                    </button>
+                  )}
                   <button
                     onClick={async () => {
                       try {
                         const r = await adminAPI.steadfastStatusByInvoice(getOrderId(order), order.orderNumber);
-                        toast.success('Status fetched (see console)');
+                        const status = r.data?.data?.delivery_status || 'unknown';
+                        toast.success(`Status: ${status}`);
                         console.log('Steadfast status:', r.data);
                       } catch (e: any) {
                         toast.error(e?.response?.data?.message || 'Failed to fetch status');
