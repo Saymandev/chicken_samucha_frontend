@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useFlashSalePrice } from '../../hooks/useFlashSalePrice';
-import { Product, ProductAttribute, ProductVariant, useStore } from '../../store/useStore';
+import { Product, useStore } from '../../store/useStore';
 import { ordersAPI, productsAPI } from '../../utils/api';
 
 interface ProductCardProps {
@@ -43,11 +43,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     email: '',
     address: ''
   });
-  
-  // Variant state
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<ProductAttribute[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   // Track viewport width to adapt description length responsively
   const [viewportWidth, setViewportWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
   React.useEffect(() => {
@@ -62,72 +57,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     const words = text.trim().split(/\s+/);
     if (words.length <= maxWords) return text;
     return words.slice(0, maxWords).join(' ') + '…';
-  };
-
-  // Variant helper functions
-  const findVariantByAttributes = (attributes: ProductAttribute[]): ProductVariant | null => {
-    if (!product.hasVariants || !product.variants) return null;
-
-    return product.variants.find(variant => {
-      return attributes.every(selectedAttr => {
-        return variant.attributes.some(variantAttr => 
-          variantAttr.attributeName === selectedAttr.attributeName && 
-          variantAttr.value === selectedAttr.value &&
-          (variantAttr.unit || '') === (selectedAttr.unit || '')
-        );
-      });
-    }) || null;
-  };
-
-  const handleVariantChange = (variant: ProductVariant | null, attributes: ProductAttribute[]) => {
-    setSelectedVariant(variant);
-    setSelectedAttributes(attributes);
-    setCurrentImageIndex(0); // Reset image index when variant changes
-  };
-
-  const handleAttributeChange = (attributeName: string, value: string, unit?: string, colorCode?: string) => {
-    const newAttributes = selectedAttributes.filter(attr => attr.attributeName !== attributeName);
-    newAttributes.push({ 
-      attributeName, 
-      attributeType: product.variantAttributes?.find(va => va.name === attributeName)?.type || 'custom',
-      value, 
-      unit,
-      colorCode
-    });
-    
-    setSelectedAttributes(newAttributes);
-    const variant = findVariantByAttributes(newAttributes);
-    handleVariantChange(variant, newAttributes);
-  };
-
-  // Get current images based on variant
-  const getCurrentImages = () => {
-    if (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0) {
-      return selectedVariant.images;
-    }
-    return product.images;
-  };
-
-  // Get current price based on variant
-  const getCurrentPrice = () => {
-    if (selectedVariant) {
-      return selectedVariant.discountPrice || selectedVariant.price;
-    }
-    return product.discountPrice || product.price;
-  };
-
-
-  // Check if product can be added to cart
-  const canAddToCart = () => {
-    if (!product.isAvailable) return false;
-    
-    if (product.hasVariants) {
-      // For products with variants, a variant must be selected
-      return selectedVariant && selectedVariant.isAvailable && selectedVariant.stock > 0;
-    }
-    
-    // For products without variants, check base stock
-    return product.stock > 0;
   };
 
   // Determine stock availability robustly (API may omit stock on some lists)
@@ -196,14 +125,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     // Add a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    // Add variant data if available
-    const variantData = selectedVariant ? {
-      variantId: selectedVariant._id,
-      attributes: selectedAttributes,
-      sku: selectedVariant.sku
-    } : undefined;
-
-    addToCart({ ...product, id: productId }, quantity, variantData);
+    addToCart({ ...product, id: productId }, quantity);
 
     // Track add to cart (fire and forget)
     try {
@@ -287,14 +209,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       
       try {
         // Add product to cart first
-        // Add variant data if available
-        const variantData = selectedVariant ? {
-          variantId: selectedVariant._id,
-          attributes: selectedAttributes,
-          sku: selectedVariant.sku
-        } : undefined;
-
-        addToCart({ ...product, id: product.id || (product as any)._id }, quantity, variantData);
+        addToCart({ ...product, id: product.id || (product as any)._id }, quantity);
         
         // Navigate to checkout
         navigate('/checkout');
@@ -329,6 +244,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
     
     try {
       const productId = product.id || (product as any)._id;
+      const currentPrice = flashSalePrice?.isOnFlashSale 
+        ? flashSalePrice.flashSalePrice 
+        : (product.discountPrice || product.price);
 
       // Create direct order for guest user
       const orderData = new FormData();
@@ -385,10 +303,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Flash sale price takes priority over regular discount
   const currentPrice = flashSalePrice?.isOnFlashSale 
     ? flashSalePrice.flashSalePrice 
-    : getCurrentPrice();
+    : (product.discountPrice || product.price);
   const originalPrice = flashSalePrice?.isOnFlashSale 
     ? flashSalePrice.originalPrice 
-    : (selectedVariant ? selectedVariant.price : product.price);
+    : product.price;
   const hasDiscount = flashSalePrice?.isOnFlashSale || !!product.discountPrice;
   const isFlashSale = flashSalePrice?.isOnFlashSale || false;
   const flashSaleStock = flashSalePrice?.remainingStock;
@@ -591,7 +509,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Product Image */}
         <div className={`relative overflow-hidden flex justify-center items-center w-full ${compact ? 'h-48' : 'h-36'}`}>
           <img
-            src={getCurrentImages()[currentImageIndex]?.url || product.images[0]?.url || '/placeholder-product.jpg'}
+            src={product.images[0]?.url || '/placeholder-product.jpg'}
             alt={product.name[language]}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             loading="lazy"
@@ -685,70 +603,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 : (viewportWidth < 380 ? 4 : viewportWidth < 640 ? 6 : 8)
             )}
           </h3>
-
-          {/* Variant Selection */}
-          {product.hasVariants && product.variantAttributes && product.variantAttributes.length > 0 && (
-            <div className="space-y-2">
-              {product.variantAttributes.slice(0, 2).map((config, index) => {
-                const availableValues = product.variants?.map(variant => {
-                  const attr = variant.attributes.find(a => a.attributeName === config.name);
-                  return attr ? { 
-                    value: attr.value, 
-                    unit: attr.unit, 
-                    colorCode: attr.colorCode 
-                  } : null;
-                }).filter((item, idx, self) => 
-                  item && self.findIndex(i => 
-                    i?.value === item.value && 
-                    i?.unit === item.unit && 
-                    i?.colorCode === item.colorCode
-                  ) === idx
-                ).map(item => item!) || [];
-
-                const currentValue = selectedAttributes.find(attr => attr.attributeName === config.name);
-
-                return (
-                  <div key={index} className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">
-                      {config.displayName?.[language] || config.name}:
-                    </label>
-                    <div className="flex flex-wrap gap-1">
-                      {availableValues.slice(0, 3).map((item, valueIndex) => (
-                        <button
-                          key={valueIndex}
-                          onClick={() => handleAttributeChange(config.name, item.value, item.unit, item.colorCode)}
-                          className={`px-2 py-1 text-xs rounded border transition-colors ${
-                            currentValue?.value === item.value && 
-                            currentValue?.unit === item.unit &&
-                            currentValue?.colorCode === item.colorCode
-                              ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-gray-300 hover:border-gray-400 text-gray-700'
-                          }`}
-                        >
-                          {config.type === 'color' && item.colorCode ? (
-                            <div className="flex items-center gap-1">
-                              <div
-                                className="w-3 h-3 rounded border"
-                                style={{ backgroundColor: item.colorCode }}
-                              />
-                              <span>{item.value}</span>
-                            </div>
-                          ) : (
-                            <span>{item.value}{item.unit && ` (${item.unit})`}</span>
-                          )}
-                        </button>
-                      ))}
-                      {availableValues.length > 3 && (
-                        <span className="text-xs text-gray-500 px-2 py-1">
-                          +{availableValues.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
 
           {/* Rating */}
           {product.ratings?.count > 0 && (
@@ -882,11 +736,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Add to Cart Button */}
           <motion.button
             onClick={handleAddToCart}
-            disabled={!canAddToCart() || isAdding}
-            whileHover={canAddToCart() && !isAdding ? { scale: 1.02 } : {}}
-            whileTap={canAddToCart() && !isAdding ? { scale: 0.98 } : {}}
+            disabled={!inStock || isAdding}
+            whileHover={inStock && !isAdding ? { scale: 1.02 } : {}}
+            whileTap={inStock && !isAdding ? { scale: 0.98 } : {}}
             className={`w-full flex items-center justify-center sm:gap-2 gap-1 py-2 sm:py-3 px-1 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
-              canAddToCart() && !isAdding
+              inStock && !isAdding
                 ? isInCart
                   ? 'bg-green-500 hover:bg-green-600 text-white'
                   : 'btn-primary hover:bg-primary-700'
@@ -902,36 +756,31 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 />
                 {language === 'bn' ? 'যোগ করা হচ্ছে...' : 'Adding...'}
               </>
-            ) : canAddToCart() ? (
+            ) : inStock ? (
               <>
                 <ShoppingCart className="w-4 h-4" />
                 {isInCart 
                   ? (language === 'bn' ? 'কার্টে আছে' : 'In Cart')
-                  : product.hasVariants && !selectedVariant
-                    ? (language === 'bn' ? 'বিকল্প নির্বাচন করুন' : 'Select Options')
-                    : t('products.addToCart')
+                  : t('products.addToCart')
                 }
               </>
             ) : (
               <>
                 <ShoppingCart className="w-4 h-4" />
-                {product.hasVariants && !selectedVariant
-                  ? (language === 'bn' ? 'বিকল্প নির্বাচন করুন' : 'Select Options')
-                  : t('products.outOfStock')
-                }
+                {t('products.outOfStock')}
               </>
             )}
           </motion.button>
 
           {/* Buy Now Button */}
-          {canAddToCart() && (
+          {inStock && (
             <motion.button
               onClick={handleBuyNow}
-              disabled={!canAddToCart() || isBuyingNow}
-              whileHover={canAddToCart() && !isBuyingNow ? { scale: 1.02 } : {}}
-              whileTap={canAddToCart() && !isBuyingNow ? { scale: 0.98 } : {}}
+              disabled={!inStock || isBuyingNow}
+              whileHover={inStock && !isBuyingNow ? { scale: 1.02 } : {}}
+              whileTap={inStock && !isBuyingNow ? { scale: 0.98 } : {}}
               className={`w-full flex items-center justify-center sm:gap-2 gap-1 py-2 sm:py-3 px-1 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base bg-[#ef4444] hover:bg-[#dc2626] text-white shadow-lg ${
-                !canAddToCart() || isBuyingNow ? 'opacity-50 cursor-not-allowed' : ''
+                !inStock || isBuyingNow ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
               {isBuyingNow ? (
