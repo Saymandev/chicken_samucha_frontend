@@ -379,10 +379,14 @@ const NewNavbar: React.FC = () => {
       <div className="bg-orange-600 text-white py-3">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-0 lg:space-y-0">
-            {/* Logo - Hidden on mobile and tablet */}
-            <Link to="/" className="hidden lg:flex flex-col items-start">
-              <PickplaceLogo size="lg" />
-              <span className="mt-1 text-white text-sm">www.pickplace.com.bd</span>
+            {/* Logo - large on lg+, compact on <lg */}
+            <Link to="/" className="flex flex-col items-start">
+              <span className="hidden lg:block"><PickplaceLogo size="lg" /></span>
+              <span className="lg:hidden flex items-center gap-2">
+                <img src="/logo.png" alt="Pickplace" className="h-8 w-auto" />
+                <span className="text-white font-semibold">Pickplace</span>
+              </span>
+              <span className="mt-1 text-white text-sm hidden lg:inline">www.pickplace.com.bd</span>
             </Link>
 
             {/* Search Bar */}

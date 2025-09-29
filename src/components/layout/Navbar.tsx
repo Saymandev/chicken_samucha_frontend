@@ -131,12 +131,10 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            {/* Logo - visible on small and large screens */}
-           
-            {/* Website name - hidden on small screens, visible on medium and large */}
-            <span className={`font-bold text-xl text-primary-600  ${
-              language === 'bn' ? 'font-bengali' : ''
-            }`}>
+            {/* Small logo beside brand on <md */}
+            <img src="/logo.png" alt="Pickplace" className="h-8 w-auto block" />
+            {/* Website name */}
+            <span className={`font-bold text-xl text-primary-600 ${language === 'bn' ? 'font-bengali' : ''}`}>
               {language === 'bn' ? 'পিকপ্লেস' : 'Pickplace'}
             </span>
           </Link>
