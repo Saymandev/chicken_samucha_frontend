@@ -65,6 +65,10 @@ interface Order {
     address?: string;
     preferredTime?: string;
     deliveryInstructions?: string;
+    courier?: string;
+    trackingNumber?: string;
+    trackingUrl?: string;
+    consignmentId?: string;
   };
   refunds?: Array<{
     _id: string;
@@ -90,6 +94,7 @@ const AdminOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [courierAutoBook, setCourierAutoBook] = useState<boolean>(false);
+  const [bookingInFlightId, setBookingInFlightId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Debounce search term
@@ -662,16 +667,31 @@ const AdminOrders: React.FC = () => {
                     <button
                       onClick={async () => {
                         try {
-                          await adminAPI.bookSteadfast(getOrderId(order));
+                          const oid = getOrderId(order);
+                          const note = prompt('Add note (optional):') || undefined;
+                          setBookingInFlightId(oid);
+                          await adminAPI.bookSteadfast(oid, note);
+                          // Optimistic UI: mark as sent and out_for_delivery
+                          setOrders(prev => prev.map(o => (getOrderId(o) === oid)
+                            ? ({
+                                ...o,
+                                orderStatus: 'out_for_delivery',
+                                deliveryInfo: { ...(o as any).deliveryInfo, courier: 'steadfast' }
+                              } as any)
+                            : o
+                          ));
                           toast.success('Booked with Steadfast');
                           fetchOrders();
                         } catch (e: any) {
                           toast.error(e?.response?.data?.message || 'Failed to book');
+                        } finally {
+                          setBookingInFlightId(null);
                         }
                       }}
-                      className="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-sm w-full"
+                      disabled={bookingInFlightId === getOrderId(order)}
+                      className={`px-3 py-2 rounded text-white text-sm w-full ${bookingInFlightId === getOrderId(order) ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
                     >
-                      Book with Steadfast
+                      {bookingInFlightId === getOrderId(order) ? 'Booking…' : 'Book with Steadfast'}
                     </button>
                   )}
                   <button
