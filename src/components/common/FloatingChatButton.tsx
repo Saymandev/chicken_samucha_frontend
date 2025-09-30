@@ -166,6 +166,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
       {!showChatPanel && (
         <motion.button
           onClick={handleChatClick}
+          aria-label="Get Help"
           className="relative w-16 h-16 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

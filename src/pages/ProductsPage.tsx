@@ -10,9 +10,9 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
-  GridSkeleton,
-  ListSkeleton,
-  ProductCardSkeleton
+    GridSkeleton,
+    ListSkeleton,
+    ProductCardSkeleton
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
@@ -505,7 +505,7 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
             <GridSkeleton 
               items={12} 
               ItemComponent={ProductCardSkeleton}
-              columns="grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+              columns="grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
             />
           ) : (
             <ListSkeleton 
@@ -519,7 +519,7 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
             animate={{ opacity: 1 }}
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2'
+                ? 'grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2'
                 : 'space-y-6'
             }
           >

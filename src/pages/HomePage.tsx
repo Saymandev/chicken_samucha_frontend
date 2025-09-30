@@ -212,7 +212,7 @@ const HomePage: React.FC = () => {
             <GridSkeleton 
               items={6} 
               ItemComponent={ProductCardSkeleton}
-              columns="grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+              columns="grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
             />
           ) : (
             <motion.div
@@ -220,7 +220,7 @@ const HomePage: React.FC = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
+              className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
             >
               {(featuredProducts || []).map((product, index) => (
                 <motion.div
@@ -274,7 +274,7 @@ const HomePage: React.FC = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
+              className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
             >
               {bestSellers.map((product, index) => (
                 <motion.div key={(product as any).id || index} initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.05 }}>
@@ -430,12 +430,18 @@ const HomePage: React.FC = () => {
               >
                 {t('homepage.orderNow')}
               </Link>
-              <Link
-                to="/chat"
+              <button
+                onClick={() => {
+                  // Trigger the floating chat button
+                  const chatButton = document.querySelector('[aria-label="Get Help"], .fixed.bottom-6.right-6 button');
+                  if (chatButton instanceof HTMLElement) {
+                    chatButton.click();
+                  }
+                }}
                 className="border-2 border-white text-white hover:bg-white hover:text-primary-600 font-medium py-3 px-8 rounded-lg transition-colors text-lg hover:scale-105 transform duration-200"
               >
                 {t('homepage.liveChat')}
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>

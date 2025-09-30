@@ -58,7 +58,7 @@ const WishlistPage: React.FC = () => {
           <GridSkeleton 
             items={6} 
             ItemComponent={ProductCardSkeleton}
-            columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            columns="grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
           />
         </div>
       </div>
@@ -135,7 +135,7 @@ const WishlistPage: React.FC = () => {
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+            className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
           >
             {wishlistItems.map((item) => (
               <motion.div

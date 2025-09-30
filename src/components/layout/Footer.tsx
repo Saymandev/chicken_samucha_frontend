@@ -1,9 +1,9 @@
 import {
-  Clock,
-  Facebook,
-  Mail,
-  MapPin,
-  Phone
+    Clock,
+    Facebook,
+    Mail,
+    MapPin,
+    Phone
 } from 'lucide-react';
 import React from 'react';
 // import toast from 'react-hot-toast';
@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
       links: [
         { name: t('nav.home'), path: '/' },
         { name: t('nav.products'), path: '/products' },
-        { name: t('nav.chat'), path: '/chat' }
+        { name: t('footer.contact'), path: '/contact' }
       ]
     },
     {

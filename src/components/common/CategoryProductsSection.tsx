@@ -90,13 +90,13 @@ const CategoryProductsSection: React.FC<CategoryProductsSectionProps> = ({
         </div>
 
         {loading ? (
-          <GridSkeleton items={limit} ItemComponent={ProductCardSkeleton} columns="grid-cols-2 md:grid-cols-3 xl:grid-cols-5" />
+          <GridSkeleton items={limit} ItemComponent={ProductCardSkeleton} columns="grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5" />
         ) : (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
+            className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
           >
             {products.map((p, i) => (
               <motion.div key={(p as any).id || i} initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>

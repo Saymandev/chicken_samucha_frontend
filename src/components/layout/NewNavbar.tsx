@@ -198,7 +198,7 @@ const NewNavbar: React.FC = () => {
             <span className="text-gray-400 text-xs sm:text-sm">•</span>
           )}
           <div className="flex-1 min-w-0">
-            <div className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm truncate">
+            <div className="font-bold text-gray-900 dark:text-white text-xs sm:text-sm truncate">
               {node.name[language] || node.name.en}
             </div>
             {depth === 0 && (
@@ -447,7 +447,7 @@ const NewNavbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsProductsMenuOpen(!isProductsMenuOpen)}
-                className="flex items-center space-x-1 sm:space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-3 sm:px-4 py-3 sm:py-3 rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                className="flex items-center space-x-1 sm:space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-1 sm:px-4 py-2 sm:py-3 rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] touch-manipulation"
               >
                 <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="font-semibold hidden sm:inline">ALL CATEGORIES</span>
