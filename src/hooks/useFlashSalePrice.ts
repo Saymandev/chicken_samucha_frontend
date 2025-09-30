@@ -23,6 +23,7 @@ const CACHE_DURATION = 60000; // 1 minute
 
 export const useFlashSalePrice = (productId: string): FlashSalePrice | null => {
   const [flashSalePrice, setFlashSalePrice] = useState<FlashSalePrice | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

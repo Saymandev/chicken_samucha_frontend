@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import EMAIL_TEMPLATES from '../../constants/emailTemplates';
 import { subscriptionsAPI } from '../../utils/api';
@@ -22,7 +22,7 @@ const AdminSubscribers: React.FC = () => {
   const [templateValues, setTemplateValues] = useState<Record<string,string>>({});
   const [showHtml, setShowHtml] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       const params: any = {};
@@ -34,9 +34,9 @@ const AdminSubscribers: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [status]);
 
-  useEffect(() => { load(); }, [status]);
+  useEffect(() => { load(); }, [load]);
 
   const handleUnsubscribe = async (email: string) => {
     try {

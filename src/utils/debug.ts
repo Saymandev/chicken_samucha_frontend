@@ -69,11 +69,10 @@ export const debugAPI = {
         // Decode token (basic check)
         const payload = JSON.parse(atob(token.split('.')[1]));
         const expiry = new Date(payload.exp * 1000);
-        const isExpired = expiry < new Date();
-        
-       
-       
-        
+        // Check if expired (validation only)
+        if (expiry < new Date()) {
+          console.warn('⚠️ Token expired');
+        }
       } catch (error) {
         console.error('❌ Invalid token format');
       }

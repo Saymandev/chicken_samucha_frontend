@@ -40,6 +40,7 @@ const AdminContent: React.FC = () => {
 
   useEffect(() => {
     fetchContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Refetch slider items when page or search changes
@@ -47,6 +48,7 @@ const AdminContent: React.FC = () => {
     if (activeTab === 'slider') {
       fetchSliderItems();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, activeTab]);
 
   const fetchSliderItems = async () => {

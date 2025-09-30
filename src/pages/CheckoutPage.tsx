@@ -121,6 +121,7 @@ const CheckoutPage: React.FC = () => {
         // keep defaults
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist selected zone for logged-in users when it changes

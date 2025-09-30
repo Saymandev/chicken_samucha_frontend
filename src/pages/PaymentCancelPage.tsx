@@ -10,20 +10,15 @@ const PaymentCancelPage: React.FC = () => {
   const { language } = useStore();
   
   const [orderNumber, setOrderNumber] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const order = searchParams.get('order');
-    const statusParam = searchParams.get('status');
     
     if (order) {
       setOrderNumber(order);
       // Cleanup any stored checkout payload for this provisional order
       try { localStorage.removeItem(`checkout:${order}`); } catch {}
-    }
-    if (statusParam) {
-      setStatus(statusParam);
     }
     
     setIsLoading(false);
