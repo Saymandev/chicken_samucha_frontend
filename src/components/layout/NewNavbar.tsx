@@ -195,19 +195,19 @@ const NewNavbar: React.FC = () => {
               {node.icon}
             </div>
           ) : (
-            <span className="text-gray-400 text-xs sm:text-sm">•</span>
+            <span className="text-gray-400 text-xs sm:text-sm font-bold">•</span>
           )}
           <div className="flex-1 min-w-0">
             <div className="font-bold text-gray-900 dark:text-white text-xs sm:text-sm truncate">
               {node.name[language] || node.name.en}
             </div>
             {depth === 0 && (
-              <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+              <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block font-semibold">
                 {node.productCount} products
               </div>
             )}
           </div>
-          <span className="text-xs text-gray-500 hidden sm:inline">{node.productCount}</span>
+          <span className="text-xs text-gray-500 hidden sm:inline font-semibold">{node.productCount}</span>
         </Link>
         {node.children && node.children.length > 0 && (
           <div className="ml-2 sm:ml-4 space-y-1">
@@ -466,9 +466,7 @@ const NewNavbar: React.FC = () => {
                       >
                         {/* Categories */}
                         <div className="px-3 sm:px-4 py-2">
-                          <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                            Categories
-                          </h3>
+                          
                           {loadingCategories ? (
                             <div className="space-y-2">
                               {[1, 2, 3].map((i) => (
