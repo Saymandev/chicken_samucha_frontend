@@ -1,0 +1,235 @@
+/* Custom Quill Editor Styles */
+
+/* Container */
+.quill-container {
+  height: 200px;
+}
+
+/* Editor */
+.ql-container {
+  font-size: 14px;
+  height: calc(200px - 42px) !important;
+}
+
+.ql-editor {
+  min-height: 150px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.ql-editor.ql-blank::before {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Dark mode support */
+.dark .ql-toolbar {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .ql-container {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #f3f4f6 !important;
+}
+
+.dark .ql-editor {
+  color: #f3f4f6 !important;
+}
+
+.dark .ql-editor.ql-blank::before {
+  color: #6b7280;
+}
+
+/* Toolbar buttons */
+.dark .ql-stroke {
+  stroke: #d1d5db !important;
+}
+
+.dark .ql-fill {
+  fill: #d1d5db !important;
+}
+
+.dark .ql-picker-label {
+  color: #d1d5db !important;
+}
+
+.dark .ql-picker-options {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .ql-picker-item {
+  color: #d1d5db !important;
+}
+
+.dark .ql-picker-item:hover {
+  background-color: #4b5563 !important;
+}
+
+/* Active state */
+.ql-toolbar button:hover,
+.ql-toolbar button:focus,
+.ql-toolbar button.ql-active {
+  color: #f97316 !important;
+}
+
+.dark .ql-toolbar button:hover .ql-stroke,
+.dark .ql-toolbar button:focus .ql-stroke,
+.dark .ql-toolbar button.ql-active .ql-stroke {
+  stroke: #f97316 !important;
+}
+
+.dark .ql-toolbar button:hover .ql-fill,
+.dark .ql-toolbar button:focus .ql-fill,
+.dark .ql-toolbar button.ql-active .ql-fill {
+  fill: #f97316 !important;
+}
+
+/* Links */
+.ql-editor a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.dark .ql-editor a {
+  color: #60a5fa;
+}
+
+/* Lists */
+.ql-editor ul,
+.ql-editor ol {
+  padding-left: 1.5em;
+}
+
+.ql-editor li {
+  margin-bottom: 0.25em;
+}
+
+/* Headers */
+.ql-editor h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+.ql-editor h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+.ql-editor h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+/* Scrollbar */
+.ql-editor::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ql-editor::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.dark .ql-editor::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.ql-editor::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.dark .ql-editor::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.ql-editor::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dark .ql-editor::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Styles for displaying rich text content on frontend */
+.rich-text-content {
+  line-height: 1.75;
+}
+
+.rich-text-content h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 1em 0 0.5em 0;
+}
+
+.rich-text-content h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.83em 0;
+}
+
+.rich-text-content h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 0.75em 0;
+}
+
+.rich-text-content p {
+  margin: 1em 0;
+}
+
+.rich-text-content strong {
+  font-weight: 700;
+}
+
+.rich-text-content em {
+  font-style: italic;
+}
+
+.rich-text-content u {
+  text-decoration: underline;
+}
+
+.rich-text-content s {
+  text-decoration: line-through;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+}
+
+.rich-text-content li {
+  margin: 0.5em 0;
+}
+
+.rich-text-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.rich-text-content a:hover {
+  color: #2563eb;
+}
+
+.dark .rich-text-content a {
+  color: #60a5fa;
+}
+
+.dark .rich-text-content a:hover {
+  color: #93c5fd;
+}

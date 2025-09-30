@@ -2,7 +2,10 @@ import { motion } from 'framer-motion';
 import { ImagePlus, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { useStore } from '../../store/useStore';
+import '../../styles/quill-custom.css';
 import { adminAPI, categoriesAPI } from '../../utils/api';
 
 interface Product {
@@ -49,12 +52,22 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
     description: { en: '', bn: '' },
     price: 0,
     discountPrice: 0,
+    weight: 0,
+    returnWarranty: { en: '', bn: '' },
     category: '',
     stock: 0,
     isAvailable: true,
     isFeatured: false,
     freeDelivery: false,
-    youtubeVideoUrl: ''
+    youtubeVideoUrl: '',
+    hasNutritionalInfo: false,
+    nutritionalInfo: {
+      calories: 0,
+      protein: '',
+      carbs: '',
+      fat: '',
+      fiber: ''
+    }
   });
   
   const [images, setImages] = useState<Array<{ url: string; public_id: string }>>([]);
@@ -84,12 +97,22 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         description: product.description || { en: '', bn: '' },
         price: product.price || 0,
         discountPrice: product.discountPrice || 0,
+        weight: (product as any).weight || 0,
+        returnWarranty: (product as any).returnWarranty || { en: '', bn: '' },
         category: categoryId,
         stock: product.stock || 0,
         isAvailable: product.isAvailable ?? true,
         isFeatured: product.isFeatured ?? false,
         freeDelivery: product.freeDelivery ?? false,
-        youtubeVideoUrl: product.youtubeVideoUrl || ''
+        youtubeVideoUrl: product.youtubeVideoUrl || '',
+        hasNutritionalInfo: !!((product as any).nutritionalInfo?.calories || (product as any).nutritionalInfo?.protein),
+        nutritionalInfo: (product as any).nutritionalInfo || {
+          calories: 0,
+          protein: '',
+          carbs: '',
+          fat: '',
+          fiber: ''
+        }
       });
       setImages(product.images || []);
       
@@ -120,10 +143,20 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
         discountPrice: 0,
         category: '',
         stock: 0,
+        weight: 0,
+        returnWarranty: { en: '', bn: '' },
         isAvailable: true,
         isFeatured: false,
         freeDelivery: false,
-        youtubeVideoUrl: ''
+        youtubeVideoUrl: '',
+        hasNutritionalInfo: false,
+        nutritionalInfo: {
+          calories: 0,
+          protein: '',
+          carbs: '',
+          fat: '',
+          fiber: ''
+        }
       });
       setImages([]);
       
@@ -287,12 +320,19 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
       if (formData.discountPrice) {
         submitData.append('discountPrice', formData.discountPrice.toString());
       }
+      submitData.append('weight', formData.weight.toString());
+      submitData.append('returnWarranty', JSON.stringify(formData.returnWarranty));
       submitData.append('category', JSON.stringify(formData.category));
       submitData.append('stock', formData.stock.toString());
       submitData.append('isAvailable', formData.isAvailable.toString());
       submitData.append('isFeatured', formData.isFeatured.toString());
       submitData.append('freeDelivery', formData.freeDelivery.toString());
       submitData.append('youtubeVideoUrl', formData.youtubeVideoUrl);
+      
+      // Add nutritional info if checkbox is enabled
+      if (formData.hasNutritionalInfo) {
+        submitData.append('nutritionalInfo', JSON.stringify(formData.nutritionalInfo));
+      }
       
       // Add variant data (sanitize out File objects and upload separately)
       submitData.append('hasVariants', hasVariants.toString());
@@ -434,30 +474,98 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
             </div>
           </div>
 
-          {/* Product Descriptions */}
+          {/* Product Descriptions - Rich Text Editor */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Description (English) *
               </label>
-              <textarea
-                value={formData.description.en}
-                onChange={(e) => handleInputChange('description', e.target.value, 'en')}
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                required
-              />
+              <div className="bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                <ReactQuill
+                  theme="snow"
+                  value={formData.description.en}
+                  onChange={(value) => handleInputChange('description', value, 'en')}
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      [{ 'color': [] }, { 'background': [] }],
+                      ['link'],
+                      ['clean']
+                    ]
+                  }}
+                  formats={[
+                    'header',
+                    'bold', 'italic', 'underline', 'strike',
+                    'list', 'bullet',
+                    'color', 'background',
+                    'link'
+                  ]}
+                  placeholder="Write product description with rich formatting..."
+                  className="h-48"
+                  style={{ height: '200px' }}
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Description (Bengali) *
               </label>
+              <div className="bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                <ReactQuill
+                  theme="snow"
+                  value={formData.description.bn}
+                  onChange={(value) => handleInputChange('description', value, 'bn')}
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      [{ 'color': [] }, { 'background': [] }],
+                      ['link'],
+                      ['clean']
+                    ]
+                  }}
+                  formats={[
+                    'header',
+                    'bold', 'italic', 'underline', 'strike',
+                    'list', 'bullet',
+                    'color', 'background',
+                    'link'
+                  ]}
+                  placeholder="পণ্যের বিবরণ লিখুন..."
+                  className="h-48"
+                  style={{ height: '200px' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Return & Warranty */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Return & Warranty (English)
+              </label>
               <textarea
-                value={formData.description.bn}
-                onChange={(e) => handleInputChange('description', e.target.value, 'bn')}
-                rows={4}
+                value={formData.returnWarranty.en}
+                onChange={(e) => handleInputChange('returnWarranty', e.target.value, 'en')}
+                rows={3}
+                placeholder="e.g., 7 days return policy, 1 year warranty"
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Return & Warranty (Bengali)
+              </label>
+              <textarea
+                value={formData.returnWarranty.bn}
+                onChange={(e) => handleInputChange('returnWarranty', e.target.value, 'bn')}
+                rows={3}
+                placeholder="যেমন: ৭ দিনের রিটার্ন পলিসি, ১ বছরের ওয়্যারেন্টি"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -668,7 +776,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
             )}
           </div>
 
-          {/* Price and Category */}
+          {/* Price, Discount Price, Weight, and Category */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -696,6 +804,22 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 step="1"
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Weight (kg) *
+              </label>
+              <input
+                type="number"
+                value={formData.weight}
+                onChange={(e) => handleInputChange('weight', parseFloat(e.target.value) || 0)}
+                min="0.01"
+                step="0.01"
+                placeholder="0.50"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                required
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Required for courier shipping</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -765,7 +889,127 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 Free Delivery
               </span>
             </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.hasNutritionalInfo}
+                onChange={(e) => handleInputChange('hasNutritionalInfo', e.target.checked)}
+                className="w-4 h-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Add Nutritional Info (Optional)
+              </span>
+            </label>
           </div>
+
+          {/* Nutritional Info (Optional) */}
+          {formData.hasNutritionalInfo && (
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Nutritional Information</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Calories
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.nutritionalInfo.calories || ''}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        nutritionalInfo: {
+                          ...prev.nutritionalInfo,
+                          calories: parseInt(e.target.value) || 0
+                        }
+                      }));
+                    }}
+                    placeholder="200"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Protein (g)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nutritionalInfo.protein || ''}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        nutritionalInfo: {
+                          ...prev.nutritionalInfo,
+                          protein: e.target.value
+                        }
+                      }));
+                    }}
+                    placeholder="10g"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Carbs (g)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nutritionalInfo.carbs || ''}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        nutritionalInfo: {
+                          ...prev.nutritionalInfo,
+                          carbs: e.target.value
+                        }
+                      }));
+                    }}
+                    placeholder="30g"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Fat (g)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nutritionalInfo.fat || ''}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        nutritionalInfo: {
+                          ...prev.nutritionalInfo,
+                          fat: e.target.value
+                        }
+                      }));
+                    }}
+                    placeholder="5g"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Fiber (g)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nutritionalInfo.fiber || ''}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        nutritionalInfo: {
+                          ...prev.nutritionalInfo,
+                          fiber: e.target.value
+                        }
+                      }));
+                    }}
+                    placeholder="2g"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Image Upload */}
           <div>

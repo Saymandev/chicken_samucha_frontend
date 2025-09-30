@@ -8,6 +8,7 @@ import ProductCard from '../components/product/ProductCard';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useStore } from '../store/useStore';
+import '../styles/quill-custom.css';
 import { ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
 
 interface Product {
@@ -724,9 +725,10 @@ const ProductDetailPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                   {t('productDetail.description')}
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {getDescription()}
-                </p>
+                <div 
+                  className="text-gray-700 dark:text-gray-300 leading-relaxed rich-text-content prose dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: getDescription() }}
+                />
                 {(() => {
                   const desc = language === 'bn' ? product.description.bn : product.description.en;
                   const wordCount = desc.trim().split(/\s+/).length;
