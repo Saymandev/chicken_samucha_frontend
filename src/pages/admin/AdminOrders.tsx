@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-  CheckCircle,
-  Clock,
-  Eye,
-  Package,
-  Search,
-  Truck,
-  X,
-  XCircle
+    CheckCircle,
+    Clock,
+    Eye,
+    Package,
+    Search,
+    Truck,
+    X,
+    XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -263,6 +263,8 @@ const AdminOrders: React.FC = () => {
       case 'out_for_delivery': return 'bg-indigo-100 text-indigo-800';
       case 'delivered': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
+      case 'courier_cancelled': return 'bg-rose-100 text-rose-800';
+      case 'return_requested': return 'bg-amber-100 text-amber-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };

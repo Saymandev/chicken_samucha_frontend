@@ -248,7 +248,9 @@
       "ready": "প্রস্তুত",
       "out_for_delivery": "ডেলিভারির জন্য রওনা",
       "delivered": "ডেলিভার হয়েছে",
-      "cancelled": "বাতিল"
+      "cancelled": "বাতিল",
+      "courier_cancelled": "কুরিয়ার বাতিল",
+      "return_requested": "ফেরত অনুরোধ করা হয়েছে"
     }
   },
   "reviews": {

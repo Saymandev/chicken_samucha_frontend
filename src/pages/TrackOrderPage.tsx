@@ -149,6 +149,10 @@ const TrackOrderPage: React.FC = () => {
         return 'text-green-600';
       case 'cancelled':
         return 'text-red-600';
+      case 'courier_cancelled':
+        return 'text-rose-600';
+      case 'return_requested':
+        return 'text-amber-600';
       case 'in_transit':
       case 'out_for_delivery':
         return 'text-blue-600';

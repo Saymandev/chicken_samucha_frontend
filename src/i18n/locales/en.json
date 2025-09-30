@@ -230,7 +230,9 @@
       "ready": "Ready",
       "out_for_delivery": "Out for Delivery",
       "delivered": "Delivered",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "courier_cancelled": "Courier Cancelled",
+      "return_requested": "Return Requested"
     }
   },
   "reviews": {

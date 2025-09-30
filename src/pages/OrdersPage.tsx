@@ -1,14 +1,16 @@
 import { motion } from 'framer-motion';
 import {
-  Calendar,
-  Clock,
-  MapPin,
-  Package,
-  Phone,
-  RefreshCw,
-  Star,
-  Truck,
-  XCircle
+    AlertCircle,
+    Calendar,
+    Clock,
+    MapPin,
+    Package,
+    Phone,
+    RefreshCw,
+    Star,
+    Truck,
+    X,
+    XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -197,6 +199,10 @@ const OrdersPage: React.FC = () => {
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'cancelled':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'courier_cancelled':
+        return 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200';
+      case 'return_requested':
+        return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -216,6 +222,12 @@ const OrdersPage: React.FC = () => {
         return <Truck className="w-4 h-4" />;
       case 'delivered':
         return <Star className="w-4 h-4" />;
+      case 'cancelled':
+        return <X className="w-4 h-4" />;
+      case 'courier_cancelled':
+        return <X className="w-4 h-4" />;
+      case 'return_requested':
+        return <AlertCircle className="w-4 h-4" />;
       default:
         return <Package className="w-4 h-4" />;
     }
