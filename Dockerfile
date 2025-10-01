@@ -34,8 +34,5 @@ RUN addgroup -g 1001 -S nginx-user && \
 # Expose port 80
 EXPOSE 80
 
-# Disable healthcheck
-HEALTHCHECK NONE
-
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
