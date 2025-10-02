@@ -197,7 +197,8 @@ const PrivacyPolicyPage: React.FC = () => {
             <p className="text-indigo-100 mb-6">{t('privacy.contact.description')}</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="mailto:privacy@pickplace.com.bd"
+                href="mailto:rongdhunu503@gmail.com
+"
                 className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
               >
                 {t('privacy.contact.email')}

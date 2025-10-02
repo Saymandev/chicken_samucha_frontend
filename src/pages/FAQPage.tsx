@@ -238,13 +238,14 @@ const FAQPage: React.FC = () => {
             <p className="text-purple-100 mb-6">{t('faq.contactSupport')}</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="tel:+8801537134852"
+                href="tel:+8801676726778"
                 className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
               >
                 {t('faq.callUs')}
               </a>
               <a
-                href="mailto:support@pickplace.com.bd"
+                href="mailto:rongdhunu503@gmail.com
+"
                 className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400"
               >
                 {t('faq.emailUs')}

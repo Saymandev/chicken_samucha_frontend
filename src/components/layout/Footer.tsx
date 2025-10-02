@@ -1,9 +1,9 @@
 import {
-    Clock,
-    Facebook,
-    Mail,
-    MapPin,
-    Phone
+  Clock,
+  Facebook,
+  Mail,
+  MapPin,
+  Phone
 } from 'lucide-react';
 import React from 'react';
 // import toast from 'react-hot-toast';
@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
             <div className="flex items-center space-x-2">
             <Link to="/" className="hidden lg:flex flex-col items-start">
               <PickplaceLogo size="lg" />
-              <span className="mt-1 text-white text-sm">www.pickplace.com.bd</span>
+              <span className="mt-1 text-white text-sm">www.rongdhunu.com</span>
             </Link>
               
             </div>
@@ -79,18 +79,18 @@ const Footer: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-sm">
                 <Phone className="w-4 h-4 text-primary-400" />
-                <span>+880 1537134852</span>
+                <span>+880 1676726778</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <Mail className="w-4 h-4 text-primary-400" />
-                <span>info@pickplace.com.bd</span>
+                <span>rongdhunu503@gmail.com</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <MapPin className="w-4 h-4 text-primary-400" />
                 <span className={language === 'bn' ? 'font-bengali' : ''}>
                   {language === 'bn' 
-                    ? 'রংপুর, বাংলাদেশ'
-                    : 'Rangpur, Bangladesh'
+                    ? 'ঢাকা, বাংলাদেশ'
+                    : 'Dhaka, Bangladesh'
                   }
                 </span>
               </div>
@@ -164,8 +164,8 @@ const Footer: React.FC = () => {
                 language === 'bn' ? 'font-bengali' : ''
               }`}>
                 {language === 'bn' 
-                  ? `© ${currentYear} পিকপ্লেস। সব অধিকার সংরক্ষিত।`
-                  : `© ${currentYear} Pickplace. All rights reserved.`
+                  ? `© ${currentYear} রঙ্গধুনু। সব অধিকার সংরক্ষিত।`
+                  : `© ${currentYear} Rongdhunu. All rights reserved.`
                 }
                 
               </p>

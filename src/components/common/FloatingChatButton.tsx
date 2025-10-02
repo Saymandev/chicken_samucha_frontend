@@ -46,9 +46,9 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
 
   const handleContactClick = (type: 'phone' | 'email') => {
     if (type === 'phone') {
-      window.open('tel:+8801234567890', '_self');
+      window.open('tel:+8801676726778', '_self');
     } else {
-      window.open('mailto:support@pickplace.com.bd', '_self');
+      window.open('mailto:rongdhunu503@gmail.com', '_self');
     }
     setIsOpen(false);
   };
@@ -143,7 +143,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
                     {language === 'bn' ? 'ইমেইল করুন' : 'Email Us'}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    support@pickplace.com.bd
+                  rongdhunu503@gmail.com
                   </div>
                 </div>
               </button>

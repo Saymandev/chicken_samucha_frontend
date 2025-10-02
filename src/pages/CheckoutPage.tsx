@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import {
-    CreditCard,
-    MapPin,
-    Phone,
-    ShoppingCart,
-    User
+  CreditCard,
+  MapPin,
+  Phone,
+  ShoppingCart,
+  User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -1067,7 +1067,7 @@ const CheckoutPage: React.FC = () => {
                 <div className="mt-4 text-center">
                   <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Phone className="w-4 h-4" />
-                    <span>Call for support: 01537134852</span>
+                    <span>Call for support: 01676-726778</span>
                   </div>
                 </div>
               </div>

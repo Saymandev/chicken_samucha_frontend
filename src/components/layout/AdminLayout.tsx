@@ -381,7 +381,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   </div>
                 </div>
                 <p className="text-orange-100 text-xs truncate">
-                  {user?.email || 'admin@pickplace.com.bd'}
+                  {user?.email || 'rongdhunu503@gmail.com'}
                 </p>
               </div>
             </div>

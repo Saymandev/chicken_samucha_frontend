@@ -223,7 +223,9 @@ const ContactUsPage: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         {t('contact.info.email.title')}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">info@pickplace.com.bd</p>
+                      <p className="text-gray-600 dark:text-gray-300">rongdhunu503@gmail.com
+                      +8801676726778
+                      </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {t('contact.info.email.response')}
                       </p>

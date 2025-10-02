@@ -34,7 +34,7 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
       { key: 'ctaUrl', label: 'Button Link' }
     ],
     defaults: {
-      brand: '🛒 Pickplace',
+      brand: '🛒 Rongdhunu',
       title: 'Fresh on the menu',
       description: 'We just launched exciting new items. Be the first to try them and enjoy special discounts today.',
       ctaText: 'Shop Now',

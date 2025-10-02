@@ -289,7 +289,8 @@ const CookiePolicyPage: React.FC = () => {
             <p className="text-amber-100 mb-6">{t('cookies.contact.description')}</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="mailto:privacy@pickplace.com.bd"
+                href="mailto:rongdhunu503@gmail.com
+"
                 className="bg-white text-amber-600 px-6 py-3 rounded-lg font-semibold hover:bg-amber-50 transition-colors"
               >
                 {t('cookies.contact.email')}

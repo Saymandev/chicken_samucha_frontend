@@ -1,5 +1,5 @@
 {
-  "name": "pickplace-frontend",
+  "name": "rongdhunu-frontend",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -66,5 +66,5 @@
     "@types/jest": "^29.5.8",
     "cross-env": "^7.0.3"
   },
-  "proxy": "https://pickplace-backend.onrender.com"
+  "proxy": "https://rongdhunu.com"
 }
