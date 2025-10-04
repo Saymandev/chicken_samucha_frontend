@@ -404,7 +404,6 @@ const NewNavbar: React.FC = () => {
             {/* Logo - large on lg+ */}
             <Link to="/" className="hidden lg:flex flex-col items-start">
               <PickplaceLogo size="lg" />
-              <span className="mt-1 text-white text-sm">www.rongdhunu.com</span>
             </Link>
 
             {/* Search Bar (desktop) */}

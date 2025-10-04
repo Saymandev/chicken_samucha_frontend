@@ -12,13 +12,13 @@ const PickplaceLogo: React.FC<PickplaceLogoProps> = ({
   className = '' 
 }) => {
   const sizeClasses = {
-    sm: 'w-16',
-    md: 'w-24',
-    lg: 'w-28'
+    sm: 'w-24',
+    md: 'w-32',
+    lg: 'w-36'
   };
 
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className={`flex items-center  ${className}`}>
       {/* Logo Image Only */}
       <div className={`${sizeClasses[size]} flex items-center justify-center`}>
         <img
