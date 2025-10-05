@@ -209,7 +209,7 @@ const ContactUsPage: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         {t('contact.info.phone.title')}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">+880 1629428590</p>
+                      <p className="text-gray-600 dark:text-gray-300">{t('contact.info.phone.number')}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {t('contact.info.phone.hours')}
                       </p>
@@ -223,9 +223,7 @@ const ContactUsPage: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         {t('contact.info.email.title')}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">rongdhunu503@gmail.com
-                      +880 1629428590
-                      </p>
+                      <p className="text-gray-600 dark:text-gray-300">rongdhunu503@gmail.com</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {t('contact.info.email.response')}
                       </p>
@@ -240,8 +238,7 @@ const ContactUsPage: React.FC = () => {
                         {t('contact.info.address.title')}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300">
-                        Shanarpar,siddirganj, Narayanganj<br />
-                        Bangladesh
+                        {t('contact.info.address.description')}
                       </p>
                     </div>
                   </div>
@@ -253,10 +250,9 @@ const ContactUsPage: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                         {t('contact.info.hours.title')}
                       </h3>
-                      <div className="text-gray-600 dark:text-gray-300">
-                        <p>{t('contact.info.hours.weekdays')}: 9:00 AM - 10:00 PM</p>
-                        <p>{t('contact.info.hours.weekends')}: 10:00 AM - 11:00 PM</p>
-                      </div>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {t('contact.info.hours.description')}
+                      </p>
                     </div>
                   </div>
                 </div>

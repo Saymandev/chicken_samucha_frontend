@@ -611,14 +611,20 @@
       "title": "Contact Information",
       "phone": {
         "title": "Phone Support",
+        "number": "+880 1629428590",
         "hours": "Available 24/7"
       },
       "email": {
         "title": "Email Support",
-        "response": "Response within 24 hours"
+        "response": "Response within 2 hours"
       },
       "address": {
-        "title": "Our Location"
+        "title": "Our Location",
+        "description": "Online store only - No physical location"
+      },
+      "hours": {
+        "title": "Customer Service Hours",
+        "description": "24/7 online support"
       }
     },
     "quickLinks": {
