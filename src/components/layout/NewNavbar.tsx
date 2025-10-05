@@ -382,7 +382,7 @@ const NewNavbar: React.FC = () => {
             {/* Small screens: logo + search in one row */}
             <div className="w-full flex items-center gap-3 lg:hidden">
               <Link to="/" className="flex items-center gap-2">
-                <img src="/logo.png?v=4" alt="Logo" className="h-8 w-auto" />
+                <img src="/logo.png?v=5" alt="Logo" className="h-8 w-auto" />
               </Link>
               <form onSubmit={handleSearch} className="relative flex-1 min-w-0">
                 <input
@@ -441,7 +441,7 @@ const NewNavbar: React.FC = () => {
       {/* Main Navigation */}
       <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex items-center min-h-12 sm:min-h-16 py-2 justify-between">
+          <div className="flex items-center min-h-12 sm:min-h-16 py-2 justify-between overflow-hidden">
             {/* Category Sidebar */}
             <div className="relative">
               <button
@@ -541,13 +541,13 @@ const NewNavbar: React.FC = () => {
             </div>
 
             {/* Right Side - Additional Actions */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
             {/* Cart */}
             <button
               onClick={openCart}
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
+              className="relative p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
             >
-              <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
                   {cartCount}
@@ -558,9 +558,9 @@ const NewNavbar: React.FC = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="relative p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
+              className="relative p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation flex items-center justify-center"
             >
-              <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
                   {wishlistCount}
@@ -657,16 +657,16 @@ const NewNavbar: React.FC = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
               <Link
                 to="/login"
-                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors"
+                  className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors whitespace-nowrap"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                  className="px-3 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                  className="px-2 sm:px-3 py-2 bg-orange-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap"
               >
                 Register
               </Link>
@@ -676,7 +676,7 @@ const NewNavbar: React.FC = () => {
               {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation dark:text-white text-gray-700"
+                className="lg:hidden p-1 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[28px] touch-manipulation dark:text-white text-gray-700 ml-1"
             >
               {isMobileMenuOpen ? (
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />

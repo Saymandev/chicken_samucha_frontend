@@ -22,7 +22,7 @@ const PickplaceLogo: React.FC<PickplaceLogoProps> = ({
       {/* Logo Image Only */}
       <div className={`${sizeClasses[size]} flex items-center justify-center`}>
         <img
-          src={variant === 'black' ? '/logo_black.png?v=4' : '/logo.png?v=4'}
+          src={variant === 'black' ? '/logo_black.png?v=5' : '/logo.png?v=5'} 
           alt="Rongdhunu Logo"
           className="w-full h-full object-contain"
         />

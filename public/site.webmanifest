@@ -1,6 +1,7 @@
 {
-  "name": "Rongdhunu - Your trusted online marketplace",
+  "name": "Rongdhunu - রংধনু",
   "short_name": "Rongdhunu",
+  "description": "Your trusted online marketplace for quality products in Bangladesh",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
