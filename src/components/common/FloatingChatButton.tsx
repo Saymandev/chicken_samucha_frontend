@@ -46,7 +46,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
 
   const handleContactClick = (type: 'phone' | 'email') => {
     if (type === 'phone') {
-      window.open('tel:+8801676726778', '_self');
+      window.open('tel:+880 1629428590', '_self');
     } else {
       window.open('mailto:rongdhunu503@gmail.com', '_self');
     }

@@ -182,7 +182,7 @@ const PaymentSuccessPage: React.FC = () => {
               }
             </p>
             <p className="text-orange-600 dark:text-orange-400 font-semibold">
-              📞 +8801676726778
+              📞 +880 1629428590
             </p>
           </div>
         </motion.div>

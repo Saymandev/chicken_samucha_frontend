@@ -162,7 +162,7 @@ const PaymentCancelPage: React.FC = () => {
               }
             </p>
             <p className="text-orange-600 dark:text-orange-400 font-semibold">
-              📞 +8801676726778
+              📞 +880 1629428590
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
               {language === 'bn' 
