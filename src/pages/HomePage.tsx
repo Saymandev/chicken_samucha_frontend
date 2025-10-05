@@ -364,47 +364,49 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Customer Reviews Section */}
-      <section className="py-16 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-4">
+     {
+      featuredReviews.length > 0 &&  <section className="py-16 bg-white dark:bg-gray-900">
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
+            language === 'bn' ? 'font-bengali' : ''
+          }`}>
+            {t('reviews.title')}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+            {t('homepage.customerReviewsDesc')}
+          </p>
+        </motion.div>
+
+        {loadingReviews ? (
+          <div className="flex justify-center">
+            <div className="animate-pulse">
+              <div className="w-96 h-64 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+            </div>
+          </div>
+        ) : (
           <motion.div
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            transition={{ delay: 0.2 }}
           >
-            <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 ${
-              language === 'bn' ? 'font-bengali' : ''
-            }`}>
-              {t('reviews.title')}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-              {t('homepage.customerReviewsDesc')}
-            </p>
+            <ReviewSlider 
+              reviews={featuredReviews || []} 
+              autoPlay={true}
+              interval={5000}
+            />
           </motion.div>
+        )}
 
-          {loadingReviews ? (
-            <div className="flex justify-center">
-              <div className="animate-pulse">
-                <div className="w-96 h-64 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
-              </div>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <ReviewSlider 
-                reviews={featuredReviews || []} 
-                autoPlay={true}
-                interval={5000}
-              />
-            </motion.div>
-          )}
-
-        </div>
-      </section>
+      </div>
+    </section>
+     }
 
       {/* CTA Section */}
       <section className="py-16 hero-gradient">
