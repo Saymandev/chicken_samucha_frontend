@@ -205,6 +205,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       } else {
         newSet.add(groupId);
       }
+      console.log('Toggling group:', groupId, 'New expanded groups:', Array.from(newSet));
       return newSet;
     });
   };
@@ -283,35 +284,47 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
                 {/* Group Children */}
                 <AnimatePresence>
-                  {isExpanded && sidebarOpen && item.children && (
+                  {isExpanded && item.children && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="ml-4 space-y-1"
+                      className={`space-y-1 ${sidebarOpen ? 'ml-4' : ''}`}
                     >
                       {item.children.map((child) => (
-                        <Link
-                          key={child.id}
-                          to={child.path!}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all group min-h-[36px] ${
-                            isActivePath(child.path!)
-                              ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                          }`}
-                        >
-                          <span className={`${isActivePath(child.path!) ? 'text-white' : 'text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`}>
-                            {child.icon}
-                          </span>
-                          <span className="font-medium text-sm">{child.label}</span>
-                          {child.badge && (
-                            <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                              {child.badge}
+                        <div key={child.id} className="relative group">
+                          <Link
+                            to={child.path!}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all group min-h-[36px] ${
+                              isActivePath(child.path!)
+                                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                            }`}
+                          >
+                            <span className={`${isActivePath(child.path!) ? 'text-white' : 'text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`}>
+                              {child.icon}
                             </span>
+                            {sidebarOpen && (
+                              <>
+                                <span className="font-medium text-sm">{child.label}</span>
+                                {child.badge && (
+                                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                    {child.badge}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </Link>
+                          
+                          {/* Tooltip for collapsed state */}
+                          {!sidebarOpen && (
+                            <div className="absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                              {child.label}
+                            </div>
                           )}
-                        </Link>
+                        </div>
                       ))}
                     </motion.div>
                   )}
