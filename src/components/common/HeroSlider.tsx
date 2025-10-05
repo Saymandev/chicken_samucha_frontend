@@ -46,8 +46,8 @@ const HeroSlider: React.FC<HeroSliderProps> = ({
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
               {language === 'bn' 
-                ? 'আমাদের সুন্দর কসমেটিক্সের জগতে আপনাকে স্বাগতম'
-                : 'Welcome to our beautiful world of cosmetics'
+                ? 'আমাদের ডিজিটাল মার্কেটপ্লেসে আপনাকে স্বাগতম - সব ধরনের পণ্যের জন্য'
+                : 'Welcome to our digital marketplace - your one-stop destination for all products'
               }
             </p>
           </div>

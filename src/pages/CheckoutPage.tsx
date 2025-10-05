@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import {
-  CreditCard,
-  MapPin,
-  Phone,
-  ShoppingCart,
-  User
+    CreditCard,
+    MapPin,
+    Phone,
+    ShoppingCart,
+    User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';

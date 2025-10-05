@@ -709,7 +709,7 @@ const NewNavbar: React.FC = () => {
                       <PickplaceLogo size="md" variant={
                         theme === 'light' ? 'black' : 'default'
                       } />
-                      <span className="mt-1 dark:text-white text-black text-sm">www.rongdhunu.com</span>
+                      
                     </div>
                   </Link>
 
