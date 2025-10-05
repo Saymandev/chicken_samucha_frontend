@@ -145,7 +145,7 @@ export const authAPI = {
     api.put(`/auth/reset-password/${token}`, { password }),
   
   uploadAvatar: (formData: FormData) =>
-    api.post('/users/avatar', formData, {
+    api.put('/users/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
   
