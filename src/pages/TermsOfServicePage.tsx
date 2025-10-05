@@ -143,7 +143,7 @@ const TermsOfServicePage: React.FC = () => {
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-green-600">
+                <h3 className="text-lg font-semibold text-green-600 dark:text-white mb-4">
                   {t('terms.responsibilities.allowed.title')}
                 </h3>
                 <div className="space-y-2">
@@ -161,7 +161,7 @@ const TermsOfServicePage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 text-red-600">
+                <h3 className="text-lg font-semibold text-red-600 dark:text-white mb-4">
                   {t('terms.responsibilities.prohibited.title')}
                 </h3>
                 <div className="space-y-2">
