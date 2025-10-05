@@ -54,8 +54,8 @@ const CheckoutPage: React.FC = () => {
     address: {
       street: user?.address?.street || '',
       area: user?.address?.area || '',
-      city: user?.address?.city || 'Rangpur',
-      district: user?.address?.district || 'Rangpur',
+      city: user?.address?.city || 'Narayanganj',
+      district: user?.address?.district || 'Narayanganj',
       postalCode: user?.address?.postalCode || ''
     }
   });
@@ -739,6 +739,7 @@ const CheckoutPage: React.FC = () => {
                       <option value="Khulna">Khulna</option>
                       <option value="Barisal">Barisal</option>
                       <option value="Rangpur">Rangpur</option>
+                      <option value="Narayanganj">Narayanganj</option>
                       <option value="Mymensingh">Mymensingh</option>
                       
                       <option value="Other">Other</option>

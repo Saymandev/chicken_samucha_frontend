@@ -9,6 +9,7 @@ const FAQPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const faqs = [
+    // Ordering FAQs
     {
       id: 1,
       category: 'ordering',
@@ -23,51 +24,165 @@ const FAQPage: React.FC = () => {
     },
     {
       id: 3,
+      category: 'ordering',
+      question: t('faq.ordering.q3'),
+      answer: t('faq.ordering.a3')
+    },
+    {
+      id: 4,
+      category: 'ordering',
+      question: t('faq.ordering.q4'),
+      answer: t('faq.ordering.a4')
+    },
+    // Delivery FAQs
+    {
+      id: 5,
       category: 'delivery',
       question: t('faq.delivery.q1'),
       answer: t('faq.delivery.a1')
     },
     {
-      id: 4,
+      id: 6,
       category: 'delivery',
       question: t('faq.delivery.q2'),
       answer: t('faq.delivery.a2')
     },
     {
-      id: 5,
+      id: 7,
+      category: 'delivery',
+      question: t('faq.delivery.q3'),
+      answer: t('faq.delivery.a3')
+    },
+    {
+      id: 8,
+      category: 'delivery',
+      question: t('faq.delivery.q4'),
+      answer: t('faq.delivery.a4')
+    },
+    // Payment FAQs
+    {
+      id: 9,
       category: 'payment',
       question: t('faq.payment.q1'),
       answer: t('faq.payment.a1')
     },
     {
-      id: 6,
+      id: 10,
       category: 'payment',
       question: t('faq.payment.q2'),
       answer: t('faq.payment.a2')
     },
     {
-      id: 7,
+      id: 11,
+      category: 'payment',
+      question: t('faq.payment.q3'),
+      answer: t('faq.payment.a3')
+    },
+    {
+      id: 12,
+      category: 'payment',
+      question: t('faq.payment.q4'),
+      answer: t('faq.payment.a4')
+    },
+    // Product FAQs
+    {
+      id: 13,
       category: 'product',
       question: t('faq.product.q1'),
       answer: t('faq.product.a1')
     },
     {
-      id: 8,
+      id: 14,
       category: 'product',
       question: t('faq.product.q2'),
       answer: t('faq.product.a2')
     },
     {
-      id: 9,
+      id: 15,
+      category: 'product',
+      question: t('faq.product.q3'),
+      answer: t('faq.product.a3')
+    },
+    {
+      id: 16,
+      category: 'product',
+      question: t('faq.product.q4'),
+      answer: t('faq.product.a4')
+    },
+    // Account FAQs
+    {
+      id: 17,
       category: 'account',
       question: t('faq.account.q1'),
       answer: t('faq.account.a1')
     },
     {
-      id: 10,
+      id: 18,
       category: 'account',
       question: t('faq.account.q2'),
       answer: t('faq.account.a2')
+    },
+    {
+      id: 19,
+      category: 'account',
+      question: t('faq.account.q3'),
+      answer: t('faq.account.a3')
+    },
+    {
+      id: 20,
+      category: 'account',
+      question: t('faq.account.q4'),
+      answer: t('faq.account.a4')
+    },
+    // Returns FAQs
+    {
+      id: 21,
+      category: 'returns',
+      question: t('faq.returns.q1'),
+      answer: t('faq.returns.a1')
+    },
+    {
+      id: 22,
+      category: 'returns',
+      question: t('faq.returns.q2'),
+      answer: t('faq.returns.a2')
+    },
+    {
+      id: 23,
+      category: 'returns',
+      question: t('faq.returns.q3'),
+      answer: t('faq.returns.a3')
+    },
+    {
+      id: 24,
+      category: 'returns',
+      question: t('faq.returns.q4'),
+      answer: t('faq.returns.a4')
+    },
+    // Security FAQs
+    {
+      id: 25,
+      category: 'security',
+      question: t('faq.security.q1'),
+      answer: t('faq.security.a1')
+    },
+    {
+      id: 26,
+      category: 'security',
+      question: t('faq.security.q2'),
+      answer: t('faq.security.a2')
+    },
+    {
+      id: 27,
+      category: 'security',
+      question: t('faq.security.q3'),
+      answer: t('faq.security.a3')
+    },
+    {
+      id: 28,
+      category: 'security',
+      question: t('faq.security.q4'),
+      answer: t('faq.security.a4')
     }
   ];
 
@@ -86,7 +201,9 @@ const FAQPage: React.FC = () => {
     { key: 'delivery', label: t('faq.categories.delivery') },
     { key: 'payment', label: t('faq.categories.payment') },
     { key: 'product', label: t('faq.categories.product') },
-    { key: 'account', label: t('faq.categories.account') }
+    { key: 'account', label: t('faq.categories.account') },
+    { key: 'returns', label: t('faq.categories.returns') },
+    { key: 'security', label: t('faq.categories.security') }
   ];
 
   const [selectedCategory, setSelectedCategory] = useState('all');

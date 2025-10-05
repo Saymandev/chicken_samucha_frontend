@@ -362,57 +362,138 @@
   },
   "returnPolicy": {
     "title": "Return Policy",
-    "subtitle": "We want you to be completely satisfied with your order. Here's our return policy.",
+    "subtitle": "We want you to be completely satisfied with your order. Here's our comprehensive return policy.",
+    "lastUpdated": "Last Updated",
     "overview": {
-      "timeLimit": "24 Hour Return",
-      "timeLimitDesc": "Return items within 24 hours",
+      "timeLimit": "7 Day Return Window",
+      "timeLimitDesc": "Return eligible items within 7 days of delivery",
       "guarantee": "Quality Guarantee",
-      "guaranteeDesc": "100% satisfaction guaranteed",
+      "guaranteeDesc": "100% satisfaction guaranteed on all products",
       "process": "Easy Process",
-      "processDesc": "Simple return procedure"
+      "processDesc": "Simple and hassle-free return procedure"
     },
     "detailed": {
-      "title": "Detailed Return Policy"
+      "title": "Detailed Return Policy",
+      "description": "At Rongdhunu, we stand behind the quality of our products and services. Our comprehensive return policy ensures your complete satisfaction."
+    },
+    "eligibility": {
+      "title": "Return Eligibility",
+      "description": "Items are eligible for return if they meet the following criteria:",
+      "condition": "Product is in original condition and packaging",
+      "timeframe": "Return request made within 7 days of delivery",
+      "documentation": "Valid proof of purchase provided",
+      "unused": "Product is unused and unopened (for consumables)",
+      "defective": "Product is defective or damaged upon arrival"
     },
     "conditions": {
       "title": "Return Conditions",
-      "fresh": "Food must be fresh and unopened",
-      "time": "Return request within 24 hours",
-      "packaging": "Original packaging required",
-      "receipt": "Order receipt or confirmation needed"
+      "fresh": "Products must be unused, unopened, and in original condition",
+      "time": "Return request must be made within 7 days of delivery",
+      "packaging": "Original packaging and labels must be intact",
+      "receipt": "Order receipt or confirmation email required",
+      "damage": "Items damaged by customer cannot be returned",
+      "hygiene": "Products must be in sellable condition"
     },
     "process": {
       "title": "Return Process",
-      "step1": "Contact our support team immediately",
+      "step1": "Contact our customer support team immediately",
       "step2": "Provide order details and reason for return",
-      "step3": "Keep the food in original packaging",
-      "step4": "Wait for pickup or return instructions"
+      "step3": "Keep the product in original packaging",
+      "step4": "Wait for pickup or return instructions",
+      "step5": "Receive confirmation of return approval",
+      "step6": "Get refund processed within 3-5 business days"
+    },
+    "methods": {
+      "title": "Return Methods",
+      "pickup": {
+        "title": "Free Pickup Service",
+        "description": "We offer free pickup service for returns within our delivery areas"
+      },
+      "store": {
+        "title": "Store Return",
+        "description": "You can return items directly to our physical store location"
+      },
+      "courier": {
+        "title": "Courier Return",
+        "description": "For areas outside our pickup zone, courier returns are available"
+      }
     },
     "nonReturnable": {
       "title": "Non-Returnable Items",
-      "description": "The following items cannot be returned:",
-      "consumed": "Already consumed food items",
-      "damaged": "Customer damaged packaging",
-      "special": "Special promotional items"
+      "description": "The following items cannot be returned for safety and business reasons:",
+      "consumed": "Already used or partially used personal care items",
+      "damaged": "Customer damaged packaging or products",
+      "special": "Special promotional or customized items",
+      "perishable": "Digital products or software licenses",
+      "hygiene": "Personal care items for hygiene reasons",
+      "opened": "Opened consumable products or cosmetics"
     },
     "refund": {
       "title": "Refund Policy",
-      "description": "Approved returns will be refunded via:",
-      "mobile": "Mobile banking (bKash, Nagad, Rocket)",
-      "bank": "Bank transfer for large amounts",
-      "timeline": "Refunds processed within 3-5 business days"
+      "description": "Approved returns will be refunded using the following methods:",
+      "mobile": "Mobile banking (bKash, Nagad, Rocket) - Same method used for payment",
+      "bank": "Bank transfer for large amounts or original payment method",
+      "cash": "Cash refund for cash on delivery orders",
+      "timeline": "Refunds processed within 3-5 business days after return approval",
+      "partial": "Partial refunds for items returned in non-original condition",
+      "shipping": "Original shipping charges are non-refundable unless product is defective"
+    },
+    "exchange": {
+      "title": "Exchange Policy",
+      "description": "We offer product exchanges for the following scenarios:",
+      "size": "Size exchange for clothing and footwear",
+      "defective": "Exchange for defective or damaged products",
+      "wrong": "Exchange for wrong items sent by us",
+      "process": "Exchange process follows the same steps as returns",
+      "timeline": "Exchanges processed within 2-3 business days"
+    },
+    "warranty": {
+      "title": "Product Warranty",
+      "description": "Our warranty coverage includes:",
+      "defects": "Manufacturing defects covered for 30 days",
+      "quality": "Quality issues reported within 7 days",
+      "damage": "Shipping damage covered if reported immediately",
+      "exclusions": "Normal wear and tear not covered by warranty"
     },
     "contact": {
       "title": "Need Help with Returns?",
+      "description": "Our customer support team is here to help with all return-related queries:",
       "phone": "Call Us",
+      "phoneNumber": "+880 1629428590",
       "phoneHours": "Available 24/7",
       "email": "Email Us",
-      "emailResponse": "Response within 2 hours"
+      "emailAddress": "rongdhunu503@gmail.com",
+      "emailResponse": "Response within 2 hours",
+      "address": "Visit our store: Shanarpar,siddirganj, Narayanganj, Bangladesh",
+      "hours": "Store hours: 9:00 AM - 10:00 PM (Daily)"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": {
+        "question": "How long do I have to return an item?",
+        "answer": "You have 7 days from the delivery date to initiate a return request."
+      },
+      "q2": {
+        "question": "What if I received a damaged item?",
+        "answer": "Contact us immediately. We will arrange a replacement or full refund for damaged items."
+      },
+      "q3": {
+        "question": "Are there any return charges?",
+        "answer": "Return pickup is free within our delivery areas. For other areas, minimal charges may apply."
+      },
+      "q4": {
+        "question": "Can I return consumable products?",
+        "answer": "Yes, but only if they are unopened, within expiry date, and within 7 days of delivery."
+      },
+      "q5": {
+        "question": "How will I receive my refund?",
+        "answer": "Refunds are processed using the same method as your original payment."
+      }
     }
   },
   "faq": {
     "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to common questions about our products and services.",
+    "subtitle": "Find answers to common questions about our e-commerce platform and services.",
     "searchPlaceholder": "Search questions...",
     "categories": {
       "all": "All",
@@ -420,44 +501,89 @@
       "delivery": "Delivery",
       "payment": "Payment",
       "product": "Products",
-      "account": "Account"
+      "account": "Account",
+      "returns": "Returns",
+      "security": "Security"
     },
     "ordering": {
       "q1": "How do I place an order?",
-      "a1": "You can place an order through our website, mobile app, or by calling our hotline. Browse our menu, select items, and proceed to checkout.",
+      "a1": "You can place an order through our website or mobile app. Browse our products, add items to cart, and proceed to checkout with your delivery details.",
       "q2": "What is the minimum order amount?",
-      "a2": "The minimum order amount is 200 BDT for delivery. There's no minimum for pickup orders."
+      "a2": "The minimum order amount for free delivery is set by our admin and may vary. Check our delivery policy for current amounts. There's no minimum for pickup orders.",
+      "q3": "Can I modify my order after placing it?",
+      "a3": "You can modify or cancel your order within 30 minutes of placing it. After that, please contact our customer service.",
+      "q4": "How do I track my order?",
+      "a4": "Once your order is confirmed, you'll receive tracking details via SMS and email. You can also track it in your account dashboard."
     },
     "delivery": {
       "q1": "What are your delivery areas?",
-      "a1": "We deliver across Rangpur city including All areas",
+      "a1": "We deliver across Narayanganj and surrounding areas including Shanarpar, Siddirganj, and nearby locations. Check our delivery zones during checkout.",
       "q2": "How long does delivery take?",
-      "a2": "Standard delivery takes 30-45 minutes. During peak hours, it may take up to 60 minutes."
+      "a2": "Standard delivery takes 2-4 business days within our delivery areas. Express delivery (1-2 days) is available for an additional fee.",
+      "q3": "Do you offer same-day delivery?",
+      "a3": "Same-day delivery is available for orders placed before 2 PM within our express delivery zones for an additional charge.",
+      "q4": "Can I schedule my delivery?",
+      "a4": "Yes, you can choose your preferred delivery date and time slot during checkout for orders over 1000 BDT."
     },
     "payment": {
       "q1": "What payment methods do you accept?",
-      "a1": "We accept cash on delivery, bKash, Nagad, Rocket, Upay, and major credit/debit cards.",
+      "a1": "We accept cash on delivery, mobile banking (bKash, Nagad, Rocket), bank transfers, and major credit/debit cards.",
       "q2": "Is online payment secure?",
-      "a2": "Yes, all online payments are processed through secure, encrypted gateways to protect your information."
+      "a2": "Yes, all online payments are processed through secure, encrypted gateways. We use SSL encryption to protect your payment information.",
+      "q3": "Can I pay in installments?",
+      "a3": "Yes, we offer installment payment options for orders above 5000 BDT through our partner financial institutions.",
+      "q4": "What if my payment fails?",
+      "a4": "If payment fails, please try again or contact our customer service. Your order will be reserved for 24 hours."
     },
     "product": {
-      "q1": "Are your samosas halal?",
-      "a1": "Yes, we ensure all our products meet halal standards. We work with certified suppliers and maintain strict quality control.",
-      "q2": "Do you have vegetarian options?",
-      "a2": "We offer a wide range of products including electronics, fashion, home goods, and more. Check our categories for the full selection."
+      "q1": "Are your products authentic?",
+      "a1": "Yes, we guarantee 100% authentic products from authorized suppliers. All products come with manufacturer warranties.",
+      "q2": "What product categories do you offer?",
+      "a2": "We offer a wide range of products including electronics, fashion, home goods, beauty, health, books, and more. Browse our categories for the full selection.",
+      "q3": "Do you offer product warranties?",
+      "a3": "Yes, most products come with manufacturer warranties. Warranty details are provided with each product listing.",
+      "q4": "Can I see product reviews?",
+      "a4": "Yes, you can read customer reviews and ratings for products on our website to make informed decisions."
     },
     "account": {
       "q1": "How do I create an account?",
-      "a1": "Click the 'Register' button, fill in your details, and verify your email address to complete registration.",
+      "a1": "Click the 'Register' button, fill in your details, and verify your email address to complete registration. It's free and takes less than 2 minutes.",
       "q2": "Can I track my order history?",
-      "a2": "Yes, once you create an account, you can view all your past orders in the 'My Orders' section."
+      "a2": "Yes, once you create an account, you can view all your past orders, track current orders, and manage your wishlist in the 'My Account' section.",
+      "q3": "How do I update my profile?",
+      "a3": "Log into your account, go to 'Profile Settings', and update your personal information, delivery addresses, and preferences.",
+      "q4": "What if I forget my password?",
+      "a4": "Click 'Forgot Password' on the login page, enter your email, and follow the instructions to reset your password."
+    },
+    "returns": {
+      "q1": "How long do I have to return an item?",
+      "a1": "You have 7 days from the delivery date to initiate a return request for eligible items.",
+      "q2": "What if I receive a damaged item?",
+      "a2": "Contact us immediately within 24 hours. We will arrange a replacement or full refund for damaged items.",
+      "q3": "Are there any return charges?",
+      "a3": "Return pickup is free within our delivery areas. For areas outside our zone, minimal charges may apply.",
+      "q4": "How will I receive my refund?",
+      "a4": "Refunds are processed using the same method as your original payment within 3-5 business days."
+    },
+    "security": {
+      "q1": "Is my personal information safe?",
+      "a1": "Yes, we use industry-standard encryption and security measures to protect your personal and payment information.",
+      "q2": "Do you share my data with third parties?",
+      "a2": "No, we do not sell or share your personal information with third parties without your consent, except for order fulfillment purposes.",
+      "q3": "How do you protect my payment data?",
+      "a3": "We use secure payment gateways and do not store your payment information on our servers. All transactions are encrypted.",
+      "q4": "Can I trust online shopping with you?",
+      "a4": "Absolutely. We are a verified e-commerce platform with secure payment processing, buyer protection, and excellent customer service."
     },
     "noResults": "No questions found",
     "tryDifferentSearch": "Try a different search term",
     "stillNeedHelp": "Still Need Help?",
     "contactSupport": "Our support team is ready to assist you",
     "callUs": "Call Us",
-    "emailUs": "Email Us"
+    "emailUs": "Email Us",
+    "helpful": "Was this helpful?",
+    "yes": "Yes",
+    "no": "No"
   },
   "contact": {
     "title": "Contact Us",
@@ -493,11 +619,6 @@
       },
       "address": {
         "title": "Our Location"
-      },
-      "hours": {
-        "title": "Business Hours",
-        "weekdays": "Mon-Fri",
-        "weekends": "Sat-Sun"
       }
     },
     "quickLinks": {
@@ -581,61 +702,109 @@
     "lastUpdated": "Last Updated",
     "agreement": {
       "title": "Agreement to Terms",
-      "description": "By using our services, you agree to be bound by these terms and conditions."
+      "description": "By accessing and using Rongdhunu's e-commerce platform, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site."
     },
     "service": {
       "title": "Our Services",
-      "description1": "Online food ordering and delivery platform",
-      "description2": "Customer support and order tracking",
-      "description3": "Quality food preparation and delivery"
+      "description1": "Online e-commerce platform for quality products and services",
+      "description2": "Secure payment processing and order management",
+      "description3": "Customer support, order tracking, and delivery services",
+      "description4": "Product reviews, ratings, and feedback system"
+    },
+    "account": {
+      "title": "User Account",
+      "registration": "You must provide accurate information during registration",
+      "responsibility": "You are responsible for maintaining account security",
+      "age": "You must be at least 18 years old to use our services",
+      "termination": "We reserve the right to suspend or terminate accounts that violate these terms"
+    },
+    "orders": {
+      "title": "Order Terms",
+      "placement": "Orders are subject to product availability and acceptance",
+      "pricing": "Prices are subject to change without notice",
+      "cancellation": "Orders can be cancelled within 30 minutes of placement",
+      "delivery": "Delivery times are estimates and may vary due to circumstances beyond our control"
     },
     "responsibilities": {
       "title": "User Responsibilities",
       "allowed": {
         "title": "You May",
-        "orders": "Place legitimate food orders",
-        "account": "Maintain accurate account information",
-        "feedback": "Provide honest feedback and reviews"
+        "orders": "Place legitimate orders for personal or business use",
+        "account": "Maintain accurate and up-to-date account information",
+        "feedback": "Provide honest feedback, reviews, and ratings",
+        "support": "Contact customer support for assistance"
       },
       "prohibited": {
         "title": "You May Not",
-        "fraud": "Engage in fraudulent activities",
-        "abuse": "Abuse our customer service",
-        "interference": "Interfere with our systems"
+        "fraud": "Engage in fraudulent activities or provide false information",
+        "abuse": "Abuse our customer service or staff",
+        "interference": "Interfere with our systems, security, or other users",
+        "illegal": "Use our platform for any illegal or unauthorized purpose",
+        "spam": "Send spam, malware, or harmful content",
+        "reverse": "Reverse engineer or attempt to extract source code"
       }
     },
     "payment": {
       "title": "Payment Terms",
       "methods": {
-        "title": "Accepted Methods",
-        "description": "We accept various payment methods as listed on our platform"
+        "title": "Accepted Payment Methods",
+        "description": "We accept cash on delivery, mobile banking, bank transfers, and other payment methods as listed on our platform. All transactions are processed securely."
       },
       "processing": {
         "title": "Payment Processing",
-        "description": "Payments are processed securely through third-party providers"
+        "description": "Payments are processed securely through third-party providers. We do not store your payment information on our servers."
       },
       "refunds": {
-        "title": "Refunds",
-        "description": "Refunds are subject to our return policy"
+        "title": "Refunds and Returns",
+        "description": "Refunds are processed according to our refund policy. Contact customer support for assistance with returns and refunds."
+      },
+      "pricing": {
+        "title": "Pricing and Taxes",
+        "description": "All prices are in Bangladeshi Taka (BDT) and include applicable taxes unless otherwise stated."
       }
+    },
+    "privacy": {
+      "title": "Privacy and Data Protection",
+      "description": "Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your information.",
+      "data": "We collect necessary information to process orders and provide customer service",
+      "security": "We implement security measures to protect your personal information",
+      "sharing": "We do not sell or share your personal information with third parties without consent"
     },
     "liability": {
       "title": "Limitation of Liability",
-      "description": "Our liability is limited to the maximum extent permitted by law."
+      "description": "Rongdhunu shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of our services. Our total liability shall not exceed the amount you paid for the specific service or product in question."
+    },
+    "warranty": {
+      "title": "Warranty and Disclaimers",
+      "description": "Our services are provided 'as is' without warranties of any kind. We do not warrant that our services will be uninterrupted, error-free, or completely secure. Product warranties are provided by the respective manufacturers."
+    },
+    "intellectual": {
+      "title": "Intellectual Property",
+      "description": "All content, trademarks, logos, and intellectual property on our platform are owned by Rongdhunu or our licensors. You may not use, reproduce, or distribute our content without written permission."
     },
     "modifications": {
       "title": "Terms Modifications",
-      "description": "We reserve the right to modify these terms at any time with notice."
+      "description": "We reserve the right to modify these terms at any time. Changes will be posted on this page with an updated 'Last Modified' date. Your continued use of our services after changes constitutes acceptance of the new terms."
+    },
+    "termination": {
+      "title": "Service Termination",
+      "description": "We may terminate or suspend your account and access to our services immediately, without prior notice, for any reason, including if you breach these terms. You may also terminate your account at any time by contacting us."
+    },
+    "disputes": {
+      "title": "Dispute Resolution",
+      "description": "Any disputes arising from these terms or your use of our services will be resolved through negotiation first. If unresolved, disputes will be subject to the jurisdiction of courts in Bangladesh."
     },
     "law": {
       "title": "Governing Law",
-      "description": "These terms are governed by the laws of Bangladesh."
+      "description": "These terms are governed by and construed in accordance with the laws of the People's Republic of Bangladesh. Any legal action or proceeding shall be brought exclusively in the courts of Bangladesh."
     },
     "contact": {
       "title": "Questions About Terms?",
-      "description": "Contact our legal team if you have questions about these terms",
+      "description": "If you have any questions about these Terms of Service, please contact us:",
       "email": "Email Legal Team",
-      "form": "Contact Form"
+      "form": "Contact Form",
+      "address": "Shanarpar,siddirganj, Narayanganj, Bangladesh",
+      "phone": "+880 1629428590"
     }
   },
   "cookies": {

@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-    CheckCircle,
-    Clock,
-    Eye,
-    Package,
-    Search,
-    Truck,
-    X,
-    XCircle
+  CheckCircle,
+  Clock,
+  Eye,
+  Package,
+  Search,
+  Truck,
+  X,
+  XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -1019,7 +1019,7 @@ const AdminOrders: React.FC = () => {
                             <span className="text-sm text-gray-600 dark:text-gray-300">Delivery Address:</span>
                             <p className="font-medium text-gray-900 dark:text-white">
                               {selectedOrder.deliveryInfo.address || 
-                                `${selectedOrder.customer.address?.street || ''} ${selectedOrder.customer.address?.area || ''}, ${selectedOrder.customer.address?.city || 'Rangpur'}, ${selectedOrder.customer.address?.district || 'Rangpur'}`
+                                `${selectedOrder.customer.address?.street || ''} ${selectedOrder.customer.address?.area || ''}, ${selectedOrder.customer.address?.city || 'Narayanganj'}, ${selectedOrder.customer.address?.district || 'Narayanganj'}`
                               }
                             </p>
                             {selectedOrder.customer.address?.landmark && (

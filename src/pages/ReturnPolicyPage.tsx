@@ -32,6 +32,9 @@ const ReturnPolicyPage: React.FC = () => {
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               {t('returnPolicy.subtitle')}
             </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+              {t('returnPolicy.lastUpdated')}: January 1, 2024
+            </p>
           </div>
 
           {/* Policy Overview */}
@@ -88,6 +91,39 @@ const ReturnPolicyPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
               {t('returnPolicy.detailed.title')}
             </h2>
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
+              {t('returnPolicy.detailed.description')}
+            </p>
+
+            {/* Return Eligibility */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                {t('returnPolicy.eligibility.title')}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {t('returnPolicy.eligibility.description')}
+              </p>
+              <div className="space-y-3">
+                {[
+                  'returnPolicy.eligibility.condition',
+                  'returnPolicy.eligibility.timeframe',
+                  'returnPolicy.eligibility.documentation',
+                  'returnPolicy.eligibility.unused',
+                  'returnPolicy.eligibility.defective'
+                ].map((key, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.45 + index * 0.05, duration: 0.3 }}
+                    className="flex items-start"
+                  >
+                    <CheckCircle className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-600 dark:text-gray-300">{t(key)}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
             {/* Return Conditions */}
             <div className="mb-8">
@@ -99,7 +135,9 @@ const ReturnPolicyPage: React.FC = () => {
                   'returnPolicy.conditions.fresh',
                   'returnPolicy.conditions.time',
                   'returnPolicy.conditions.packaging',
-                  'returnPolicy.conditions.receipt'
+                  'returnPolicy.conditions.receipt',
+                  'returnPolicy.conditions.damage',
+                  'returnPolicy.conditions.hygiene'
                 ].map((key, index) => (
                   <motion.div
                     key={index}
@@ -125,7 +163,9 @@ const ReturnPolicyPage: React.FC = () => {
                   { step: 1, key: 'returnPolicy.process.step1' },
                   { step: 2, key: 'returnPolicy.process.step2' },
                   { step: 3, key: 'returnPolicy.process.step3' },
-                  { step: 4, key: 'returnPolicy.process.step4' }
+                  { step: 4, key: 'returnPolicy.process.step4' },
+                  { step: 5, key: 'returnPolicy.process.step5' },
+                  { step: 6, key: 'returnPolicy.process.step6' }
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -156,7 +196,10 @@ const ReturnPolicyPage: React.FC = () => {
                   {[
                     'returnPolicy.nonReturnable.consumed',
                     'returnPolicy.nonReturnable.damaged',
-                    'returnPolicy.nonReturnable.special'
+                    'returnPolicy.nonReturnable.special',
+                    'returnPolicy.nonReturnable.perishable',
+                    'returnPolicy.nonReturnable.hygiene',
+                    'returnPolicy.nonReturnable.opened'
                   ].map((key, index) => (
                     <li key={index} className="flex items-start">
                       <span className="w-2 h-2 bg-red-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>
@@ -180,7 +223,10 @@ const ReturnPolicyPage: React.FC = () => {
                   {[
                     'returnPolicy.refund.mobile',
                     'returnPolicy.refund.bank',
-                    'returnPolicy.refund.timeline'
+                    'returnPolicy.refund.cash',
+                    'returnPolicy.refund.timeline',
+                    'returnPolicy.refund.partial',
+                    'returnPolicy.refund.shipping'
                   ].map((key, index) => (
                     <li key={index} className="flex items-start">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
@@ -189,6 +235,126 @@ const ReturnPolicyPage: React.FC = () => {
                   ))}
                 </ul>
               </div>
+            </div>
+
+            {/* Return Methods */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                {t('returnPolicy.methods.title')}
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 dark:text-white mb-2">
+                    {t('returnPolicy.methods.pickup.title')}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    {t('returnPolicy.methods.pickup.description')}
+                  </p>
+                </div>
+                <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 dark:text-white mb-2">
+                    {t('returnPolicy.methods.store.title')}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    {t('returnPolicy.methods.store.description')}
+                  </p>
+                </div>
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 dark:text-white mb-2">
+                    {t('returnPolicy.methods.courier.title')}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    {t('returnPolicy.methods.courier.description')}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Exchange Policy */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                {t('returnPolicy.exchange.title')}
+              </h3>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <p className="text-gray-600 dark:text-gray-300 mb-3">
+                  {t('returnPolicy.exchange.description')}
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    'returnPolicy.exchange.size',
+                    'returnPolicy.exchange.defective',
+                    'returnPolicy.exchange.wrong',
+                    'returnPolicy.exchange.process',
+                    'returnPolicy.exchange.timeline'
+                  ].map((key, index) => (
+                    <li key={index} className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-300">{t(key)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Product Warranty */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                {t('returnPolicy.warranty.title')}
+              </h3>
+              <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-4">
+                <p className="text-gray-600 dark:text-gray-300 mb-3">
+                  {t('returnPolicy.warranty.description')}
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    'returnPolicy.warranty.defects',
+                    'returnPolicy.warranty.quality',
+                    'returnPolicy.warranty.damage',
+                    'returnPolicy.warranty.exclusions'
+                  ].map((key, index) => (
+                    <li key={index} className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-teal-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-300">{t(key)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* FAQ Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65, duration: 0.6 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8"
+          >
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+              {t('returnPolicy.faq.title')}
+            </h2>
+            <div className="space-y-6">
+              {[
+                'returnPolicy.faq.q1',
+                'returnPolicy.faq.q2',
+                'returnPolicy.faq.q3',
+                'returnPolicy.faq.q4',
+                'returnPolicy.faq.q5'
+              ].map((qKey, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 + index * 0.1, duration: 0.3 }}
+                  className="border-l-4 border-orange-500 pl-4"
+                >
+                  <h3 className="font-semibold text-gray-800 dark:text-white mb-2">
+                    {t(`${qKey}.question`)}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {t(`${qKey}.answer`)}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
@@ -202,7 +368,10 @@ const ReturnPolicyPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">
               {t('returnPolicy.contact.title')}
             </h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <p className="text-gray-600 dark:text-gray-300 text-center mb-8">
+              {t('returnPolicy.contact.description')}
+            </p>
+            <div className="grid md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="w-8 h-8 text-blue-600" />
@@ -210,7 +379,7 @@ const ReturnPolicyPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
                   {t('returnPolicy.contact.phone')}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">+880 123 456 7890</p>
+                <p className="text-gray-600 dark:text-gray-300">{t('returnPolicy.contact.phoneNumber')}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {t('returnPolicy.contact.phoneHours')}
                 </p>
@@ -222,9 +391,21 @@ const ReturnPolicyPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
                   {t('returnPolicy.contact.email')}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">rongdhunu503@gmail.com or +880 1629428590</p>
+                <p className="text-gray-600 dark:text-gray-300">{t('returnPolicy.contact.emailAddress')}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {t('returnPolicy.contact.emailResponse')}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                  Visit Our Store
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{t('returnPolicy.contact.address')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {t('returnPolicy.contact.hours')}
                 </p>
               </div>
             </div>

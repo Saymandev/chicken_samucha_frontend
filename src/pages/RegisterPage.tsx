@@ -21,8 +21,8 @@ const RegisterPage: React.FC = () => {
     address: {
       street: '',
       area: '',
-      city: 'Rangpur',
-      district: 'Rangpur'
+      city: 'Narayanganj',
+      district: 'Narayanganj'
     },
     agreeToTerms: false
   });
@@ -319,6 +319,7 @@ const RegisterPage: React.FC = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors"
                     >
                       <option value="Rangpur">Rangpur</option>
+                      <option value="Narayanganj">Narayanganj</option>
                       <option value="Dinajpur">Dinajpur</option>
                       <option value="Panchagarh">Panchagarh</option>
                       <option value="Thakurgaon">Thakurgaon</option>

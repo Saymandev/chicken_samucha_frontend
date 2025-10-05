@@ -240,7 +240,7 @@ const ContactUsPage: React.FC = () => {
                         {t('contact.info.address.title')}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300">
-                        Rangpur, C.O Bazar<br />
+                        Shanarpar,siddirganj, Narayanganj<br />
                         Bangladesh
                       </p>
                     </div>
