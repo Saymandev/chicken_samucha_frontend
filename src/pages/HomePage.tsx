@@ -138,7 +138,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative">
         {loadingSlider ? (
@@ -162,7 +162,7 @@ const HomePage: React.FC = () => {
         {/* Top Categories Section */}
       {
         TopCategories.length > 0 && (<section className="py-16 bg-gray-50 dark:bg-gray-800">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 max-w-full overflow-hidden">
             <motion.div
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -193,7 +193,7 @@ const HomePage: React.FC = () => {
 
       {/* Featured Products Section */}
       <section className="py-16 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-full overflow-hidden">
           <motion.div
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -214,7 +214,7 @@ const HomePage: React.FC = () => {
             <GridSkeleton 
               items={6} 
               ItemComponent={ProductCardSkeleton}
-              columns="grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+              columns="grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 max-w-full overflow-hidden"
             />
           ) : (
             <motion.div
@@ -222,7 +222,7 @@ const HomePage: React.FC = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
+              className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 max-w-full overflow-hidden"
             >
               {(featuredProducts || []).map((product, index) => (
                 <motion.div
@@ -257,7 +257,7 @@ const HomePage: React.FC = () => {
       {/* Best Sellers Section */}
       {bestSellers.length > 0 && (
         <section className="py-16 bg-gray-50 dark:bg-gray-800">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 max-w-full overflow-hidden">
             <motion.div
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -276,7 +276,7 @@ const HomePage: React.FC = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2"
+              className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 max-w-full overflow-hidden"
             >
               {bestSellers.map((product, index) => (
                 <motion.div key={(product as any).id || index} initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.05 }}>
@@ -291,7 +291,7 @@ const HomePage: React.FC = () => {
        <DynamicCategorySections limit={8} maxCategories={6} />
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-full overflow-hidden">
           <motion.div
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -305,7 +305,7 @@ const HomePage: React.FC = () => {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 max-w-full overflow-hidden">
             {[
               {
                 icon: '✨',
@@ -427,7 +427,7 @@ const HomePage: React.FC = () => {
             }`}>
               {t('homepage.ctaDescription')} ${deliverySettings?.freeDeliveryThreshold ? `৳${deliverySettings.freeDeliveryThreshold}` : '৳1000'}!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center ">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-full overflow-hidden">
               <Link
                 to="/products"
                 className="bg-white text-primary-600 hover:bg-gray-100 font-medium py-3 px-8 rounded-lg transition-colors text-lg hover:scale-105 transform duration-200"
