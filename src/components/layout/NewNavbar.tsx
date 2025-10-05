@@ -1,18 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ChevronDown,
-  Globe,
-  Heart,
-  LogOut,
-  Menu,
-  Moon,
-  Package,
-  Search,
-  Settings,
-  ShoppingCart,
-  Sun,
-  User,
-  X
+    ChevronDown,
+    Globe,
+    Heart,
+    LogOut,
+    Menu,
+    Moon,
+    Package,
+    Search,
+    Settings,
+    ShoppingCart,
+    Sun,
+    User,
+    X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -480,7 +480,7 @@ const NewNavbar: React.FC = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="fixed sm:absolute top-full left-2 sm:left-0 mt-2 w-64 sm:w-72 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-y-auto"
+                        className="absolute top-full left-0 mt-2 w-64 sm:w-72 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-y-auto"
                         style={{ zIndex: 9999 }}
                       >
                         {/* Categories */}

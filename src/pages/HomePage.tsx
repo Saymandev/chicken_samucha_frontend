@@ -160,8 +160,7 @@ const HomePage: React.FC = () => {
        
         
         {/* Top Categories Section */}
-      {
-        TopCategories.length > 0 && (<section className="py-16 bg-gray-50 dark:bg-gray-800">
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ y: 30, opacity: 0 }}
@@ -188,8 +187,8 @@ const HomePage: React.FC = () => {
               <TopCategories limit={4} />
             </motion.div>
           </div>
-        </section>)
-      }
+        </section>
+      
 
       {/* Featured Products Section */}
       <section className="py-16 bg-white dark:bg-gray-900">
