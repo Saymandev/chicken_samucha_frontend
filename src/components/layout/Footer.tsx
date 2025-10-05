@@ -159,7 +159,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Copyright */}
-            <div className="text-center md:text-right">
+            <div className="text-center md:text-right space-y-2">
               <p className={`text-gray-400 text-sm flex items-center justify-center md:justify-end ${
                 language === 'bn' ? 'font-bengali' : ''
               }`}>
@@ -167,13 +167,20 @@ const Footer: React.FC = () => {
                   ? `© ${currentYear} রঙ্গধুনু। সব অধিকার সংরক্ষিত।`
                   : `© ${currentYear} Rongdhunu. All rights reserved.`
                 }
-                
               </p>
-              <p className="text-gray-500 text-xs mt-2">
-                {language === 'bn' 
-                  ? 'রেসপন্সিভ ডিজাইন এবং ডার্ক মোড সহ'
-                  : 'With responsive design and dark mode'
-                }
+              <p className="text-gray-500 dark:text-gray-400 text-xs flex items-center justify-center md:justify-end gap-1">
+                {language === 'bn' ? 'তৈরি করেছে' : 'Created by'}{' '}
+                <a 
+                  href="https://infotigo.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary-400 hover:text-primary-300 dark:text-primary-500 dark:hover:text-primary-400 transition-colors font-medium inline-flex items-center gap-1"
+                >
+                  Infotigo
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
               </p>
             </div>
           </div>
