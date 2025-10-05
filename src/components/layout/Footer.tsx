@@ -79,7 +79,7 @@ const Footer: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-sm">
                 <Phone className="w-4 h-4 text-primary-400" />
-                <span>+880 1676726778</span>
+                <span>+880 1629428590</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <Mail className="w-4 h-4 text-primary-400" />
@@ -98,8 +98,8 @@ const Footer: React.FC = () => {
                 <Clock className="w-4 h-4 text-primary-400" />
                 <span className={language === 'bn' ? 'font-bengali' : ''}>
                   {language === 'bn' 
-                    ? '২৪/৭'
-                    : '24/7'
+                    ? 'Always Open'
+                    : 'Always Open'
                   }
                 </span>
               </div>
