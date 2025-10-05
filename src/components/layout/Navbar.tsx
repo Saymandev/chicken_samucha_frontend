@@ -132,7 +132,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             {/* Small logo beside brand on <md */}
-            <img src="/logo.png" alt="Rongdhunu" className="h-8 w-auto block" />
+            <img src="/logo.png?v=4" alt="Rongdhunu" className="h-8 w-auto block" />
             {/* Website name */}
             <span className={`font-bold text-xl text-primary-600 ${language === 'bn' ? 'font-bengali' : ''}`}>
               {language === 'bn' ? 'রঙ্গধুনু' : 'Rongdhunu'}

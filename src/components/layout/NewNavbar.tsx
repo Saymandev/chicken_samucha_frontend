@@ -382,7 +382,7 @@ const NewNavbar: React.FC = () => {
             {/* Small screens: logo + search in one row */}
             <div className="w-full flex items-center gap-3 lg:hidden">
               <Link to="/" className="flex items-center gap-2">
-                <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+                <img src="/logo.png?v=4" alt="Logo" className="h-8 w-auto" />
               </Link>
               <form onSubmit={handleSearch} className="relative flex-1 min-w-0">
                 <input
