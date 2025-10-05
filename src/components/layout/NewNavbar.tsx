@@ -382,7 +382,7 @@ const NewNavbar: React.FC = () => {
             {/* Small screens: logo + search in one row */}
             <div className="w-full flex items-center gap-3 lg:hidden">
               <Link to="/" className="flex items-center gap-2">
-                <img src="/logo.png?v=5" alt="Logo" className="h-8 w-auto" />
+                <img src="/logo.png?v=6" alt="Logo" className="h-8 w-auto" />
               </Link>
               <form onSubmit={handleSearch} className="relative flex-1 min-w-0">
                 <input
@@ -697,25 +697,7 @@ const NewNavbar: React.FC = () => {
               className="lg:hidden border-t border-gray-200 dark:border-gray-700 relative z-40"
             >
               <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-4">
-                {/* Mobile Header with Logo and Cart/Wishlist */}
-                <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
-                  {/* Mobile Logo */}
-                  <Link
-                    to="/" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-start p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <div className="flex flex-col items-start">
-                      <PickplaceLogo size="md" variant={
-                        theme === 'light' ? 'black' : 'default'
-                      } />
-                      
-                    </div>
-                  </Link>
-
-                  {/* Mobile primary actions intentionally hidden per requirements */}
-                  <div className="hidden" />
-                  </div>
+                
 
                 {/* Dynamic navigation menu items */}
                 <div className="space-y-2">
