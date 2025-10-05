@@ -89,8 +89,8 @@ const Footer: React.FC = () => {
                 <MapPin className="w-4 h-4 text-primary-400" />
                 <span className={language === 'bn' ? 'font-bengali' : ''}>
                   {language === 'bn' 
-                    ? 'ঢাকা, বাংলাদেশ'
-                    : 'Dhaka, Bangladesh'
+                    ? 'Shanarpar,siddirganj, Narayanganj'
+                    : 'Shanarpar,siddirganj, Narayanganj'
                   }
                 </span>
               </div>
@@ -98,8 +98,8 @@ const Footer: React.FC = () => {
                 <Clock className="w-4 h-4 text-primary-400" />
                 <span className={language === 'bn' ? 'font-bengali' : ''}>
                   {language === 'bn' 
-                    ? 'সকাল ৯টা - রাত ১১টা'
-                    : '9:00 AM - 11:00 PM'
+                    ? '২৪/৭'
+                    : '24/7'
                   }
                 </span>
               </div>
@@ -164,7 +164,7 @@ const Footer: React.FC = () => {
                 language === 'bn' ? 'font-bengali' : ''
               }`}>
                 {language === 'bn' 
-                  ? `© ${currentYear} রঙ্গধুনু। সব অধিকার সংরক্ষিত।`
+                  ? `© ${currentYear} রংধনু। সব অধিকার সংরক্ষিত।`
                   : `© ${currentYear} Rongdhunu. All rights reserved.`
                 }
               </p>

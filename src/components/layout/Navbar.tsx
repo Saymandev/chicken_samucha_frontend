@@ -1,16 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Globe,
-  Home,
-  LogOut,
-  Menu,
-  Moon,
-  Package,
-  Settings,
-  ShoppingCart,
-  Sun,
-  User,
-  X
+    Globe,
+    Home,
+    LogOut,
+    Menu,
+    Moon,
+    Package,
+    Settings,
+    ShoppingCart,
+    Sun,
+    User,
+    X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -135,7 +135,7 @@ const Navbar: React.FC = () => {
             <img src="/logo.png?v=4" alt="Rongdhunu" className="h-8 w-auto block" />
             {/* Website name */}
             <span className={`font-bold text-xl text-primary-600 ${language === 'bn' ? 'font-bengali' : ''}`}>
-              {language === 'bn' ? 'রঙ্গধুনু' : 'Rongdhunu'}
+              {language === 'bn' ? 'রংধনু' : 'Rongdhunu'}
             </span>
           </Link>
 

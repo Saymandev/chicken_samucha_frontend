@@ -10,9 +10,9 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
-    GridSkeleton,
-    ListSkeleton,
-    ProductCardSkeleton
+  GridSkeleton,
+  ListSkeleton,
+  ProductCardSkeleton
 } from '../components/common/Skeleton';
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
@@ -292,8 +292,8 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
             {currentCategory && currentCategory.description 
               ? (currentCategory.description[language] || currentCategory.description.en)
               : language === 'bn' 
-                ? 'আমাদের সুস্বাদু সমুচার কালেকশন আবিষ্কার করুন'
-                : 'Discover our delicious samosa collection'
+                ? 'আমাদের পণ্যগুলি দেখুন'
+                : 'Discover our products'
             }
           </p>
         </div>
