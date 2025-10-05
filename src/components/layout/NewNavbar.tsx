@@ -81,6 +81,21 @@ const NewNavbar: React.FC = () => {
     fetchFlashSales();
   }, []);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.category-dropdown')) {
+        setIsProductsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Debug menu items
   
 
@@ -441,11 +456,15 @@ const NewNavbar: React.FC = () => {
       {/* Main Navigation */}
       <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-2 sm:px-4">
-          <div className="flex items-center min-h-12 sm:min-h-16 py-2 justify-between overflow-hidden">
+          <div className="flex items-center min-h-12 sm:min-h-16 py-2 justify-between">
             {/* Category Sidebar */}
-            <div className="relative">
+            <div className="relative category-dropdown">
               <button
-                onClick={() => setIsProductsMenuOpen(!isProductsMenuOpen)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsProductsMenuOpen(!isProductsMenuOpen);
+                }}
                 className="flex items-center space-x-1 sm:space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-1 sm:px-4 py-2 sm:py-3 rounded-lg transition-colors text-xs sm:text-sm min-h-[44px] touch-manipulation"
               >
                 <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -461,11 +480,11 @@ const NewNavbar: React.FC = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-0 mt-2 w-64 sm:w-72 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-y-auto"
+                        className="fixed sm:absolute top-full left-2 sm:left-0 mt-2 w-64 sm:w-72 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 max-h-96 overflow-y-auto"
+                        style={{ zIndex: 9999 }}
                       >
                         {/* Categories */}
                         <div className="px-3 sm:px-4 py-2">
-                          
                           {loadingCategories ? (
                             <div className="space-y-2">
                               {[1, 2, 3].map((i) => (
