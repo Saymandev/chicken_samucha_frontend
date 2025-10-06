@@ -1,18 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    ChevronDown,
-    Globe,
-    Heart,
-    LogOut,
-    Menu,
-    Moon,
-    Package,
-    Search,
-    Settings,
-    ShoppingCart,
-    Sun,
-    User,
-    X
+  ChevronDown,
+  Globe,
+  Heart,
+  LogOut,
+  Menu,
+  Moon,
+  Package,
+  Search,
+  Settings,
+  ShoppingCart,
+  Sun,
+  User,
+  X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

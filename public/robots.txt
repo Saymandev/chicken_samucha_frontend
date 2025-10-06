@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /orders
+
+# Sitemap
+Sitemap: https://rongdhunu.com/sitemap.xml
+
