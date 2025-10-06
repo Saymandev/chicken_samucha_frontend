@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, Clock, MapPin, Package, Phone, Search, Star, Truck, XCircle } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { ordersAPI, reviewsAPI } from '../utils/api';
 
 const TrackOrderPage: React.FC = () => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [orderNumber, setOrderNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [isTracking, setIsTracking] = useState(false);
@@ -17,6 +19,51 @@ const TrackOrderPage: React.FC = () => {
   const [rating, setRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  // Auto-fill from URL params (when coming from OrdersPage)
+  useEffect(() => {
+    const orderParam = searchParams.get('orderNumber');
+    const phoneParam = searchParams.get('phone');
+    
+    if (orderParam) {
+      setOrderNumber(orderParam);
+    }
+    if (phoneParam) {
+      setPhone(phoneParam);
+    }
+    
+    // Auto-track if both params are present
+    if (orderParam && phoneParam) {
+      // Small delay to show the form first
+      setTimeout(() => {
+        trackOrderAutomatically(orderParam, phoneParam);
+      }, 500);
+    }
+  }, [searchParams]);
+
+  const trackOrderAutomatically = async (order: string, phoneNum: string) => {
+    setIsTracking(true);
+    setError('');
+    
+    try {
+      const response = await ordersAPI.trackOrderWithPhone(order.trim(), phoneNum.trim());
+      
+      if (response.data.success && response.data.data) {
+        setOrderStatus(response.data.data);
+        toast.success('Order found successfully!');
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error: any) {
+      console.error('Error tracking order:', error);
+      const errorMessage = error.response?.data?.message || 'Order not found. Please check your order number and phone number.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setOrderStatus(null);
+    } finally {
+      setIsTracking(false);
+    }
+  };
 
   const handleTrackOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,22 +119,9 @@ const TrackOrderPage: React.FC = () => {
     setReviewComment('');
   };
 
-  const handleRequestReturn = (orderNumber: string) => {
-    // Navigate to return request page
-    toast('Redirecting to return request page...');
-    // window.location.href = `/returns/request?order=${orderNumber}`;
-  };
-
-  const handleCancelOrder = (orderNumber: string) => {
-    if (window.confirm('Are you sure you want to cancel this order?')) {
-      toast.success('Order cancellation requested. We will contact you shortly.');
-      // In real implementation, call API to request cancellation
-    }
-  };
-
   const handleContactSupport = () => {
     // Open support chat or call
-    window.open('tel:01700000000', '_self');
+    window.open('tel:01629428590', '_self');
   };
 
   const submitReview = async () => {
@@ -96,9 +130,24 @@ const TrackOrderPage: React.FC = () => {
       return;
     }
 
+    // Get the first product from the order
+    const firstItem = orderStatus?.items?.[0];
+    if (!firstItem) {
+      toast.error('Unable to find product information');
+      return;
+    }
+
+    // Get product ID (check both item.product and item.product._id formats)
+    const productId = firstItem.product?._id || firstItem.product || firstItem._id;
+    if (!productId) {
+      toast.error('Unable to find product ID');
+      return;
+    }
+
     setSubmittingReview(true);
     try {
       const formData = new FormData();
+      formData.append('product', productId); // ✅ ADD PRODUCT ID
       formData.append('rating', rating.toString());
       formData.append('comment.en', reviewComment);
       formData.append('reviewType', 'general');
@@ -451,34 +500,23 @@ const TrackOrderPage: React.FC = () => {
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                     Order Actions
                   </h3>
-                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                     <button 
-                       onClick={() => handleConfirmDelivery(orderStatus.orderNumber)}
-                       className="w-full flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600 transition-colors text-sm sm:text-base"
-                     >
-                       <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                       <span className="hidden sm:inline">Confirm Receipt</span>
-                       <span className="sm:hidden">Confirm</span>
-                     </button>
-                     
-                     <button 
-                       onClick={() => handleRateOrder(orderStatus.orderNumber)}
-                       className="w-full flex items-center justify-center gap-2 bg-yellow-500 text-white px-4 py-3 rounded-lg hover:bg-yellow-600 transition-colors text-sm sm:text-base"
-                     >
-                       <Package className="w-4 h-4 sm:w-5 sm:h-5" />
-                       <span className="hidden sm:inline">Rate & Review</span>
-                       <span className="sm:hidden">Review</span>
-                     </button>
-                     
-                     <button 
-                       onClick={() => handleRequestReturn(orderStatus.orderNumber)}
-                       className="w-full flex items-center justify-center gap-2 bg-red-500 text-white px-4 py-3 rounded-lg hover:bg-red-600 transition-colors text-sm sm:text-base"
-                     >
-                       <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
-                       <span className="hidden sm:inline">Request Return</span>
-                       <span className="sm:hidden">Return</span>
-                     </button>
-                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <button 
+                      onClick={() => handleConfirmDelivery(orderStatus.orderNumber)}
+                      className="w-full flex items-center justify-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Confirm Receipt</span>
+                    </button>
+                    
+                    <button 
+                      onClick={() => handleRateOrder(orderStatus.orderNumber)}
+                      className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <Star className="w-5 h-5" />
+                      <span>Rate & Review</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -486,19 +524,9 @@ const TrackOrderPage: React.FC = () => {
               {orderStatus.status !== 'delivered' && orderStatus.status !== 'cancelled' && (
                 <div className="mb-8">
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                    Order Actions
+                    Need Help?
                   </h3>
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    {(orderStatus.status === 'pending' || orderStatus.status === 'confirmed') && (
-                      <button 
-                        onClick={() => handleCancelOrder(orderStatus.orderNumber)}
-                        className="flex items-center gap-2 bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors"
-                      >
-                        <XCircle className="w-5 h-5" />
-                        Cancel Order
-                      </button>
-                    )}
-                    
+                  <div className="flex justify-center">
                     <button 
                       onClick={() => handleContactSupport()}
                       className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
@@ -519,11 +547,11 @@ const TrackOrderPage: React.FC = () => {
                   </p>
                   <div className="flex justify-center items-center gap-4">
                     <a 
-                      href="tel:01700000000" 
+                      href="tel:01629428590" 
                       className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
                     >
                       <Phone className="w-4 h-4" />
-                      Call: 01700000000
+                      Call: 01629428590
                     </a>
                   </div>
                 </div>

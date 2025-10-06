@@ -1,16 +1,16 @@
 import { motion } from 'framer-motion';
 import {
-    AlertCircle,
-    Calendar,
-    Clock,
-    MapPin,
-    Package,
-    Phone,
-    RefreshCw,
-    Star,
-    Truck,
-    X,
-    XCircle
+  AlertCircle,
+  Calendar,
+  Clock,
+  MapPin,
+  Package,
+  Phone,
+  RefreshCw,
+  Star,
+  Truck,
+  X,
+  XCircle
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -274,9 +274,18 @@ const OrdersPage: React.FC = () => {
       return;
     }
 
+    // Get the first product from the order (for orders with multiple products, use the first one)
+    const firstProduct = reviewOrder.items[0]?.product;
+    const productId = (firstProduct as any)?._id || (firstProduct as any)?.id;
+    if (!firstProduct || !productId) {
+      toast.error('Unable to find product information');
+      return;
+    }
+
     setSubmittingReview(true);
     try {
       const formData = new FormData();
+      formData.append('product', productId); // ✅ ADD PRODUCT ID
       formData.append('rating', rating.toString());
       formData.append('comment.en', reviewComment);
       formData.append('reviewType', 'general');
