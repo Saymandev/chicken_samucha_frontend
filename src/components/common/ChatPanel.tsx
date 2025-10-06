@@ -415,7 +415,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
         }}
         exit={{ opacity: 0, scale: 0.8, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="fixed bottom-20 right-6 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col"
+        className="fixed bottom-4 right-4 sm:bottom-20 sm:right-6 left-4 sm:left-auto bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col max-sm:w-auto"
         style={{ 
           maxHeight: isMinimized ? '64px' : '500px',
           minHeight: isMinimized ? '64px' : '384px'
