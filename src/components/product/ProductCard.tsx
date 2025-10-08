@@ -52,6 +52,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return words.slice(0, maxWords).join(' ') + '…';
   };
 
+  // Strip HTML tags and clean up description for card view
+  const cleanDescription = (html: string | undefined): string => {
+    if (!html) return '';
+    
+    // Remove HTML tags
+    let cleaned = html.replace(/<[^>]*>/g, '');
+    
+    // Remove emoji characters (🌿, etc.)
+    cleaned = cleaned.replace(/[\uD83C-\uDBFF\uDC00-\uDFFF]+|[\uD83D\uDE00-\uDE4F]+|[\uD83D\uDE80-\uDEFF]+|[\u2600-\u27BF]+/g, '');
+    
+    // Clean up extra whitespace
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    
+    return cleaned;
+  };
+
   // Determine stock availability robustly (API may omit stock on some lists)
   const inStock = product.isAvailable !== false && (
     product.stock == null ? true : product.stock > 0
@@ -348,7 +364,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     language === 'bn' ? 'font-bengali' : ''
                   }`}>
                     {truncateWords(
-                      product.description[language],
+                      cleanDescription(product.description[language]),
                       viewportWidth < 380 ? 8 : viewportWidth < 640 ? 12 : viewportWidth < 1024 ? 24 : 32
                     )}
                   </p>
