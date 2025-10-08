@@ -86,6 +86,12 @@ const ProductDetailPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  
+  // Review pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreReviews, setHasMoreReviews] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalReviews, setTotalReviews] = useState(0);
   const [relatedLoading, setRelatedLoading] = useState(false);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -155,18 +161,44 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
-  const fetchReviews = async () => {
+  const fetchReviews = async (reset = true) => {
     try {
-      setReviewsLoading(true);
-      const response = await reviewsAPI.getProductReviews(id!, { limit: 10 });
+      if (reset) {
+        setReviewsLoading(true);
+        setCurrentPage(1);
+        setHasMoreReviews(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
+      const page = reset ? 1 : currentPage + 1;
+      const response = await reviewsAPI.getProductReviews(id!, { 
+        page, 
+        limit: 10 
+      });
+      
       if (response.data.success) {
-        setReviews(response.data.data);
+        if (reset) {
+          setReviews(response.data.data);
+        } else {
+          setReviews(prev => [...prev, ...response.data.data]);
+        }
+        
+        setCurrentPage(page);
+        setTotalReviews(response.data.total || 0);
+        setHasMoreReviews(response.data.data.length === 10);
       }
     } catch (error: any) {
       console.error('Error fetching reviews:', error);
     } finally {
       setReviewsLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const loadMoreReviews = async () => {
+    if (!hasMoreReviews || loadingMore) return;
+    await fetchReviews(false);
   };
 
   const fetchRelatedProducts = async () => {
@@ -957,6 +989,35 @@ const ProductDetailPage: React.FC = () => {
                     </div>
                   </div>
                 ))}
+                
+                {/* Load More Button and Review Count */}
+                {hasMoreReviews && (
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={loadMoreReviews}
+                      disabled={loadingMore}
+                      className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium rounded-lg transition-colors duration-200 flex items-center gap-2 mx-auto"
+                    >
+                      {loadingMore ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Loading...
+                        </>
+                      ) : (
+                        'Load More Reviews'
+                      )}
+                    </button>
+                  </div>
+                )}
+                
+                {/* Review Count */}
+                {totalReviews > 0 && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Showing {reviews.length} of {totalReviews} reviews
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-8">
