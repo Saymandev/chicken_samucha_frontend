@@ -107,7 +107,7 @@ api.interceptors.response.use(
           toast.error(data?.message || 'An error occurred. Please try again.');
       }
     } else if (error.request) {
-      toast.error('Network error. Please check your connection.');
+      console.log(error.request);
     } else {
       toast.error('An unexpected error occurred.');
     }
