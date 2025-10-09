@@ -79,6 +79,9 @@ import { WishlistProvider } from './contexts/WishlistContext';
 // Hooks
 import { usePromotions } from './hooks/usePromotions';
 
+// Utils
+import { trackPageView } from './utils/facebookPixel';
+
 // Component to handle layout based on route
 function AppContent() {
   const { theme, user, language, setLanguage } = useStore();
@@ -92,6 +95,11 @@ function AppContent() {
   // Promotion modal logic (only for non-admin routes)
   const { currentPromotion, closePromotion, handlePromotionClick } = usePromotions();
   
+  // Track page views on route change for Facebook Pixel
+  useEffect(() => {
+    trackPageView();
+  }, [location.pathname]);
+
   // Synchronize language between Zustand store and react-i18next
   useEffect(() => {
     if (language && i18n.language !== language) {
