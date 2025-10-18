@@ -47,6 +47,7 @@ interface Order {
   customer: {
     name: string;
     phone: string;
+    email?: string;
     address: {
       street: string;
       area: string;
@@ -274,23 +275,29 @@ const OrdersPage: React.FC = () => {
       return;
     }
 
-    // Get the first product from the order (for orders with multiple products, use the first one)
-    const firstProduct = reviewOrder.items[0]?.product;
-    const productId = (firstProduct as any)?._id || (firstProduct as any)?.id;
-    if (!firstProduct || !productId) {
-      toast.error('Unable to find product information');
-      return;
-    }
-
     setSubmittingReview(true);
     try {
       const formData = new FormData();
-      formData.append('product', productId); // ✅ ADD PRODUCT ID
+      
+      // Try to get product ID if available (for product-specific reviews)
+      const firstProduct = reviewOrder.items[0]?.product;
+      const productId = (firstProduct as any)?._id || (firstProduct as any)?.id;
+      
+      // If we have a product ID, add it; otherwise create a general order review
+      if (productId) {
+        formData.append('product', productId);
+      } else if (firstProduct && (firstProduct as any).name) {
+        // Try to use product name as fallback
+        const productName = (firstProduct as any).name.en || (firstProduct as any).name.bn || (firstProduct as any).name;
+        formData.append('product', productName);
+      }
+      
       formData.append('rating', rating.toString());
       formData.append('comment.en', reviewComment);
       formData.append('reviewType', 'general');
       formData.append('customer.name', reviewOrder.customer.name);
       formData.append('customer.phone', reviewOrder.customer.phone);
+      formData.append('customer.email', reviewOrder.customer.email || '');
       formData.append('orderNumber', reviewOrder.orderNumber);
 
       await reviewsAPI.createReview(formData);

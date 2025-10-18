@@ -130,29 +130,31 @@ const TrackOrderPage: React.FC = () => {
       return;
     }
 
-    // Get the first product from the order
-    const firstItem = orderStatus?.items?.[0];
-    if (!firstItem) {
-      toast.error('Unable to find product information');
-      return;
-    }
-
-    // Get product ID (check both item.product and item.product._id formats)
-    const productId = firstItem.product?._id || firstItem.product || firstItem._id;
-    if (!productId) {
-      toast.error('Unable to find product ID');
-      return;
-    }
-
     setSubmittingReview(true);
     try {
       const formData = new FormData();
-      formData.append('product', productId); // ✅ ADD PRODUCT ID
+      
+      // Try to get product ID if available (for product-specific reviews)
+      const firstItem = orderStatus?.items?.[0];
+      if (firstItem) {
+        // Get product ID (check both item.product and item.product._id formats)
+        const productId = firstItem.product?._id || firstItem.product?._id || firstItem._id;
+        const productName = firstItem.product?.name?.en || firstItem.product?.name?.bn || firstItem.name?.en || firstItem.name?.bn;
+        
+        // If we have a product ID, add it; otherwise try product name as fallback
+        if (productId) {
+          formData.append('product', productId);
+        } else if (productName) {
+          formData.append('product', productName);
+        }
+      }
+      
       formData.append('rating', rating.toString());
       formData.append('comment.en', reviewComment);
       formData.append('reviewType', 'general');
       formData.append('customer.name', orderStatus?.customer?.name || 'Customer');
       formData.append('customer.phone', orderStatus?.customer?.phone || '');
+      formData.append('customer.email', orderStatus?.customer?.email || '');
       
       // Link to order if available
       if (selectedOrderForReview) {
