@@ -145,7 +145,7 @@ const Footer: React.FC = () => {
                 {language === 'bn' ? 'আমাদের ফলো করুন:' : 'Follow us:'}
               </span>
               <div className="flex space-x-3">
-                <Link to="https://www.facebook.com/share/19fy3wkqHZ/" target="_blank" rel="noopener noreferrer">
+                <Link to="https://www.facebook.com/share/17DvPSpqfM/" target="_blank" rel="noopener noreferrer">
                 <button
                   type="button"
                   className="text-gray-300 hover:text-primary-400 transition-colors"
