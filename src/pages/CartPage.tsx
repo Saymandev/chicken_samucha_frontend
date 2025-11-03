@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
+import { contentAPI } from '../utils/api';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,8 +13,20 @@ const CartPage: React.FC = () => {
   const [isLoading] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
+  // Delivery settings (pulled from backend public endpoint)
+  const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number; zones?: Array<{ id: string; name: { en: string; bn: string }; price: number }> } | null>(null);
+  const baseDeliveryCharge = deliverySettings?.deliveryCharge ?? 60; // Default fallback
+  const freeThreshold = deliverySettings?.freeDeliveryThreshold ?? 500; // Default fallback
   
-  const finalTotal = cartTotal; // Remove delivery charge from cart page total
+  // Check if any product in cart has free delivery
+  const hasFreeDeliveryProduct = cart.some(item => {
+    const product = item.product;
+    return product && product.freeDelivery === true;
+  });
+  
+  // Calculate delivery charge (free if threshold met or product has free delivery)
+  const deliveryCharge = cartTotal >= freeThreshold || hasFreeDeliveryProduct ? 0 : baseDeliveryCharge;
+  const finalTotal = cartTotal + deliveryCharge;
 
   // Safely resolve localized strings with sensible fallbacks
   const getLocalized = (value: any): string => {
@@ -54,6 +67,20 @@ const CartPage: React.FC = () => {
     if (words.length <= maxWords) return text;
     return words.slice(0, maxWords).join(' ') + '…';
   };
+
+  // Fetch delivery settings on component mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await contentAPI.getDeliverySettings();
+        if (res.data?.success) {
+          setDeliverySettings(res.data.settings);
+        }
+      } catch (e) {
+        // keep defaults
+      }
+    })();
+  }, []);
 
   if (cartCount === 0) {
     return (
@@ -241,8 +268,8 @@ const CartPage: React.FC = () => {
                     <span className="text-gray-600 dark:text-gray-400">
                       Delivery Charge
                     </span>
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      Calculated at checkout
+                    <span className={`font-medium ${deliveryCharge === 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
+                      {deliveryCharge === 0 ? (hasFreeDeliveryProduct ? 'FREE (Product) 🎉' : 'FREE 🎉') : `৳${deliveryCharge}`}
                     </span>
                   </div>
 
@@ -250,14 +277,16 @@ const CartPage: React.FC = () => {
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <div className="flex justify-between">
                       <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Subtotal
+                        Total
                       </span>
                       <span className="text-xl font-bold text-orange-500">
                         ৳{finalTotal}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Final total calculated at checkout
+                      {deliveryCharge === 0 
+                        ? (hasFreeDeliveryProduct ? 'FREE delivery included (Product)' : `FREE delivery (Order ≥ ৳${freeThreshold})`)
+                        : `Delivery charge: ৳${deliveryCharge} (included)`}
                     </p>
                   </div>
                 </div>
@@ -286,29 +315,33 @@ const CartPage: React.FC = () => {
                   </h4>
                   <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                     <li>• Free pickup from restaurant</li>
-                    <li>• Home delivery available with charges</li>
+                    <li>• Home delivery available {deliveryCharge === 0 && cartTotal >= freeThreshold ? '(FREE)' : `(৳${baseDeliveryCharge})`}</li>
                     <li>• Estimated delivery: 30-45 minutes</li>
                     <li>• Available 7 days a week</li>
                   </ul>
                   
                   {/* Free Delivery Promotion */}
-                  {cartTotal < 500 ? (
+                  {deliveryCharge > 0 && cartTotal < freeThreshold && !hasFreeDeliveryProduct ? (
                     <div className="mt-3 p-3 bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
                       <div className="text-sm text-orange-800 dark:text-orange-200">
                         <div className="font-medium mb-1">🚚 FREE Delivery Available!</div>
                         <div className="text-xs">
-                          Add ৳{500 - cartTotal} more to get FREE home delivery
+                          Add ৳{freeThreshold - cartTotal} more to get FREE home delivery
                         </div>
                       </div>
                     </div>
-                  ) : (
+                  ) : deliveryCharge === 0 ? (
                     <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                       <div className="text-sm text-green-800 dark:text-green-200">
                         <div className="font-medium">🎉 FREE Delivery Unlocked!</div>
-                        <div className="text-xs">Your order qualifies for FREE home delivery</div>
+                        <div className="text-xs">
+                          {hasFreeDeliveryProduct 
+                            ? 'Your order includes products with FREE delivery'
+                            : `Your order qualifies for FREE home delivery (Order ≥ ৳${freeThreshold})`}
+                        </div>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </motion.div>
             </div>
