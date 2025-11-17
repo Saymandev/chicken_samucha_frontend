@@ -21,18 +21,30 @@ interface SliderItem {
   order: number;
 }
 
+interface TrackingSettings {
+  facebookPixelId: string;
+  facebookAccessToken: string;
+  facebookTestEventCode: string;
+}
+
 // Payment settings interface removed - only SSLCommerz and COD are supported
 
 const AdminContent: React.FC = () => {
   const [heroContent, setHeroContent] = useState<HeroContent | null>(null);
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [deliverySettings, setDeliverySettings] = useState<{ deliveryCharge: number; freeDeliveryThreshold: number; zones: Array<{ id: string; name: { en: string; bn: string }; price: number }> } | null>(null);
+  const [trackingSettings, setTrackingSettings] = useState<TrackingSettings>({
+    facebookPixelId: '',
+    facebookAccessToken: '',
+    facebookTestEventCode: ''
+  });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'delivery'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'slider' | 'delivery' | 'tracking'>('hero');
   const [newSliderItem, setNewSliderItem] = useState<SliderItem | null>(null);
   const [editingSlider, setEditingSlider] = useState<SliderItem | null>(null);
   const [showSliderModal, setShowSliderModal] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [savingTracking, setSavingTracking] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -99,6 +111,11 @@ const AdminContent: React.FC = () => {
             deliveryCharge: s?.general?.deliveryCharge ?? 60,
             freeDeliveryThreshold: s?.delivery?.freeDeliveryThreshold ?? 500,
             zones: Array.isArray(s?.delivery?.zones) ? s.delivery.zones : []
+          });
+          setTrackingSettings({
+            facebookPixelId: s?.tracking?.facebookPixelId || '',
+            facebookAccessToken: s?.tracking?.facebookAccessToken || '',
+            facebookTestEventCode: s?.tracking?.facebookTestEventCode || ''
           });
         }
       } catch {}
@@ -273,7 +290,8 @@ const AdminContent: React.FC = () => {
             {[
               { id: 'hero', label: 'Hero Section', icon: <Image className="w-4 h-4" /> },
               { id: 'slider', label: 'Slider Items', icon: <FileText className="w-4 h-4" /> },
-              { id: 'delivery', label: 'Delivery', icon: <Settings className="w-4 h-4" /> }
+              { id: 'delivery', label: 'Delivery', icon: <Settings className="w-4 h-4" /> },
+              { id: 'tracking', label: 'Tracking', icon: <Settings className="w-4 h-4" /> }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -544,6 +562,85 @@ const AdminContent: React.FC = () => {
                 } text-white`}
               >
                 {savingSettings ? 'Saving...' : 'Save Delivery Settings'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tracking Settings Tab */}
+        {activeTab === 'tracking' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Tracking & Pixels</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Facebook Pixel ID
+                </label>
+                <input
+                  type="text"
+                  value={trackingSettings.facebookPixelId}
+                  onChange={(e) => setTrackingSettings(ts => ({ ...ts, facebookPixelId: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  placeholder="e.g. 1234567890"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Test Event Code (optional)
+                </label>
+                <input
+                  type="text"
+                  value={trackingSettings.facebookTestEventCode}
+                  onChange={(e) => setTrackingSettings(ts => ({ ...ts, facebookTestEventCode: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  placeholder="From Events Manager → Test Events"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Conversions API Access Token
+                </label>
+                <textarea
+                  value={trackingSettings.facebookAccessToken}
+                  onChange={(e) => setTrackingSettings(ts => ({ ...ts, facebookAccessToken: e.target.value }))}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  placeholder="Paste your long-lived system user token"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Store the token securely. It is used by the server-side Conversions API when sending events.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={async () => {
+                  try {
+                    setSavingTracking(true);
+                    await adminAPI.updateSystemSettings({
+                      category: 'tracking',
+                      settings: {
+                        facebookPixelId: trackingSettings.facebookPixelId.trim(),
+                        facebookAccessToken: trackingSettings.facebookAccessToken.trim(),
+                        facebookTestEventCode: trackingSettings.facebookTestEventCode.trim()
+                      }
+                    });
+                    toast.success('Tracking settings updated successfully');
+                  } catch (error) {
+                    console.error('Tracking settings update error:', error);
+                    toast.error('Failed to update tracking settings');
+                  } finally {
+                    setSavingTracking(false);
+                  }
+                }}
+                disabled={savingTracking}
+                className={`px-6 py-3 rounded-lg transition-colors ${
+                  savingTracking ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'
+                } text-white`}
+              >
+                {savingTracking ? 'Saving...' : 'Save Tracking Settings'}
               </button>
             </div>
           </div>

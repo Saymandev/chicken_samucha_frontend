@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import {
-  CreditCard,
-  MapPin,
-  Phone,
-  ShoppingCart,
-  User
+    CreditCard,
+    MapPin,
+    Phone,
+    ShoppingCart,
+    User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { contentAPI, couponAPI, ordersAPI, paymentsAPI, productsAPI } from '../utils/api';
+import { trackBrowserAndServer } from '../utils/fbpixel';
 
 interface CustomerInfo {
   name: string;
@@ -553,6 +554,19 @@ const CheckoutPage: React.FC = () => {
       const response = await ordersAPI.createOrder(formData);
       
       if (response.data.success) {
+        const orderNumber = response.data.order.orderNumber;
+        try {
+          trackBrowserAndServer('Purchase', {
+            customData: {
+              value: finalTotal,
+              currency: 'BDT',
+              contents: cart.map((i) => ({ id: i.product.id, quantity: i.quantity })),
+              content_type: 'product',
+              num_items: cart.length,
+              order_id: orderNumber,
+            },
+          });
+        } catch {}
         // Track purchase counts for each item (best-effort)
         try {
           for (const item of cart) {
@@ -569,7 +583,7 @@ const CheckoutPage: React.FC = () => {
 
         clearCart();
         toast.success('Order placed successfully!');
-        navigate(`/track-order?orderNumber=${response.data.order.orderNumber}`);
+        navigate(`/track-order?orderNumber=${orderNumber}`);
       }
     } catch (error: any) {
       console.error('Order creation error:', error);

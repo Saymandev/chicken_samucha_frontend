@@ -29,8 +29,7 @@ const transformData = (data: any): any => {
   return data;
 };
 // changes made here
-const API_BASE_URL =  process.env.API_URL || 'https://rest.ourb.live/api';
-
+const API_BASE_URL =  process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api';
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -212,6 +211,7 @@ export const contentAPI = {
   getSliderItems: (params?: { page?: number; limit?: number; search?: string }) => 
     api.get('/content/slider', { params }),
   getDeliverySettings: () => api.get('/content/delivery-settings'),
+  getTrackingSettings: () => api.get('/content/tracking-settings'),
   // Payment settings removed - only SSLCommerz and COD are supported
   createSliderItem: (itemData: FormData) => api.post('/content/slider', itemData, {
     headers: { 'Content-Type': 'multipart/form-data' }

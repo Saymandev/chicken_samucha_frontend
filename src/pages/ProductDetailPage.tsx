@@ -10,6 +10,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { useStore } from '../store/useStore';
 import '../styles/quill-custom.css';
 import { ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
+import { trackBrowserAndServer } from '../utils/fbpixel';
 
 interface Product {
   id: string;
@@ -132,6 +133,20 @@ const ProductDetailPage: React.FC = () => {
       if (response.data.success) {
         const prod = response.data.product;
         setProduct(prod);
+        try {
+          const prodId = (prod as any).id || (prod as any)._id || id;
+          const price = (prod as any).discountPrice || (prod as any).price || 0;
+          if (prodId) {
+            trackBrowserAndServer('ViewContent', {
+              customData: {
+                content_ids: [prodId],
+                content_type: 'product',
+                value: price,
+                currency: 'BDT',
+              },
+            });
+          }
+        } catch {}
         try {
           // Update recently viewed list in localStorage (store only IDs)
           const key = 'recentlyViewedProductIds';
@@ -273,6 +288,18 @@ const ProductDetailPage: React.FC = () => {
     try {
       const variantData = getVariantData();
       addToCart(product, quantity, variantData);
+      try {
+        const productId = (product as any).id || (product as any)._id || id;
+        trackBrowserAndServer('AddToCart', {
+          customData: {
+            content_ids: [productId],
+            content_type: 'product',
+            value: getCurrentPrice() * quantity,
+            currency: 'BDT',
+            quantity,
+          },
+        });
+      } catch {}
       
       // Open cart sidebar to show the added item
       openCart();
@@ -497,6 +524,24 @@ const ProductDetailPage: React.FC = () => {
       const response = await ordersAPI.createOrder(orderData);
       
       if (response.data.success) {
+        try {
+          const prodId = product.id || (product as any)._id;
+          trackBrowserAndServer('Lead', {
+            customData: {
+              content_name: 'Quick Order',
+              value: (product.discountPrice || product.price) * quantity,
+              currency: 'BDT',
+              content_ids: prodId ? [prodId] : undefined,
+              content_type: 'product',
+            },
+            userData: {
+              email: quickOrderData.email,
+              phone: quickOrderData.phone,
+              firstName: quickOrderData.name.split(' ')?.[0],
+              lastName: quickOrderData.name.split(' ')?.slice(1).join(' '),
+            },
+          });
+        } catch {}
         toast.success('Order placed successfully! We will contact you soon.');
         setShowQuickOrderModal(false);
         setQuickOrderData({ name: '', phone: '', email: '', address: '' });

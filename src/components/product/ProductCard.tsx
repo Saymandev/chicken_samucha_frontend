@@ -9,6 +9,7 @@ import { useWishlist } from '../../contexts/WishlistContext';
 import { useFlashSalePrice } from '../../hooks/useFlashSalePrice';
 import { Product, useStore } from '../../store/useStore';
 import { productsAPI } from '../../utils/api';
+import { trackBrowserAndServer } from '../../utils/fbpixel';
 
 interface ProductCardProps {
   product: Product;
@@ -138,6 +139,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
     // Track add to cart (fire and forget)
     try {
+      trackBrowserAndServer('AddToCart', {
+        customData: {
+          content_ids: [productId],
+          content_type: 'product',
+          value: (product as any).discountPrice || (product as any).price,
+          currency: 'BDT',
+          quantity,
+        },
+      });
       if (productId) {
         productsAPI.trackAddToCart(productId).catch(() => {});
       }

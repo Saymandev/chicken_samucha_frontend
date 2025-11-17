@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { contentAPI } from '../utils/api';
+import { trackBrowserAndServer } from '../utils/fbpixel';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,6 +59,17 @@ const CartPage: React.FC = () => {
       toast.error('Your cart is empty');
       return;
     }
+    try {
+      trackBrowserAndServer('InitiateCheckout', {
+        customData: {
+          value: cartTotal,
+          currency: 'BDT',
+          num_items: cartCount,
+          content_ids: cart.map((i: any) => i.product?.id || i.product?._id).filter(Boolean),
+          content_type: 'product',
+        }
+      });
+    } catch {}
     navigate('/checkout');
   };
 

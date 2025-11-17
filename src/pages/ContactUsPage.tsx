@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { contactAPI } from '../utils/api';
+import { trackBrowserAndServer } from '../utils/fbpixel';
 
 const ContactUsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -28,6 +29,20 @@ const ContactUsPage: React.FC = () => {
     
     try {
       await contactAPI.sendContactMessage(formData);
+      try {
+        trackBrowserAndServer('Lead', {
+          customData: {
+            content_name: 'Contact Form',
+            lead_type: formData.subject,
+          },
+          userData: {
+            email: formData.email,
+            phone: formData.phone,
+            firstName: formData.name.split(' ')?.[0],
+            lastName: formData.name.split(' ')?.slice(1).join(' '),
+          },
+        });
+      } catch {}
       toast.success(t('contact.successMessage'));
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error: any) {

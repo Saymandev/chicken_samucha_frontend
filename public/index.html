@@ -75,23 +75,56 @@
     }
     </script>
     
-<!-- Meta Pixel Code -->
-<script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1377145243924735');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1377145243924735&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Meta Pixel Code -->
+    <!-- Meta Pixel Code -->
+    <script>
+      !(function(f,b,e,v,n,t,s){
+        if(f.fbq) return; n=f.fbq=function(){n.callMethod ? n.callMethod.apply(n,arguments) : n.queue.push(arguments)};
+        if(!f._fbq) f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0';
+        n.queue=[]; t=b.createElement(e); t.async=!0;
+        t.src=v; s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s);
+      })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+      window.FB_PIXEL_ID = window.FB_PIXEL_ID || '1718279882178157';
+      window.FB_ADV_MATCH = window.FB_ADV_MATCH || { country: 'bd' };
+      window.__FB_PIXEL_READY__ = false;
+
+      window.__initFacebookPixel = function(config) {
+        if (window.__FB_PIXEL_READY__) return;
+        if (!window.fbq) {
+          setTimeout(() => window.__initFacebookPixel(config), 200);
+          return;
+        }
+        const pixelId = (config && config.facebookPixelId) || window.FB_PIXEL_ID;
+        const advMatch = (config && config.advancedMatching) || window.FB_ADV_MATCH || {};
+        if (!pixelId) return;
+        window.FB_PIXEL_ID = pixelId;
+        window.FB_ADV_MATCH = advMatch;
+        fbq('init', pixelId, advMatch);
+        fbq('consent', 'grant');
+        fbq('track', 'PageView');
+        window.__FB_PIXEL_READY__ = true;
+      };
+
+      fetch('/api/content/tracking-settings')
+        .then((res) => res.ok ? res.json() : null)
+        .then((data) => {
+          if (data && data.success) {
+            window.__initFacebookPixel({
+              facebookPixelId: data.settings?.facebookPixelId,
+              advancedMatching: data.settings?.advancedMatchingDefaults
+            });
+          } else {
+            window.__initFacebookPixel();
+          }
+        })
+        .catch(() => window.__initFacebookPixel());
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=1718279882178157&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Meta Pixel Code -->
     
     <title>Rongdhunu - রংধনু | Your Trusted Online Marketplace</title>
   </head>
