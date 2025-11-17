@@ -108,7 +108,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ isOpen, onClose }) => {
     });
 
     socketRef.current.on('connect', () => {
-      console.log('✅ Socket connected to chat');
+      
       setIsConnected(true);
       socketRef.current?.emit('join-chat', chatId);
     });

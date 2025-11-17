@@ -24,7 +24,7 @@ export const trackEvent = (
 ) => {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', eventName, parameters);
-    console.log(`[FB Pixel] Tracked event: ${eventName}`, parameters);
+    
   }
 };
 
@@ -39,7 +39,7 @@ export const trackCustomEvent = (
 ) => {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('trackCustom', eventName, parameters);
-    console.log(`[FB Pixel] Tracked custom event: ${eventName}`, parameters);
+   
   }
 };
 
@@ -49,7 +49,7 @@ export const trackCustomEvent = (
 export const trackPageView = () => {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', 'PageView');
-    console.log('[FB Pixel] Tracked PageView');
+    
   }
 };
 

@@ -106,7 +106,7 @@ api.interceptors.response.use(
           toast.error(data?.message || 'An error occurred. Please try again.');
       }
     } else if (error.request) {
-      console.log(error.request);
+      
     } else {
       toast.error('An unexpected error occurred.');
     }

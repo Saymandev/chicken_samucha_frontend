@@ -205,7 +205,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       } else {
         newSet.add(groupId);
       }
-      console.log('Toggling group:', groupId, 'New expanded groups:', Array.from(newSet));
+      
       return newSet;
     });
   };
