@@ -63,8 +63,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
     // Remove emoji characters (🌿, etc.)
     cleaned = cleaned.replace(/[\uD83C-\uDBFF\uDC00-\uDFFF]+|[\uD83D\uDE00-\uDE4F]+|[\uD83D\uDE80-\uDEFF]+|[\u2600-\u27BF]+/g, '');
     
-    // Clean up extra whitespace
+    // Clean up extra whitespace and line breaks
     cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    cleaned = cleaned.replace(/\n+/g, ' ').trim();
     
     return cleaned;
   };

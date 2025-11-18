@@ -803,7 +803,8 @@ const ProductDetailPage: React.FC = () => {
                   {t('productDetail.description')}
                 </h3>
                 <div 
-                  className="text-gray-700 dark:text-gray-300 leading-relaxed rich-text-content prose dark:prose-invert max-w-none"
+                  className="text-gray-700 dark:text-gray-300 rich-text-content max-w-none"
+                  style={{ lineHeight: '1.5' }}
                   dangerouslySetInnerHTML={{ __html: getDescription() }}
                 />
                 {(() => {
