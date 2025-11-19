@@ -46,7 +46,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
 
   const handleContactClick = (type: 'phone' | 'email') => {
     if (type === 'phone') {
-      window.open('tel:+880 1629428590', '_self');
+      window.open('https://wa.me/8801629428590', '_blank');
     } else {
       window.open('mailto:rongdhunu503@gmail.com', '_self');
     }
@@ -122,10 +122,10 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ className = '' 
                 </div>
                 <div className="text-left">
                   <div className="font-medium text-gray-900 dark:text-white">
-                    {language === 'bn' ? 'ফোন করুন' : 'Call Us'}
+                    {language === 'bn' ? 'হোয়াটসঅ্যাপে কথা বলুন' : 'Chat on WhatsApp'}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    +880 1234 567890
+                    +880 1629 428590
                   </div>
                 </div>
               </button>
