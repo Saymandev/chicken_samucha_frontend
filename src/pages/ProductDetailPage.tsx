@@ -499,27 +499,32 @@ const ProductDetailPage: React.FC = () => {
       // Create direct order for guest user
       const orderData = new FormData();
       
-      orderData.append('customer', JSON.stringify({
-        name: quickOrderData.name,
-        phone: quickOrderData.phone,
-        email: quickOrderData.email || undefined,
-        address: quickOrderData.address || 'Address not provided'
-      }));
+      // Add customer info in the format backend expects
+      orderData.append('customer[name]', quickOrderData.name);
+      orderData.append('customer[phone]', quickOrderData.phone);
+      if (quickOrderData.email) {
+        orderData.append('customer[email]', quickOrderData.email);
+      }
       
-      orderData.append('items', JSON.stringify([{
-        product: product.id || (product as any)._id,
-        quantity: quantity
-      }]));
+      // Parse address - put full address in street, use default for area if needed
+      const addressString = quickOrderData.address || 'Address not provided';
+      orderData.append('customer[address][street]', addressString);
+      orderData.append('customer[address][area]', 'Not specified');
+      orderData.append('customer[address][city]', 'Rangpur');
+      orderData.append('customer[address][district]', 'Rangpur');
       
-      orderData.append('paymentInfo', JSON.stringify({
-        method: 'cod',
-        status: 'pending'
-      }));
+      // Add items in the format backend expects
+      const productId = product.id || (product as any)._id;
+      orderData.append('items[0][product]', productId);
+      orderData.append('items[0][quantity]', quantity.toString());
       
-      orderData.append('deliveryInfo', JSON.stringify({
-        method: 'delivery',
-        address: quickOrderData.address || 'Address not provided'
-      }));
+      // Add payment info
+      orderData.append('paymentInfo[method]', 'cash_on_delivery');
+      
+      // Add delivery info
+      orderData.append('deliveryInfo[method]', 'delivery');
+      orderData.append('deliveryInfo[address]', addressString);
+      orderData.append('deliveryInfo[phone]', quickOrderData.phone);
 
       const response = await ordersAPI.createOrder(orderData);
       
