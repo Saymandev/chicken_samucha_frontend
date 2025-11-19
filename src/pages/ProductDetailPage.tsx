@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, Heart, Minus, Plus, ShoppingCart, Star, Zap } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useStore } from '../store/useStore';
 import '../styles/quill-custom.css';
-import { ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
+import { contentAPI, ordersAPI, productsAPI, reviewsAPI } from '../utils/api';
 import { trackBrowserAndServer } from '../utils/fbpixel';
 
 interface Product {
@@ -104,6 +104,12 @@ const ProductDetailPage: React.FC = () => {
     email: '',
     address: ''
   });
+  const [quickOrderZoneId, setQuickOrderZoneId] = useState('');
+  const [deliverySettings, setDeliverySettings] = useState<{
+    deliveryCharge: number;
+    freeDeliveryThreshold: number;
+    zones?: Array<{ id: string; name: { en: string; bn: string }; price: number }>;
+  } | null>(null);
   
   // Simple Variant Selection State
   const [selectedColor, setSelectedColor] = useState<string>('');
@@ -125,6 +131,56 @@ const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     setSelectedImage(0);
   }, [selectedColor, selectedSize, selectedWeight]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await contentAPI.getDeliverySettings();
+        if (res.data?.success) {
+          setDeliverySettings(res.data.settings);
+        }
+      } catch (error) {
+        // Default fallbacks will be used
+      }
+    })();
+  }, []);
+
+  const quickOrderPricing = useMemo(() => {
+    const zones = deliverySettings?.zones || [];
+    const selectedZone = zones.find((zone) => zone.id === quickOrderZoneId) || null;
+    const baseCharge = selectedZone?.price ?? deliverySettings?.deliveryCharge ?? 60;
+    const threshold = deliverySettings?.freeDeliveryThreshold ?? 500;
+    const hasFreeDeliveryProduct = Boolean(product && (product as any)?.freeDelivery === true);
+    const unitPrice = product ? (product.discountPrice ?? product.price ?? 0) : 0;
+    const orderValue = unitPrice * quantity;
+    const deliveryCharge =
+      orderValue >= threshold || hasFreeDeliveryProduct ? 0 : baseCharge;
+
+    return {
+      selectedZone,
+      baseCharge,
+      threshold,
+      deliveryCharge,
+      hasFreeDeliveryProduct,
+      orderValue,
+    };
+  }, [deliverySettings, quickOrderZoneId, product, quantity]);
+
+  const {
+    selectedZone: quickOrderSelectedZone,
+    baseCharge: quickOrderBaseCharge,
+    threshold: quickOrderFreeThreshold,
+    deliveryCharge: quickOrderDeliveryCharge,
+    hasFreeDeliveryProduct: quickOrderHasFreeDeliveryProduct,
+  } = quickOrderPricing;
+
+  const getZoneLabel = (zone?: { id?: string; name?: { en?: string; bn?: string } }) => {
+    if (!zone) return '';
+    if (language === 'bn') {
+      return zone.name?.bn || zone.name?.en || zone.id || '';
+    }
+    return zone.name?.en || zone.name?.bn || zone.id || '';
+  };
 
   const fetchProduct = async () => {
     try {
@@ -506,8 +562,16 @@ const ProductDetailPage: React.FC = () => {
         orderData.append('customer[email]', quickOrderData.email);
       }
       
-      // Parse address - put full address in street, use default for area if needed
-      const addressString = quickOrderData.address || 'Address not provided';
+      // Resolve dynamic delivery info
+      const resolvedDeliveryCharge = quickOrderDeliveryCharge;
+
+      // Parse address - include zone label if selected
+      const addressInput = quickOrderData.address?.trim();
+      const zoneLabel = getZoneLabel(quickOrderSelectedZone || undefined);
+      const addressString = addressInput
+        ? zoneLabel ? `${addressInput} (${zoneLabel})` : addressInput
+        : zoneLabel || 'Address not provided';
+
       orderData.append('customer[address][street]', addressString);
       orderData.append('customer[address][area]', 'Not specified');
       orderData.append('customer[address][city]', 'Rangpur');
@@ -525,6 +589,12 @@ const ProductDetailPage: React.FC = () => {
       orderData.append('deliveryInfo[method]', 'delivery');
       orderData.append('deliveryInfo[address]', addressString);
       orderData.append('deliveryInfo[phone]', quickOrderData.phone);
+      orderData.append('deliveryInfo[deliveryCharge]', resolvedDeliveryCharge.toString());
+      if (quickOrderSelectedZone) {
+        orderData.append('deliveryInfo[zoneId]', quickOrderSelectedZone.id);
+        orderData.append('deliveryInfo[zoneName]', getZoneLabel(quickOrderSelectedZone));
+        orderData.append('deliveryInfo[zoneCharge]', quickOrderBaseCharge.toString());
+      }
 
       const response = await ordersAPI.createOrder(orderData);
       
@@ -1168,6 +1238,78 @@ const ProductDetailPage: React.FC = () => {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
                         placeholder={language === 'bn' ? 'বিস্তারিত ঠিকানা দিন...' : 'Enter detailed address...'}
                       />
+                    </div>
+
+                    {deliverySettings?.zones && deliverySettings.zones.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          {language === 'bn' ? 'ডেলিভারি এলাকা নির্বাচন করুন' : 'Choose Delivery Area'}
+                        </label>
+                        <select
+                          value={quickOrderZoneId}
+                          onChange={(e) => setQuickOrderZoneId(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                        >
+                          <option value="">
+                            {language === 'bn'
+                              ? `স্ট্যান্ডার্ড ডেলিভারি (৳${deliverySettings.deliveryCharge ?? 60})`
+                              : `Standard delivery (৳${deliverySettings.deliveryCharge ?? 60})`}
+                          </option>
+                          {deliverySettings.zones.map((zone) => (
+                            <option key={zone.id} value={zone.id}>
+                              {`${getZoneLabel(zone)} — ৳${zone.price}`}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {language === 'bn'
+                            ? `অর্ডার ≥ ৳${quickOrderFreeThreshold} হলে অথবা ফ্রি-ডেলিভারি প্রোডাক্টে ডেলিভারি ফ্রি`
+                            : `Orders ≥ ৳${quickOrderFreeThreshold} or products with free delivery pay 0 charge`}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {language === 'bn' ? 'ডেলিভারি চার্জ' : 'Delivery Charge'}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {quickOrderDeliveryCharge === 0
+                              ? (quickOrderHasFreeDeliveryProduct
+                                  ? language === 'bn'
+                                    ? 'এই পণ্যে ফ্রি ডেলিভারি প্রযোজ্য'
+                                    : 'This product includes free delivery'
+                                  : language === 'bn'
+                                    ? `অর্ডার ≥ ৳${quickOrderFreeThreshold} হওয়ায় ফ্রি`
+                                    : `Free because order ≥ ৳${quickOrderFreeThreshold}`)
+                              : (language === 'bn'
+                                  ? `অর্ডার ≥ ৳${quickOrderFreeThreshold} হলে ফ্রি`
+                                  : `Free if order ≥ ৳${quickOrderFreeThreshold}`)}
+                          </p>
+                          {quickOrderSelectedZone && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {language === 'bn'
+                                ? `নির্বাচিত এলাকা: ${getZoneLabel(quickOrderSelectedZone)} (৳${quickOrderBaseCharge})`
+                                : `Selected area: ${getZoneLabel(quickOrderSelectedZone)} (৳${quickOrderBaseCharge})`}
+                            </p>
+                          )}
+                        </div>
+                        <div
+                          className={`text-lg font-semibold ${
+                            quickOrderDeliveryCharge === 0
+                              ? 'text-green-600 dark:text-green-400'
+                              : 'text-gray-900 dark:text-white'
+                          }`}
+                        >
+                          {quickOrderDeliveryCharge === 0
+                            ? language === 'bn'
+                              ? 'ফ্রি'
+                              : 'FREE'
+                            : `৳${quickOrderDeliveryCharge}`}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex gap-3 pt-4">
