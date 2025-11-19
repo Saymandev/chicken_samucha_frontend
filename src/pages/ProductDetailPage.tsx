@@ -488,7 +488,7 @@ const ProductDetailPage: React.FC = () => {
     e.preventDefault();
     if (!product) return;
 
-    if (!quickOrderData.name || !quickOrderData.phone || !quickOrderData.email) {
+    if (!quickOrderData.name || !quickOrderData.phone) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -502,7 +502,7 @@ const ProductDetailPage: React.FC = () => {
       orderData.append('customer', JSON.stringify({
         name: quickOrderData.name,
         phone: quickOrderData.phone,
-        email: quickOrderData.email,
+        email: quickOrderData.email || undefined,
         address: quickOrderData.address || 'Address not provided'
       }));
       
@@ -535,7 +535,7 @@ const ProductDetailPage: React.FC = () => {
               content_type: 'product',
             },
             userData: {
-              email: quickOrderData.email,
+              ...(quickOrderData.email && { email: quickOrderData.email }),
               phone: quickOrderData.phone,
               firstName: quickOrderData.name.split(' ')?.[0],
               lastName: quickOrderData.name.split(' ')?.slice(1).join(' '),
@@ -1142,14 +1142,13 @@ const ProductDetailPage: React.FC = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {language === 'bn' ? 'ইমেইল *' : 'Email *'}
+                        {language === 'bn' ? 'ইমেইল' : 'Email'}
                       </label>
                       <input
                         type="email"
                         value={quickOrderData.email}
                         onChange={(e) => setQuickOrderData({...quickOrderData, email: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ef4444] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                        required
                       />
                     </div>
 
