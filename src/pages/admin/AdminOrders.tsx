@@ -121,7 +121,8 @@ const AdminOrders: React.FC = () => {
       const response = await adminAPI.getAllOrders(params);
       if (response.data.success) {
         setOrders(response.data.orders || []);
-        setTotalPages(response.data.totalPages || 1);
+        const resolvedTotalPages = Number(response.data.totalPages ?? response.data.pagination?.pages ?? 1);
+        setTotalPages(Number.isFinite(resolvedTotalPages) && resolvedTotalPages > 0 ? resolvedTotalPages : 1);
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -939,8 +940,8 @@ const AdminOrders: React.FC = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center gap-2 mb-8">
-                {[...Array(totalPages)].map((_, i) => (
+              <div className="flex flex-wrap justify-center gap-2 mb-8">
+                {Array.from({ length: totalPages }, (_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentPage(i + 1)}

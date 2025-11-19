@@ -554,6 +554,7 @@ const ProductDetailPage: React.FC = () => {
       
       // Create direct order for guest user
       const orderData = new FormData();
+      const variantData = getVariantData();
       
       // Add customer info in the format backend expects
       orderData.append('customer[name]', quickOrderData.name);
@@ -581,6 +582,20 @@ const ProductDetailPage: React.FC = () => {
       const productId = product.id || (product as any)._id;
       orderData.append('items[0][product]', productId);
       orderData.append('items[0][quantity]', quantity.toString());
+      if (variantData) {
+        if (variantData.color) {
+          orderData.append('items[0][variantData][color]', variantData.color);
+        }
+        if (variantData.size) {
+          orderData.append('items[0][variantData][size]', variantData.size);
+        }
+        if (variantData.weight) {
+          orderData.append('items[0][variantData][weight]', variantData.weight);
+        }
+        if (typeof variantData.priceModifier === 'number') {
+          orderData.append('items[0][variantData][priceModifier]', variantData.priceModifier.toString());
+        }
+      }
       
       // Add payment info
       orderData.append('paymentInfo[method]', 'cash_on_delivery');
