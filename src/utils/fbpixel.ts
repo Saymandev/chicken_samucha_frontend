@@ -21,20 +21,34 @@ export function trackBrowserAndServer(
   const normalizedCustomData = { ...customData };
 
   if (eventName === 'Purchase') {
-    const numericValue =
-      Number(
-        customData.value ??
-          customData.total ??
-          customData.totalAmount ??
-          customData.order_value ??
-          customData.finalAmount ??
-          customData.price
-      ) || 0;
+    // Extract value from various possible fields
+    const rawValue =
+      customData.value ??
+      customData.total ??
+      customData.totalAmount ??
+      customData.order_value ??
+      customData.finalAmount ??
+      customData.price ??
+      0;
 
-    normalizedCustomData.value = Number.isFinite(numericValue)
+    // Ensure value is a valid positive number
+    const numericValue = Number(rawValue);
+    const finalValue = Number.isFinite(numericValue) && numericValue > 0
       ? Number(numericValue.toFixed(2))
       : 0;
-    normalizedCustomData.currency = (customData.currency || 'BDT').toUpperCase();
+
+    // Ensure currency is a valid 3-letter ISO code
+    const rawCurrency = customData.currency || 'BDT';
+    const finalCurrency = String(rawCurrency).toUpperCase().substring(0, 3);
+
+    // Meta requires value and currency for Purchase events
+    normalizedCustomData.value = finalValue;
+    normalizedCustomData.currency = finalCurrency;
+
+    // Log warning if value is 0 (shouldn't happen for real purchases)
+    if (finalValue === 0) {
+      console.warn('⚠️ Purchase event with value 0 - this may cause Meta validation issues');
+    }
   }
 
   if (typeof window !== 'undefined' && (window as any).fbq) {
