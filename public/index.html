@@ -75,8 +75,8 @@
     }
     </script>
     
-    <!-- Meta Pixel Code -->
-    <script>
+<!-- Meta Pixel Code -->
+<script>
       !(function(f,b,e,v,n,t,s){
         if(f.fbq) return; n=f.fbq=function(){n.callMethod ? n.callMethod.apply(n,arguments) : n.queue.push(arguments)};
         if(!f._fbq) f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0';
@@ -97,13 +97,22 @@
         }
         const pixelId = (config && config.facebookPixelId) || window.FB_PIXEL_ID;
         const advMatch = (config && config.advancedMatching) || window.FB_ADV_MATCH || {};
-        if (!pixelId) return;
+        if (!pixelId) {
+          console.warn('⚠️ [Meta Pixel] No Pixel ID configured');
+          return;
+        }
         window.FB_PIXEL_ID = pixelId;
         window.FB_ADV_MATCH = advMatch;
-        fbq('init', pixelId, advMatch);
-        fbq('consent', 'grant');
-        fbq('track', 'PageView');
-        window.__FB_PIXEL_READY__ = true;
+        console.log('🔵 [Meta Pixel] Initializing with Pixel ID:', pixelId);
+        try {
+          fbq('init', pixelId, advMatch);
+          fbq('consent', 'grant');
+          fbq('track', 'PageView');
+          window.__FB_PIXEL_READY__ = true;
+          console.log('✅ [Meta Pixel] Successfully initialized');
+        } catch (error) {
+          console.error('❌ [Meta Pixel] Initialization error:', error);
+        }
       };
 
       fetch('/api/content/tracking-settings')
@@ -119,7 +128,7 @@
           }
         })
         .catch(() => window.__initFacebookPixel());
-    </script>
+  </script>
     <noscript>
       <img height="1" width="1" style="display:none"
            src="https://www.facebook.com/tr?id=1718279882178157&ev=PageView&noscript=1"/>

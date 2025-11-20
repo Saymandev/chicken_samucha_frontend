@@ -31,24 +31,65 @@ export function trackBrowserAndServer(
       customData.price ??
       0;
 
-    // Ensure value is a valid positive number
-    const numericValue = Number(rawValue);
-    const finalValue = Number.isFinite(numericValue) && numericValue > 0
-      ? Number(numericValue.toFixed(2))
-      : 0;
+    console.log('🛒 [Meta Pixel] Purchase Event - Raw Data:', {
+      rawValue,
+      rawCurrency: customData.currency,
+      allCustomData: customData
+    });
 
-    // Ensure currency is a valid 3-letter ISO code
+    // Meta requires: value must be numeric and > 0
+    const numericValue = Number(rawValue);
+    let finalValue: number | undefined;
+    
+    if (Number.isFinite(numericValue) && numericValue > 0) {
+      // Format to 2 decimal places (e.g., 9.99 or 9.00)
+      // Meta allows decimals like 9.99 or whole numbers like 9
+      finalValue = Number(numericValue.toFixed(2));
+      console.log('✅ [Meta Pixel] Purchase Event - Value Valid:', {
+        rawValue,
+        numericValue,
+        finalValue,
+        isValid: finalValue > 0,
+        isNumeric: typeof finalValue === 'number'
+      });
+    } else {
+      // If value is invalid, log warning
+      console.warn('⚠️ [Meta Pixel] Purchase Event - Invalid Value:', {
+        rawValue,
+        numericValue,
+        reason: numericValue <= 0 ? 'Value must be > 0' : 'Value is not a number',
+        metaRequirement: 'Meta requires value > 0'
+      });
+      // Don't set value if it's invalid (Meta will reject it anyway)
+      finalValue = undefined;
+    }
+
+    // Ensure currency is a valid 3-letter ISO code (no extra characters)
     const rawCurrency = customData.currency || 'BDT';
-    const finalCurrency = String(rawCurrency).toUpperCase().substring(0, 3);
+    // Extract exactly 3 uppercase letters (e.g., "BDT", "USD")
+    const finalCurrency = String(rawCurrency).toUpperCase().substring(0, 3).replace(/[^A-Z]/g, '') || 'BDT';
+
+    console.log('💰 [Meta Pixel] Purchase Event - Currency:', {
+      rawCurrency,
+      finalCurrency,
+      isValid: finalCurrency.length === 3 && /^[A-Z]{3}$/.test(finalCurrency)
+    });
 
     // Meta requires value and currency for Purchase events
-    normalizedCustomData.value = finalValue;
+    if (finalValue !== undefined) {
+      normalizedCustomData.value = finalValue;
+    }
     normalizedCustomData.currency = finalCurrency;
 
-    // Log warning if value is 0 (shouldn't happen for real purchases)
-    if (finalValue === 0) {
-      console.warn('⚠️ Purchase event with value 0 - this may cause Meta validation issues');
-    }
+    console.log('📤 [Meta Pixel] Purchase Event - Final Data Being Sent:', {
+      value: normalizedCustomData.value,
+      currency: normalizedCustomData.currency,
+      hasValue: normalizedCustomData.value !== undefined,
+      hasCurrency: !!normalizedCustomData.currency,
+      meetsMetaRequirements: normalizedCustomData.value !== undefined && 
+                              normalizedCustomData.value > 0 && 
+                              normalizedCustomData.currency.length === 3
+    });
   }
 
   if (typeof window !== 'undefined' && (window as any).fbq) {
