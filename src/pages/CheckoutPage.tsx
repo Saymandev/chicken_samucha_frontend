@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import {
-    CreditCard,
-    MapPin,
-    Phone,
-    ShoppingCart,
-    User
+  CreditCard,
+  MapPin,
+  Phone,
+  ShoppingCart,
+  User
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -556,11 +556,19 @@ const CheckoutPage: React.FC = () => {
       if (response.data.success) {
         const orderNumber = response.data.order.orderNumber;
         try {
+          const toMoney = (amount: number) =>
+            Number((Number.isFinite(amount) ? amount : 0).toFixed(2));
+          const purchaseValue = toMoney(finalTotal);
           trackBrowserAndServer('Purchase', {
             customData: {
-              value: finalTotal,
+              value: purchaseValue,
               currency: 'BDT',
-              contents: cart.map((i) => ({ id: i.product.id, quantity: i.quantity })),
+              contents: cart.map((i) => ({
+                id: i.product.id,
+                quantity: i.quantity,
+                item_price: toMoney(i.price),
+              })),
+              content_ids: cart.map((i) => i.product.id),
               content_type: 'product',
               num_items: cart.length,
               order_id: orderNumber,

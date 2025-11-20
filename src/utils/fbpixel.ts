@@ -18,8 +18,27 @@ export function trackBrowserAndServer(
     eventSourceUrl?: string;
   } = {}
 ) {
+  const normalizedCustomData = { ...customData };
+
+  if (eventName === 'Purchase') {
+    const numericValue =
+      Number(
+        customData.value ??
+          customData.total ??
+          customData.totalAmount ??
+          customData.order_value ??
+          customData.finalAmount ??
+          customData.price
+      ) || 0;
+
+    normalizedCustomData.value = Number.isFinite(numericValue)
+      ? Number(numericValue.toFixed(2))
+      : 0;
+    normalizedCustomData.currency = (customData.currency || 'BDT').toUpperCase();
+  }
+
   if (typeof window !== 'undefined' && (window as any).fbq) {
-    (window as any).fbq('track', eventName, customData, { eventID: eventId });
+    (window as any).fbq('track', eventName, normalizedCustomData, { eventID: eventId });
   }
 
   api
@@ -28,7 +47,7 @@ export function trackBrowserAndServer(
       eventId,
       eventSourceUrl,
       userData,
-      customData,
+      customData: normalizedCustomData,
       eventTime: Math.floor(Date.now() / 1000),
     })
     .catch(() => {});

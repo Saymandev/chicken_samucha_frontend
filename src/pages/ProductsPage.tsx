@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Filter, Grid, List, Search } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -17,6 +17,7 @@ import {
 import ProductCard from '../components/product/ProductCard';
 import { Product, useStore } from '../store/useStore';
 import { categoriesAPI, productsAPI } from '../utils/api';
+import { trackBrowserAndServer } from '../utils/fbpixel';
 
 const ProductsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ const ProductsPage: React.FC = () => {
 // Categories fetched from API
 const [allCategories, setAllCategories] = useState<Array<{ slug: string; name: { en: string; bn: string } }>>([]);
 const [currentCategory, setCurrentCategory] = useState<any>(null);
+const lastTrackedCategory = useRef<string | null>(null);
 
   const sortOptions = [
     { value: 'featured', label: { en: 'Featured', bn: 'বৈশিষ্ট্য' } },
@@ -156,6 +158,21 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
     fetchCategoryDetails(selectedCategory);
   }, [selectedCategory]);
 
+  useEffect(() => {
+    if (!currentCategory?.slug) return;
+    if (lastTrackedCategory.current === currentCategory.slug) return;
+
+    trackBrowserAndServer('ViewCategory', {
+      customData: {
+        content_category: currentCategory.slug,
+        category_id: currentCategory._id,
+        category_name: currentCategory.name?.[language] || currentCategory.name?.en,
+      },
+    });
+
+    lastTrackedCategory.current = currentCategory.slug;
+  }, [currentCategory, language]);
+
   const fetchProducts = async (page = 1, isNewSearch = false) => {
     if (isNewSearch) {
       setLoading(true);
@@ -233,6 +250,19 @@ const [currentCategory, setCurrentCategory] = useState<any>(null);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     updateURLParams();
+
+    const trimmed = searchTerm.trim();
+    if (trimmed) {
+      trackBrowserAndServer('Search', {
+        customData: {
+          search_string: trimmed,
+          category: selectedCategory || undefined,
+          sort_by: sortBy,
+          min_price: priceRange.min,
+          max_price: priceRange.max,
+        },
+      });
+    }
   };
 
   const updateURLParams = () => {
