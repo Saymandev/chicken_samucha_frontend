@@ -149,7 +149,7 @@ const OrdersPage: React.FC = () => {
   useEffect(() => {
     if (!user) return;
 
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://rest.ourb.live/api';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://eco-dev.genify.live';
     const socket = io(API_BASE_URL, {
       transports: ['websocket', 'polling']
     });

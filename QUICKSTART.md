@@ -14,13 +14,16 @@ You need to update hardcoded API URLs to use environment variables or your produ
 - `src/App.tsx` - Update Socket.IO URL (line 122)
 
 **Replace this pattern:**
+
 ```typescript
-const API_BASE_URL = 'https://rest.ourb.live/api';
+const API_BASE_URL = "https://eco-dev.genify.live";
 ```
 
 **With this:**
+
 ```typescript
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://your-backend-domain.com/api';
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "https://your-backend-domain.com/api";
 ```
 
 ### 2. Update Backend CORS
@@ -29,20 +32,22 @@ In your backend `server.js`, update CORS to allow your frontend domain:
 
 ```javascript
 // Update around line 117-122
-app.use(cors({
-  origin: 'https://your-frontend-domain.com',  // Your new frontend URL
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: "https://your-frontend-domain.com", // Your new frontend URL
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 // Update Socket.IO CORS (around line 58-64)
 const io = socketio(server, {
   cors: {
-    origin: "https://your-frontend-domain.com",  // Your new frontend URL
+    origin: "https://your-frontend-domain.com", // Your new frontend URL
     methods: ["GET", "POST"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 ```
 
@@ -103,13 +108,13 @@ NODE_ENV=production
 
 ## ✨ What Was Created
 
-| File | Purpose |
-|------|---------|
-| `Dockerfile` | Multi-stage build: React build + Nginx server |
-| `nginx.conf` | Nginx configuration for serving React app |
-| `.dockerignore` | Files to exclude from Docker build |
-| `COOLIFY_DEPLOYMENT_GUIDE.md` | Comprehensive deployment guide |
-| `QUICKSTART.md` | This quick reference |
+| File                          | Purpose                                       |
+| ----------------------------- | --------------------------------------------- |
+| `Dockerfile`                  | Multi-stage build: React build + Nginx server |
+| `nginx.conf`                  | Nginx configuration for serving React app     |
+| `.dockerignore`               | Files to exclude from Docker build            |
+| `COOLIFY_DEPLOYMENT_GUIDE.md` | Comprehensive deployment guide                |
+| `QUICKSTART.md`               | This quick reference                          |
 
 ---
 
@@ -129,18 +134,22 @@ NODE_ENV=production
 ## 🔧 Common Issues
 
 ### "Connecting..." in Chat
+
 - Check backend CORS includes your frontend domain
 - Verify Socket.IO URLs are updated in the code
 
 ### CORS Errors
+
 - Update backend CORS origin to your frontend domain
 - Redeploy backend after changes
 
 ### 404 on Page Refresh
+
 - Already handled by `nginx.conf`
 - Verify the config file is included in the build
 
 ### Build Fails
+
 - Check Coolify build logs
 - Ensure all dependencies are in `package.json`
 - Try increasing memory limit if needed
@@ -150,6 +159,7 @@ NODE_ENV=production
 ## 📚 Full Documentation
 
 For detailed information, troubleshooting, and advanced configuration, see:
+
 - **`COOLIFY_DEPLOYMENT_GUIDE.md`** - Complete deployment guide
 
 ---
@@ -159,6 +169,7 @@ For detailed information, troubleshooting, and advanced configuration, see:
 Your frontend is now ready to deploy on Coolify!
 
 **Next Steps:**
+
 1. Update the API URLs in your code
 2. Update backend CORS settings
 3. Push to Git

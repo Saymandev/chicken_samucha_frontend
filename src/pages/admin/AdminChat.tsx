@@ -87,7 +87,7 @@ const AdminChat: React.FC = () => {
 
     useEffect(() => {
     const initializeSocket = () => {
-      const API_BASE_URL = 'https://rest.ourb.live/api';
+      const API_BASE_URL = 'https://eco-dev.genify.live';
       const socketURL = API_BASE_URL.replace('/api', '');
       
       socketRef.current = io(socketURL, {

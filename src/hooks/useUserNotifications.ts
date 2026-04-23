@@ -65,7 +65,7 @@ export const useUserNotifications = (userId?: string) => {
   useEffect(() => {
     if (!userId) return;
 
-    const API_BASE_URL = process.env.API_URL || 'https://rest.ourb.live/api';
+    const API_BASE_URL = process.env.API_URL || 'https://eco-dev.genify.live';
     const socketURL = API_BASE_URL.replace('/api', '');
     
     const newSocket = io(socketURL, {
