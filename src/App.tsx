@@ -127,7 +127,7 @@ function AppContent() {
     let socket: Socket | null = null;
 
     if (user?.id) {
-      const API_BASE_URL = process.env.API_URL || 'https://eco-dev.genify.live';
+      const API_BASE_URL = process.env.API_URL || 'https://eco-dev.genify.live/api';
       const socketURL = API_BASE_URL.replace('/api', '');
       
       socket = io(socketURL, {

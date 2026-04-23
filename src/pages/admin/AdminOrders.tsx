@@ -149,7 +149,7 @@ const AdminOrders: React.FC = () => {
 
   // Socket.IO connection for real-time updates
   useEffect(() => {
-    const API_BASE_URL = process.env.API_URL || 'https://eco-dev.genify.live';
+    const API_BASE_URL = process.env.API_URL || 'https://eco-dev.genify.live/api';
     const socketURL = API_BASE_URL.replace('/api', '');
     
     const newSocket = io(socketURL, {

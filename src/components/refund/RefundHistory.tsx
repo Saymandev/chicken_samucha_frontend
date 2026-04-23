@@ -77,7 +77,7 @@ const RefundHistory: React.FC = () => {
 
   // Real-time updates for refund status changes
   useEffect(() => {
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://eco-dev.genify.live';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://eco-dev.genify.live/api';
     const socket = io(API_BASE_URL, {
       transports: ['websocket', 'polling']
     });

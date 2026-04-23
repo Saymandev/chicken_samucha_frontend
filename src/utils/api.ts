@@ -29,7 +29,7 @@ const transformData = (data: any): any => {
   return data;
 };
 // changes made here
-const API_BASE_URL =  process.env.REACT_APP_API_URL || 'https://eco-dev.genify.live';
+const API_BASE_URL =  process.env.REACT_APP_API_URL || 'https://eco-dev.genify.live/api';
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,

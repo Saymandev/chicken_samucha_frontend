@@ -16,7 +16,7 @@ You need to update hardcoded API URLs to use environment variables or your produ
 **Replace this pattern:**
 
 ```typescript
-const API_BASE_URL = "https://eco-dev.genify.live";
+const API_BASE_URL = "https://eco-dev.genify.live/api";
 ```
 
 **With this:**
